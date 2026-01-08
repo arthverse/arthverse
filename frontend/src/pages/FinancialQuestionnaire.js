@@ -545,85 +545,350 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           {step === 2 && (
             <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
               <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">2. Expense Tracking</h2>
+              <p className="text-sm text-slate-600 mb-6">Fill in your monthly and yearly expenses. We've listed common categories.</p>
               
-              <div className="space-y-4">
-                <div className="flex justify-between items-center mb-4">
-                  <p className="text-sm text-slate-600">Add all your expenses (fixed & variable)</p>
-                  <Button
-                    type="button"
-                    onClick={() => addEntry('expense')}
-                    className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
-                    data-testid="add-expense-btn"
-                  >
-                    + Add Expense
-                  </Button>
+              <div className="space-y-6">
+                {/* Predefined Fixed Expenses */}
+                <div className="bg-orange-50 p-6 rounded-xl border border-brand-orange/20">
+                  <h3 className="text-lg font-semibold text-brand-orange mb-4">Fixed Expenses</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Rent (₹/month)</Label>
+                      <Input
+                        type="number"
+                        value={formData.rent_expense}
+                        onChange={(e) => setFormData({ ...formData, rent_expense: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">EMIs (₹/month)</Label>
+                      <Input
+                        type="number"
+                        value={formData.emis}
+                        onChange={(e) => setFormData({ ...formData, emis: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Term Insurance (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.term_insurance}
+                        onChange={(e) => setFormData({ ...formData, term_insurance: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Health Insurance (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.health_insurance}
+                        onChange={(e) => setFormData({ ...formData, health_insurance: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">2-Wheeler Insurance 1 (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicle_2w_1}
+                        onChange={(e) => setFormData({ ...formData, vehicle_2w_1: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">2-Wheeler Insurance 2 (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicle_2w_2}
+                        onChange={(e) => setFormData({ ...formData, vehicle_2w_2: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">4-Wheeler Insurance 1 (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicle_4w_1}
+                        onChange={(e) => setFormData({ ...formData, vehicle_4w_1: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">4-Wheeler Insurance 2 (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicle_4w_2}
+                        onChange={(e) => setFormData({ ...formData, vehicle_4w_2: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">4-Wheeler Insurance 3 (₹/year)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicle_4w_3}
+                        onChange={(e) => setFormData({ ...formData, vehicle_4w_3: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {formData.expense_entries.length === 0 ? (
-                  <div className="text-center py-8 bg-slate-50 rounded-xl">
-                    <p className="text-slate-500">No expenses added yet. Click "Add Expense" to start.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {formData.expense_entries.map((entry, index) => (
-                      <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`expense-entry-${index}`}>
-                        <div className="col-span-5">
-                          <Label className="text-xs">Type/Category</Label>
-                          <Input
-                            placeholder="e.g., Rent, Groceries, EMI"
-                            value={entry.type}
-                            onChange={(e) => updateEntry('expense', index, 'type', e.target.value)}
-                            className="mt-1"
-                            data-testid={`expense-type-${index}`}
-                          />
-                        </div>
-                        <div className="col-span-3">
-                          <Label className="text-xs">Amount (₹)</Label>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            value={entry.amount}
-                            onChange={(e) => updateEntry('expense', index, 'amount', e.target.value)}
-                            className="mt-1"
-                            data-testid={`expense-amount-${index}`}
-                          />
-                        </div>
-                        <div className="col-span-3">
-                          <Label className="text-xs">Frequency</Label>
-                          <Select
-                            value={entry.frequency}
-                            onValueChange={(value) => updateEntry('expense', index, 'frequency', value)}
-                          >
-                            <SelectTrigger className="mt-1" data-testid={`expense-frequency-${index}`}>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="monthly">Monthly</SelectItem>
-                              <SelectItem value="yearly">Yearly</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="col-span-1 flex items-end">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeEntry('expense', index)}
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                            data-testid={`remove-expense-${index}`}
-                          >
-                            <span className="text-lg">×</span>
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Predefined Variable Expenses */}
+                <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                  <h3 className="text-lg font-semibold text-red-600 mb-4">Variable Expenses (Monthly)</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Household - Maid</Label>
+                      <Input
+                        type="number"
+                        value={formData.household_maid}
+                        onChange={(e) => setFormData({ ...formData, household_maid: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
 
-                <div className="pt-4 border-t mt-6">
+                    <div>
+                      <Label className="text-sm font-medium">Groceries</Label>
+                      <Input
+                        type="number"
+                        value={formData.groceries}
+                        onChange={(e) => setFormData({ ...formData, groceries: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Food & Dining</Label>
+                      <Input
+                        type="number"
+                        value={formData.food_dining}
+                        onChange={(e) => setFormData({ ...formData, food_dining: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Fuel</Label>
+                      <Input
+                        type="number"
+                        value={formData.fuel}
+                        onChange={(e) => setFormData({ ...formData, fuel: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Travel</Label>
+                      <Input
+                        type="number"
+                        value={formData.travel}
+                        onChange={(e) => setFormData({ ...formData, travel: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Shopping</Label>
+                      <Input
+                        type="number"
+                        value={formData.shopping}
+                        onChange={(e) => setFormData({ ...formData, shopping: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Online Shopping</Label>
+                      <Input
+                        type="number"
+                        value={formData.online_shopping}
+                        onChange={(e) => setFormData({ ...formData, online_shopping: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Electronics</Label>
+                      <Input
+                        type="number"
+                        value={formData.electronics}
+                        onChange={(e) => setFormData({ ...formData, electronics: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Entertainment</Label>
+                      <Input
+                        type="number"
+                        value={formData.entertainment}
+                        onChange={(e) => setFormData({ ...formData, entertainment: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Telecom & Utilities</Label>
+                      <Input
+                        type="number"
+                        value={formData.telecom_utilities}
+                        onChange={(e) => setFormData({ ...formData, telecom_utilities: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Healthcare</Label>
+                      <Input
+                        type="number"
+                        value={formData.healthcare}
+                        onChange={(e) => setFormData({ ...formData, healthcare: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Education</Label>
+                      <Input
+                        type="number"
+                        value={formData.education}
+                        onChange={(e) => setFormData({ ...formData, education: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Cash Withdrawals</Label>
+                      <Input
+                        type="number"
+                        value={formData.cash_withdrawals}
+                        onChange={(e) => setFormData({ ...formData, cash_withdrawals: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Foreign Transactions</Label>
+                      <Input
+                        type="number"
+                        value={formData.foreign_transactions}
+                        onChange={(e) => setFormData({ ...formData, foreign_transactions: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Custom Expense Entries */}
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-brand-orange">Additional Expenses (Optional)</h3>
+                    <Button
+                      type="button"
+                      onClick={() => addEntry('expense')}
+                      className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
+                      data-testid="add-expense-btn"
+                    >
+                      + Add Custom Expense
+                    </Button>
+                  </div>
+
+                  {formData.expense_entries.length > 0 && (
+                    <div className="space-y-3">
+                      {formData.expense_entries.map((entry, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`expense-entry-${index}`}>
+                          <div className="col-span-5">
+                            <Label className="text-xs">Type/Category</Label>
+                            <Input
+                              placeholder="e.g., Pet Care, Subscriptions"
+                              value={entry.type}
+                              onChange={(e) => updateEntry('expense', index, 'type', e.target.value)}
+                              className="mt-1"
+                              data-testid={`expense-type-${index}`}
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs">Amount (₹)</Label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={entry.amount}
+                              onChange={(e) => updateEntry('expense', index, 'amount', e.target.value)}
+                              className="mt-1"
+                              data-testid={`expense-amount-${index}`}
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs">Frequency</Label>
+                            <Select
+                              value={entry.frequency}
+                              onValueChange={(value) => updateEntry('expense', index, 'frequency', value)}
+                            >
+                              <SelectTrigger className="mt-1" data-testid={`expense-frequency-${index}`}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="monthly">Monthly</SelectItem>
+                                <SelectItem value="yearly">Yearly</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-1 flex items-end">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeEntry('expense', index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                              data-testid={`remove-expense-${index}`}
+                            >
+                              <span className="text-lg">×</span>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-4 border-t mt-6 bg-red-50 p-4 rounded-xl">
                   <div className="flex justify-between items-center">
-                    <p className="text-sm text-slate-600">Total Monthly Expenses:</p>
-                    <p className="text-2xl font-bold font-mono text-red-600">₹{totalMonthlyExpenses.toLocaleString()}</p>
+                    <p className="text-sm font-semibold text-slate-700">Total Monthly Expenses:</p>
+                    <p className="text-3xl font-bold font-mono text-red-600">₹{Math.round(totalMonthlyExpenses).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
