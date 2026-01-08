@@ -1,0 +1,181 @@
+{
+  "identity": {
+    "persona": "E1",
+    "philosophy": "Fusion over Imitation. Emotion First. Content is King.",
+    "anti_patterns": [
+      "Generic Bootstrap layouts",
+      "Inter font for headings",
+      "Center-aligned everything",
+      "Gradient overload",
+      "Default Shadcn styling without customization"
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Plus Jakarta Sans",
+      "body": "DM Sans",
+      "mono": "JetBrains Mono"
+    },
+    "usage": {
+      "h1": "text-5xl md:text-7xl font-bold tracking-tight leading-none font-heading",
+      "h2": "text-3xl md:text-5xl font-semibold tracking-tight font-heading",
+      "h3": "text-2xl font-medium tracking-normal font-heading",
+      "body": "text-base md:text-lg leading-relaxed text-muted-foreground font-body",
+      "caption": "text-sm font-medium uppercase tracking-widest text-muted-foreground/80 font-mono",
+      "data": "font-mono text-sm tracking-tight"
+    },
+    "installation": "Import fonts via Google Fonts in index.css: @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');"
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "DEFAULT": "#0066FF",
+        "foreground": "#FFFFFF",
+        "50": "#EBF5FF",
+        "100": "#D1E6FF",
+        "500": "#0066FF",
+        "600": "#0052CC",
+        "900": "#002966"
+      },
+      "secondary": {
+        "DEFAULT": "#FF9500",
+        "foreground": "#FFFFFF",
+        "50": "#FFF8EB",
+        "100": "#FFEDCC",
+        "500": "#FF9500",
+        "600": "#CC7700",
+        "900": "#663C00"
+      },
+      "background": {
+        "light": "#F8FAFC",
+        "dark": "#020617"
+      },
+      "surface": {
+        "light": "#FFFFFF",
+        "dark": "#0F172A"
+      },
+      "neutral": {
+        "slate-50": "#F8FAFC",
+        "slate-100": "#F1F5F9",
+        "slate-200": "#E2E8F0",
+        "slate-800": "#1E293B",
+        "slate-900": "#0F172A",
+        "slate-950": "#020617"
+      }
+    },
+    "semantic": {
+      "profit": "#0066FF",
+      "loss": "#FF9500",
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444"
+    },
+    "tailwind_config_extension": {
+      "colors": {
+        "brand": {
+          "blue": "#0066FF",
+          "orange": "#FF9500"
+        }
+      },
+      "fontFamily": {
+        "heading": ["Plus Jakarta Sans", "sans-serif"],
+        "body": ["DM Sans", "sans-serif"],
+        "mono": ["JetBrains Mono", "monospace"]
+      }
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-white/70 dark:bg-slate-900/60 border border-white/20 shadow-sm",
+    "tracing_beam": "relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-brand-blue/20 before:to-transparent before:animate-shimmer",
+    "noise_texture": "bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay",
+    "shadows": {
+      "card": "shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300",
+      "glow": "shadow-[0_0_16px_rgba(0,102,255,0.3)]"
+    },
+    "borders": "border border-slate-200 dark:border-slate-800"
+  },
+  "grids": {
+    "dashboard": {
+      "name": "Control Room Grid",
+      "classes": "grid grid-cols-1 md:grid-cols-4 gap-4 p-4 md:p-6",
+      "items": {
+        "summary": "col-span-1 h-full",
+        "chart_main": "col-span-1 md:col-span-3 row-span-2 h-full",
+        "feed": "col-span-1 md:col-span-1 row-span-2 h-full"
+      }
+    },
+    "landing": {
+      "name": "Tetris Grid",
+      "classes": "grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 p-6 md:p-12",
+      "items": {
+        "hero": "col-span-full md:col-span-8 row-span-2",
+        "feature_tall": "col-span-full md:col-span-4 row-span-2",
+        "feature_box": "col-span-full md:col-span-4"
+      }
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-brand-blue text-white hover:bg-brand-blue/90 rounded-full px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-brand-blue/25 transition-all",
+      "secondary": "bg-white text-slate-900 border-2 border-slate-200 hover:border-brand-orange hover:text-brand-orange rounded-full px-8 py-6 text-lg font-medium transition-all",
+      "ghost": "text-slate-600 hover:text-brand-blue hover:bg-brand-blue/5 rounded-lg px-4 py-2"
+    },
+    "cards": {
+      "base": "bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8",
+      "interactive": "group cursor-pointer hover:-translate-y-1 transition-transform duration-300"
+    },
+    "inputs": {
+      "base": "h-12 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+    }
+  },
+  "image_urls": {
+    "hero": {
+      "url": "https://images.unsplash.com/photo-1765648763990-ad0ee9b546c9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMHByb2Zlc3Npb25hbCUyMGZpbmFuY2lhbCUyMHN1Y2Nlc3MlMjBsYXB0b3B8ZW58MHx8fHwxNzY3ODYwMzkwfDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Young professional managing finances",
+      "category": "landing_hero"
+    },
+    "shop_owner": {
+      "url": "https://images.unsplash.com/photo-1602631509855-c2acb7354655?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBzaG9wa2VlcGVyJTIwdXNpbmclMjBzbWFydHBob25lJTIwaGFwcHl8ZW58MHx8fHwxNzY3ODYwMzg4fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Small shop owner using app",
+      "category": "testimonials"
+    },
+    "abstract_chart": {
+      "url": "https://images.unsplash.com/photo-1640696085101-12085802bcf3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwzfHwzZCUyMGFic3RyYWN0JTIwZmluYW5jaWFsJTIwZ3Jvd3RoJTIwY2hhcnQlMjBibHVlJTIwb3JhbmdlfGVufDB8fHx8MTc2Nzg2MDM5MXww&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract financial growth visualization",
+      "category": "features_background"
+    },
+    "growth_concept": {
+      "url": "https://images.pexels.com/photos/6120215/pexels-photo-6120215.jpeg",
+      "alt": "Coins and growth concept",
+      "category": "financial_health"
+    }
+  },
+  "instructions_to_main_agent": {
+    "general": "You are building Arthvyay. Use the provided colors and fonts strictly. Do not revert to default Shadcn styles. Every page must feel 'directed' and intentional.",
+    "landing_page": "Use the 'Tetris Grid'. The Hero section should use the 'Young professional' image with a 'Tracing Beam' effect on the CTA. Use the 'Abstract chart' image as a subtle background texture for the Features section.",
+    "dashboard": "Use the 'Control Room Grid'. The 'Financial Health Score' must be the dominant visual element (Hero Card). Use Recharts for P&L and Balance Sheet visualizations, styling them with the brand palette (Blue for assets/profit, Orange for liabilities/loss).",
+    "mobile": "Ensure all grids collapse to single columns on mobile. Touch targets must be at least 44px. Use a bottom navigation bar for the mobile app view.",
+    "charts": "Use Recharts. Customize Tooltips to be dark with white text (glassmorphism). Use gradients in AreaCharts (fade from brand color to transparent).",
+    "accessibility": "Ensure text contrast is > 4.5:1. Use 'data-testid' on all interactive elements."
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use sonner for toasts. Sonner component are located in /app/src/components/ui/sonner.tsx"
+  ]
+}
