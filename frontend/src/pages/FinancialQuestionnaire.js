@@ -274,116 +274,86 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           {/* Step 2: Expense Tracking */}
           {step === 2 && (
             <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
-              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">2. Expense Tracking (Monthly)</h2>
+              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">2. Expense Tracking</h2>
               
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-brand-blue mb-3">Fixed Expenses</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Rent (₹/month)</Label>
-                      <Input
-                        type="number"
-                        value={formData.rent_expense}
-                        onChange={(e) => setFormData({ ...formData, rent_expense: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>EMIs (₹/month)</Label>
-                      <Input
-                        type="number"
-                        value={formData.emis}
-                        onChange={(e) => setFormData({ ...formData, emis: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Term Insurance (₹/year)</Label>
-                      <Input
-                        type="number"
-                        value={formData.term_insurance}
-                        onChange={(e) => setFormData({ ...formData, term_insurance: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Health Insurance (₹/year)</Label>
-                      <Input
-                        type="number"
-                        value={formData.health_insurance}
-                        onChange={(e) => setFormData({ ...formData, health_insurance: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-sm text-slate-600">Add all your expenses (fixed & variable)</p>
+                  <Button
+                    type="button"
+                    onClick={() => addEntry('expense')}
+                    className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
+                    data-testid="add-expense-btn"
+                  >
+                    + Add Expense
+                  </Button>
                 </div>
 
-                <div>
-                  <h3 className="text-lg font-semibold text-brand-blue mb-3">Variable Expenses</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Household - Maid</Label>
-                      <Input
-                        type="number"
-                        value={formData.household_maid}
-                        onChange={(e) => setFormData({ ...formData, household_maid: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
+                {formData.expense_entries.length === 0 ? (
+                  <div className="text-center py-8 bg-slate-50 rounded-xl">
+                    <p className="text-slate-500">No expenses added yet. Click "Add Expense" to start.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {formData.expense_entries.map((entry, index) => (
+                      <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`expense-entry-${index}`}>
+                        <div className="col-span-5">
+                          <Label className="text-xs">Type/Category</Label>
+                          <Input
+                            placeholder="e.g., Rent, Groceries, EMI"
+                            value={entry.type}
+                            onChange={(e) => updateEntry('expense', index, 'type', e.target.value)}
+                            className="mt-1"
+                            data-testid={`expense-type-${index}`}
+                          />
+                        </div>
+                        <div className="col-span-3">
+                          <Label className="text-xs">Amount (₹)</Label>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            value={entry.amount}
+                            onChange={(e) => updateEntry('expense', index, 'amount', e.target.value)}
+                            className="mt-1"
+                            data-testid={`expense-amount-${index}`}
+                          />
+                        </div>
+                        <div className="col-span-3">
+                          <Label className="text-xs">Frequency</Label>
+                          <Select
+                            value={entry.frequency}
+                            onValueChange={(value) => updateEntry('expense', index, 'frequency', value)}
+                          >
+                            <SelectTrigger className="mt-1" data-testid={`expense-frequency-${index}`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="yearly">Yearly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="col-span-1 flex items-end">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeEntry('expense', index)}
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            data-testid={`remove-expense-${index}`}
+                          >
+                            <span className="text-lg">×</span>
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                    <div>
-                      <Label>Groceries</Label>
-                      <Input
-                        type="number"
-                        value={formData.groceries}
-                        onChange={(e) => setFormData({ ...formData, groceries: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Food & Dining</Label>
-                      <Input
-                        type="number"
-                        value={formData.food_dining}
-                        onChange={(e) => setFormData({ ...formData, food_dining: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Fuel</Label>
-                      <Input
-                        type="number"
-                        value={formData.fuel}
-                        onChange={(e) => setFormData({ ...formData, fuel: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Shopping</Label>
-                      <Input
-                        type="number"
-                        value={formData.shopping}
-                        onChange={(e) => setFormData({ ...formData, shopping: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Entertainment</Label>
-                      <Input
-                        type="number"
-                        value={formData.entertainment}
-                        onChange={(e) => setFormData({ ...formData, entertainment: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
+                <div className="pt-4 border-t mt-6">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-slate-600">Total Monthly Expenses:</p>
+                    <p className="text-2xl font-bold font-mono text-red-600">₹{totalMonthlyExpenses.toLocaleString()}</p>
                   </div>
                 </div>
               </div>
