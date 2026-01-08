@@ -174,87 +174,98 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           {/* Step 1: Income Setup */}
           {step === 1 && (
             <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
-              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">1. Income Setup (Monthly)</h2>
+              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">1. Income Setup</h2>
               
               <div className="space-y-4">
-                <div>
-                  <Label className="font-semibold">Rental Income - Property 1 (₹/month)</Label>
-                  <Input
-                    type="number"
-                    value={formData.rental_income.property1}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      rental_income: { ...formData.rental_income, property1: e.target.value }
-                    })}
-                    className="mt-1"
-                  />
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-sm text-slate-600">Add all your income sources</p>
+                  <Button
+                    type="button"
+                    onClick={() => addEntry('income')}
+                    className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
+                    data-testid="add-income-btn"
+                  >
+                    + Add Income
+                  </Button>
                 </div>
 
-                <div>
-                  <Label className="font-semibold">Rental Income - Property 2 (₹/month)</Label>
-                  <Input
-                    type="number"
-                    value={formData.rental_income.property2}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      rental_income: { ...formData.rental_income, property2: e.target.value }
-                    })}
-                    className="mt-1"
-                  />
+                {formData.income_entries.length === 0 ? (
+                  <div className="text-center py-8 bg-slate-50 rounded-xl">
+                    <p className="text-slate-500">No income sources added yet. Click "Add Income" to start.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {formData.income_entries.map((entry, index) => (
+                      <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`income-entry-${index}`}>
+                        <div className="col-span-5">
+                          <Label className="text-xs">Type/Source</Label>
+                          <Input
+                            placeholder="e.g., Salary, Rental Income, Business"
+                            value={entry.type}
+                            onChange={(e) => updateEntry('income', index, 'type', e.target.value)}
+                            className="mt-1"
+                            data-testid={`income-type-${index}`}
+                          />
+                        </div>
+                        <div className="col-span-3">
+                          <Label className="text-xs">Amount (₹)</Label>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            value={entry.amount}
+                            onChange={(e) => updateEntry('income', index, 'amount', e.target.value)}
+                            className="mt-1"
+                            data-testid={`income-amount-${index}`}
+                          />
+                        </div>
+                        <div className="col-span-3">
+                          <Label className="text-xs">Frequency</Label>
+                          <Select
+                            value={entry.frequency}
+                            onValueChange={(value) => updateEntry('income', index, 'frequency', value)}
+                          >
+                            <SelectTrigger className="mt-1" data-testid={`income-frequency-${index}`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="yearly">Yearly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="col-span-1 flex items-end">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeEntry('income', index)}
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            data-testid={`remove-income-${index}`}
+                          >
+                            <span className="text-lg">×</span>
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="pt-4 border-t mt-6">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-slate-600">Total Monthly Income:</p>
+                    <p className="text-2xl font-bold font-mono text-green-600">₹{totalMonthlyIncome.toLocaleString()}</p>
+                  </div>
                 </div>
 
-                <div>
-                  <Label className="font-semibold">Salary Income (Yearly ₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.salary_income}
-                    onChange={(e) => setFormData({ ...formData, salary_income: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label className="font-semibold">Business Income (Yearly ₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.business_income}
-                    onChange={(e) => setFormData({ ...formData, business_income: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label className="font-semibold">Interest Income (Yearly ₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.interest_income}
-                    onChange={(e) => setFormData({ ...formData, interest_income: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label className="font-semibold">Dividend Income (Yearly ₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.dividend_income}
-                    onChange={(e) => setFormData({ ...formData, dividend_income: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
+                <div className="mt-4">
                   <Label className="font-semibold">Monthly Investment Amount (₹)</Label>
                   <Input
                     type="number"
                     value={formData.monthly_investment}
                     onChange={(e) => setFormData({ ...formData, monthly_investment: e.target.value })}
                     className="mt-1"
+                    placeholder="Amount you invest every month"
                   />
-                </div>
-
-                <div className="pt-4 border-t">
-                  <p className="text-sm text-slate-600">Total Monthly Income: ₹{totalMonthlyIncome.toLocaleString()}</p>
                 </div>
               </div>
             </Card>
