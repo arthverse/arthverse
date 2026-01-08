@@ -148,13 +148,10 @@ export default function Dashboard({ token, user, onLogout }) {
                     <p className="text-lg text-slate-700 font-body">Every month, you earn:</p>
                     <p className="text-3xl font-bold font-mono text-green-600">
                       ₹{(() => {
-                        const monthlyIncome = 
-                          (parseFloat(questionnaire.rental_income?.property1 || 0)) +
-                          (parseFloat(questionnaire.rental_income?.property2 || 0)) +
-                          (parseFloat(questionnaire.salary_income || 0) / 12) +
-                          (parseFloat(questionnaire.business_income || 0) / 12) +
-                          (parseFloat(questionnaire.interest_income || 0) / 12) +
-                          (parseFloat(questionnaire.dividend_income || 0) / 12);
+                        const monthlyIncome = (questionnaire.income_entries || []).reduce((sum, entry) => {
+                          const amount = parseFloat(entry.amount) || 0;
+                          return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                        }, 0);
                         return Math.round(monthlyIncome).toLocaleString();
                       })()}
                     </p>
@@ -164,20 +161,14 @@ export default function Dashboard({ token, user, onLogout }) {
                     <p className="text-lg text-slate-700 font-body">But only keep:</p>
                     <p className="text-3xl font-bold font-mono text-brand-blue">
                       ₹{(() => {
-                        const monthlyIncome = 
-                          (parseFloat(questionnaire.rental_income?.property1 || 0)) +
-                          (parseFloat(questionnaire.rental_income?.property2 || 0)) +
-                          (parseFloat(questionnaire.salary_income || 0) / 12) +
-                          (parseFloat(questionnaire.business_income || 0) / 12);
-                        const monthlyExpenses = 
-                          (parseFloat(questionnaire.rent_expense || 0)) +
-                          (parseFloat(questionnaire.emis || 0)) +
-                          (parseFloat(questionnaire.household_maid || 0)) +
-                          (parseFloat(questionnaire.groceries || 0)) +
-                          (parseFloat(questionnaire.food_dining || 0)) +
-                          (parseFloat(questionnaire.fuel || 0)) +
-                          (parseFloat(questionnaire.shopping || 0)) +
-                          (parseFloat(questionnaire.entertainment || 0));
+                        const monthlyIncome = (questionnaire.income_entries || []).reduce((sum, entry) => {
+                          const amount = parseFloat(entry.amount) || 0;
+                          return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                        }, 0);
+                        const monthlyExpenses = (questionnaire.expense_entries || []).reduce((sum, entry) => {
+                          const amount = parseFloat(entry.amount) || 0;
+                          return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                        }, 0);
                         const savings = monthlyIncome - monthlyExpenses;
                         const savingsRate = monthlyIncome > 0 ? (savings / monthlyIncome * 100) : 0;
                         return Math.round(savings).toLocaleString() + ' (' + Math.round(savingsRate) + '%)';
@@ -189,15 +180,10 @@ export default function Dashboard({ token, user, onLogout }) {
                     <p className="text-lg text-slate-700 font-body">You're losing:</p>
                     <p className="text-3xl font-bold font-mono text-brand-orange">
                       ₹{(() => {
-                        const monthlyExpenses = 
-                          (parseFloat(questionnaire.rent_expense || 0)) +
-                          (parseFloat(questionnaire.emis || 0)) +
-                          (parseFloat(questionnaire.household_maid || 0)) +
-                          (parseFloat(questionnaire.groceries || 0)) +
-                          (parseFloat(questionnaire.food_dining || 0)) +
-                          (parseFloat(questionnaire.fuel || 0)) +
-                          (parseFloat(questionnaire.shopping || 0)) +
-                          (parseFloat(questionnaire.entertainment || 0));
+                        const monthlyExpenses = (questionnaire.expense_entries || []).reduce((sum, entry) => {
+                          const amount = parseFloat(entry.amount) || 0;
+                          return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                        }, 0);
                         return Math.round(monthlyExpenses).toLocaleString();
                       })()} to expenses
                     </p>
