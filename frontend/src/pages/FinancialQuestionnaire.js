@@ -101,10 +101,66 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
 
     try {
       const payload = {
+        // Predefined income
+        rental_property1: parseFloat(formData.rental_property1) || 0,
+        rental_property2: parseFloat(formData.rental_property2) || 0,
+        salary_income: parseFloat(formData.salary_income) || 0,
+        business_income: parseFloat(formData.business_income) || 0,
+        interest_income: parseFloat(formData.interest_income) || 0,
+        dividend_income: parseFloat(formData.dividend_income) || 0,
+        capital_gains: parseFloat(formData.capital_gains) || 0,
+        freelance_income: parseFloat(formData.freelance_income) || 0,
+        other_income: parseFloat(formData.other_income) || 0,
+        
+        // Predefined expenses
+        rent_expense: parseFloat(formData.rent_expense) || 0,
+        emis: parseFloat(formData.emis) || 0,
+        term_insurance: parseFloat(formData.term_insurance) || 0,
+        health_insurance: parseFloat(formData.health_insurance) || 0,
+        vehicle_2w_1: parseFloat(formData.vehicle_2w_1) || 0,
+        vehicle_2w_2: parseFloat(formData.vehicle_2w_2) || 0,
+        vehicle_4w_1: parseFloat(formData.vehicle_4w_1) || 0,
+        vehicle_4w_2: parseFloat(formData.vehicle_4w_2) || 0,
+        vehicle_4w_3: parseFloat(formData.vehicle_4w_3) || 0,
+        household_maid: parseFloat(formData.household_maid) || 0,
+        groceries: parseFloat(formData.groceries) || 0,
+        food_dining: parseFloat(formData.food_dining) || 0,
+        fuel: parseFloat(formData.fuel) || 0,
+        travel: parseFloat(formData.travel) || 0,
+        shopping: parseFloat(formData.shopping) || 0,
+        online_shopping: parseFloat(formData.online_shopping) || 0,
+        electronics: parseFloat(formData.electronics) || 0,
+        entertainment: parseFloat(formData.entertainment) || 0,
+        telecom_utilities: parseFloat(formData.telecom_utilities) || 0,
+        healthcare: parseFloat(formData.healthcare) || 0,
+        education: parseFloat(formData.education) || 0,
+        cash_withdrawals: parseFloat(formData.cash_withdrawals) || 0,
+        foreign_transactions: parseFloat(formData.foreign_transactions) || 0,
+        
+        // Predefined assets
+        property_value: parseFloat(formData.property_value) || 0,
+        vehicles_value: parseFloat(formData.vehicles_value) || 0,
+        gold_value: parseFloat(formData.gold_value) || 0,
+        silver_value: parseFloat(formData.silver_value) || 0,
+        stocks_value: parseFloat(formData.stocks_value) || 0,
+        mutual_funds_value: parseFloat(formData.mutual_funds_value) || 0,
+        pf_nps_value: parseFloat(formData.pf_nps_value) || 0,
+        bank_balance: parseFloat(formData.bank_balance) || 0,
+        cash_in_hand: parseFloat(formData.cash_in_hand) || 0,
+        
+        // Predefined liabilities
+        home_loan: parseFloat(formData.home_loan) || 0,
+        personal_loan: parseFloat(formData.personal_loan) || 0,
+        vehicle_loan: parseFloat(formData.vehicle_loan) || 0,
+        credit_card_outstanding: parseFloat(formData.credit_card_outstanding) || 0,
+        
+        // Custom entries
         income_entries: formData.income_entries,
         expense_entries: formData.expense_entries,
         asset_entries: formData.asset_entries,
         liability_entries: formData.liability_entries,
+        
+        // Financial stability & others
         has_health_insurance: formData.has_health_insurance,
         has_term_insurance: formData.has_term_insurance,
         invests_in_mutual_funds: formData.invests_in_mutual_funds,
