@@ -183,23 +183,83 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     'OneCard', 'Jupiter Edge', 'Slice Card'
   ];
 
-  const totalMonthlyIncome = formData.income_entries.reduce((sum, entry) => {
-    const amount = parseFloat(entry.amount) || 0;
-    return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
-  }, 0);
+  // Calculate totals from both predefined and custom entries
+  const totalMonthlyIncome = 
+    // Predefined monthly income
+    (parseFloat(formData.rental_property1) || 0) +
+    (parseFloat(formData.rental_property2) || 0) +
+    // Predefined yearly income (convert to monthly)
+    ((parseFloat(formData.salary_income) || 0) / 12) +
+    ((parseFloat(formData.business_income) || 0) / 12) +
+    ((parseFloat(formData.interest_income) || 0) / 12) +
+    ((parseFloat(formData.dividend_income) || 0) / 12) +
+    ((parseFloat(formData.capital_gains) || 0) / 12) +
+    ((parseFloat(formData.freelance_income) || 0) / 12) +
+    ((parseFloat(formData.other_income) || 0) / 12) +
+    // Custom entries
+    formData.income_entries.reduce((sum, entry) => {
+      const amount = parseFloat(entry.amount) || 0;
+      return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+    }, 0);
 
-  const totalMonthlyExpenses = formData.expense_entries.reduce((sum, entry) => {
-    const amount = parseFloat(entry.amount) || 0;
-    return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
-  }, 0);
+  const totalMonthlyExpenses = 
+    // Predefined fixed monthly expenses
+    (parseFloat(formData.rent_expense) || 0) +
+    (parseFloat(formData.emis) || 0) +
+    ((parseFloat(formData.term_insurance) || 0) / 12) +
+    ((parseFloat(formData.health_insurance) || 0) / 12) +
+    ((parseFloat(formData.vehicle_2w_1) || 0) / 12) +
+    ((parseFloat(formData.vehicle_2w_2) || 0) / 12) +
+    ((parseFloat(formData.vehicle_4w_1) || 0) / 12) +
+    ((parseFloat(formData.vehicle_4w_2) || 0) / 12) +
+    ((parseFloat(formData.vehicle_4w_3) || 0) / 12) +
+    // Predefined variable monthly expenses
+    (parseFloat(formData.household_maid) || 0) +
+    (parseFloat(formData.groceries) || 0) +
+    (parseFloat(formData.food_dining) || 0) +
+    (parseFloat(formData.fuel) || 0) +
+    (parseFloat(formData.travel) || 0) +
+    (parseFloat(formData.shopping) || 0) +
+    (parseFloat(formData.online_shopping) || 0) +
+    (parseFloat(formData.electronics) || 0) +
+    (parseFloat(formData.entertainment) || 0) +
+    (parseFloat(formData.telecom_utilities) || 0) +
+    (parseFloat(formData.healthcare) || 0) +
+    (parseFloat(formData.education) || 0) +
+    (parseFloat(formData.cash_withdrawals) || 0) +
+    (parseFloat(formData.foreign_transactions) || 0) +
+    // Custom entries
+    formData.expense_entries.reduce((sum, entry) => {
+      const amount = parseFloat(entry.amount) || 0;
+      return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+    }, 0);
 
-  const totalAssets = formData.asset_entries.reduce((sum, entry) => {
-    return sum + (parseFloat(entry.amount) || 0);
-  }, 0);
+  const totalAssets = 
+    // Predefined assets
+    (parseFloat(formData.property_value) || 0) +
+    (parseFloat(formData.vehicles_value) || 0) +
+    (parseFloat(formData.gold_value) || 0) +
+    (parseFloat(formData.silver_value) || 0) +
+    (parseFloat(formData.stocks_value) || 0) +
+    (parseFloat(formData.mutual_funds_value) || 0) +
+    (parseFloat(formData.pf_nps_value) || 0) +
+    (parseFloat(formData.bank_balance) || 0) +
+    (parseFloat(formData.cash_in_hand) || 0) +
+    // Custom entries
+    formData.asset_entries.reduce((sum, entry) => {
+      return sum + (parseFloat(entry.amount) || 0);
+    }, 0);
 
-  const totalLiabilities = formData.liability_entries.reduce((sum, entry) => {
-    return sum + (parseFloat(entry.amount) || 0);
-  }, 0);
+  const totalLiabilities = 
+    // Predefined liabilities
+    (parseFloat(formData.home_loan) || 0) +
+    (parseFloat(formData.personal_loan) || 0) +
+    (parseFloat(formData.vehicle_loan) || 0) +
+    (parseFloat(formData.credit_card_outstanding) || 0) +
+    // Custom entries
+    formData.liability_entries.reduce((sum, entry) => {
+      return sum + (parseFloat(entry.amount) || 0);
+    }, 0);
 
   return (
     <Layout token={token} onLogout={onLogout}>
