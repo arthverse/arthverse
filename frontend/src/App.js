@@ -51,6 +51,10 @@ function App() {
 
           {/* Arthvyay App Routes */}
           <Route 
+            path="/arthvyay/questionnaire" 
+            element={token ? <FinancialQuestionnaire token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+          />
+          <Route 
             path="/arthvyay/dashboard" 
             element={token ? <Dashboard token={token} user={user} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
           />
