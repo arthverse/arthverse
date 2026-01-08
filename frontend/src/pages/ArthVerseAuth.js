@@ -77,6 +77,7 @@ export default function ArthVerseAuth({ onAuth }) {
             <span className="text-brand-blue">a</span>
             <span className="text-brand-orange">₹</span>
             <span className="text-brand-blue">th-verse</span>
+            <span className="text-brand-orange">.in</span>
           </div>
           <p className="text-slate-600 font-body">Universe Where Every Rupee Finds Its Place.</p>
         </div>
