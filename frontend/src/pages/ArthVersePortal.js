@@ -106,6 +106,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
               <span className="text-brand-blue">a</span>
               <span className="text-brand-orange">₹</span>
               <span className="text-brand-blue">th-verse</span>
+              <span className="text-brand-orange">.in</span>
             </div>
             
             <div className="flex items-center gap-4">
