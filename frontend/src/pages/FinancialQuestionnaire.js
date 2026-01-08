@@ -51,16 +51,18 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     setLoading(true);
 
     try {
-      // Convert nested objects to proper format
       const payload = {
-        ...formData,
-        rental_income: formData.rental_income,
-        vehicle_insurance: formData.vehicle_insurance,
-        other_loans: formData.other_loans,
-        salary_income: parseFloat(formData.salary_income) || 0,
-        business_income: parseFloat(formData.business_income) || 0,
-        interest_income: parseFloat(formData.interest_income) || 0,
-        dividend_income: parseFloat(formData.dividend_income) || 0,
+        income_entries: formData.income_entries,
+        expense_entries: formData.expense_entries,
+        asset_entries: formData.asset_entries,
+        liability_entries: formData.liability_entries,
+        has_health_insurance: formData.has_health_insurance,
+        has_term_insurance: formData.has_term_insurance,
+        invests_in_mutual_funds: formData.invests_in_mutual_funds,
+        takes_tds_refund: formData.takes_tds_refund,
+        has_emergency_fund: formData.has_emergency_fund,
+        files_itr_yearly: formData.files_itr_yearly,
+        credit_cards: formData.credit_cards,
         monthly_investment: parseFloat(formData.monthly_investment) || 0
       };
 
