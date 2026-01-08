@@ -406,6 +406,39 @@ async def categorize_expense(request: CategorizeExpenseRequest, credentials: HTT
     result = await categorize_with_ai(request.description, request.amount)
     return CategorizeExpenseResponse(**result)
 
+# ============= Questionnaire Routes =============
+
+@api_router.post("/questionnaire", response_model=QuestionnaireResponse)
+async def submit_questionnaire(questionnaire: FinancialQuestionnaire, credentials: HTTPAuthorizationCredentials = security):
+    user_id = await verify_token(credentials)
+    
+    questionnaire_data = questionnaire.dict()
+    questionnaire_data['user_id'] = user_id
+    questionnaire_data['completed_at'] = datetime.now(timezone.utc).isoformat()
+    
+    # Update or insert questionnaire
+    await db.questionnaires.update_one(
+        {"user_id": user_id},
+        {"$set": questionnaire_data},
+        upsert=True
+    )
+    
+    return QuestionnaireResponse(
+        message="Questionnaire saved successfully",
+        questionnaire=questionnaire
+    )
+
+@api_router.get("/questionnaire", response_model=FinancialQuestionnaire)
+async def get_questionnaire(credentials: HTTPAuthorizationCredentials = security):
+    user_id = await verify_token(credentials)
+    
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+    
+    if not questionnaire:
+        raise HTTPException(status_code=404, detail="Questionnaire not found")
+    
+    return FinancialQuestionnaire(**questionnaire)
+
 # ============= Reports Routes =============
 
 @api_router.get("/reports/health-score", response_model=FinancialHealthScore)
