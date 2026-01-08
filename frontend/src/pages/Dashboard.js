@@ -10,6 +10,8 @@ export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [questionnaire, setQuestionnaire] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
@@ -17,6 +19,22 @@ export default function Dashboard({ token, user, onLogout }) {
 
   const fetchData = async () => {
     try {
+      // Check if questionnaire is completed
+      let questionnaireData = null;
+      try {
+        const qResponse = await axios.get(`${API}/questionnaire`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        questionnaireData = qResponse.data;
+        setQuestionnaire(questionnaireData);
+      } catch (error) {
+        // Questionnaire not completed, redirect to setup
+        if (error.response?.status === 404) {
+          navigate('/arthvyay/questionnaire');
+          return;
+        }
+      }
+
       const [scoreRes, transactionsRes] = await Promise.all([
         axios.get(`${API}/reports/health-score`, {
           headers: { Authorization: `Bearer ${token}` }
