@@ -18,16 +18,65 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const [step, setStep] = useState(1);
   
   const [formData, setFormData] = useState({
-    // Income - Dynamic arrays
+    // Predefined Income fields
+    rental_property1: 0,
+    rental_property2: 0,
+    salary_income: 0,
+    business_income: 0,
+    interest_income: 0,
+    dividend_income: 0,
+    capital_gains: 0,
+    freelance_income: 0,
+    other_income: 0,
+    
+    // Predefined Expense fields - Fixed
+    rent_expense: 0,
+    emis: 0,
+    term_insurance: 0,
+    health_insurance: 0,
+    vehicle_2w_1: 0,
+    vehicle_2w_2: 0,
+    vehicle_4w_1: 0,
+    vehicle_4w_2: 0,
+    vehicle_4w_3: 0,
+    
+    // Predefined Expense fields - Variable
+    household_maid: 0,
+    groceries: 0,
+    food_dining: 0,
+    fuel: 0,
+    travel: 0,
+    shopping: 0,
+    online_shopping: 0,
+    electronics: 0,
+    entertainment: 0,
+    telecom_utilities: 0,
+    healthcare: 0,
+    education: 0,
+    cash_withdrawals: 0,
+    foreign_transactions: 0,
+    
+    // Predefined Assets
+    property_value: 0,
+    vehicles_value: 0,
+    gold_value: 0,
+    silver_value: 0,
+    stocks_value: 0,
+    mutual_funds_value: 0,
+    pf_nps_value: 0,
+    bank_balance: 0,
+    cash_in_hand: 0,
+    
+    // Predefined Liabilities
+    home_loan: 0,
+    personal_loan: 0,
+    vehicle_loan: 0,
+    credit_card_outstanding: 0,
+    
+    // Dynamic/Manual entries
     income_entries: [],
-    
-    // Expenses - Dynamic arrays
     expense_entries: [],
-    
-    // Assets - Dynamic arrays
     asset_entries: [],
-    
-    // Liabilities - Dynamic arrays
     liability_entries: [],
     
     // Financial Stability
