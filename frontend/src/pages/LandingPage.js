@@ -123,7 +123,8 @@ export default function LandingPage() {
           <div className="font-heading text-2xl font-bold mb-4">
             <span className="text-brand-blue">a</span>
             <span className="text-brand-orange">₹</span>
-            <span className="text-white">thvyay</span>
+            <span className="text-white">th</span>
+            <span className="text-brand-orange">vyay</span>
           </div>
           <p className="text-slate-400 font-body">Your balance sheet. Your life.</p>
           <p className="text-slate-500 text-sm mt-6">© 2025 Arthvyay. All rights reserved.</p>
