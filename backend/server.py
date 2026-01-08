@@ -219,7 +219,7 @@ async def login(credentials: UserLogin):
     return AuthResponse(token=token, user=user_response)
 
 @api_router.get("/auth/me", response_model=UserResponse)
-async def get_current_user(credentials: HTTPAuthorizationCredentials = security):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     user = await db.users.find_one({"id": user_id}, {"_id": 0})
     if not user:
