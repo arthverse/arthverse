@@ -132,21 +132,23 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     'OneCard', 'Jupiter Edge', 'Slice Card'
   ];
 
-  const totalMonthlyIncome = 
-    (parseFloat(formData.rental_income.property1) || 0) +
-    (parseFloat(formData.rental_income.property2) || 0) +
-    (parseFloat(formData.salary_income) || 0) / 12 +
-    (parseFloat(formData.business_income) || 0) / 12 +
-    (parseFloat(formData.interest_income) || 0) / 12 +
-    (parseFloat(formData.dividend_income) || 0) / 12;
+  const totalMonthlyIncome = formData.income_entries.reduce((sum, entry) => {
+    const amount = parseFloat(entry.amount) || 0;
+    return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+  }, 0);
 
-  const totalMonthlyExpenses =
-    (parseFloat(formData.rent_expense) || 0) +
-    (parseFloat(formData.emis) || 0) +
-    (parseFloat(formData.household_maid) || 0) +
-    (parseFloat(formData.groceries) || 0) +
-    (parseFloat(formData.food_dining) || 0) +
-    (parseFloat(formData.fuel) || 0);
+  const totalMonthlyExpenses = formData.expense_entries.reduce((sum, entry) => {
+    const amount = parseFloat(entry.amount) || 0;
+    return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+  }, 0);
+
+  const totalAssets = formData.asset_entries.reduce((sum, entry) => {
+    return sum + (parseFloat(entry.amount) || 0);
+  }, 0);
+
+  const totalLiabilities = formData.liability_entries.reduce((sum, entry) => {
+    return sum + (parseFloat(entry.amount) || 0);
+  }, 0);
 
   return (
     <Layout token={token} onLogout={onLogout}>
