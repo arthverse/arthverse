@@ -267,7 +267,7 @@ async def get_transactions(credentials: HTTPAuthorizationCredentials = Depends(s
     return [Transaction(**t) for t in transactions]
 
 @api_router.delete("/transactions/{transaction_id}")
-async def delete_transaction(transaction_id: str, credentials: HTTPAuthorizationCredentials = security):
+async def delete_transaction(transaction_id: str, credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     result = await db.transactions.delete_one({"id": transaction_id, "user_id": user_id})
