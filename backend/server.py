@@ -236,7 +236,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # ============= Transaction Routes =============
 
 @api_router.post("/transactions", response_model=Transaction)
-async def create_transaction(transaction_data: TransactionCreate, credentials: HTTPAuthorizationCredentials = security):
+async def create_transaction(transaction_data: TransactionCreate, credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     transaction_id = str(uuid.uuid4())
