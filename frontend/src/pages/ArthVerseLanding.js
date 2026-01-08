@@ -160,6 +160,7 @@ export default function ArthVerseLanding() {
             <span className="text-brand-blue">a</span>
             <span className="text-brand-orange">₹</span>
             <span className="text-white">th-verse</span>
+            <span className="text-brand-orange">.in</span>
           </div>
           <p className="text-slate-400 font-body">Universe Where Every Rupee Finds Its Place.</p>
           <p className="text-slate-500 text-sm mt-6">© 2025 ArthVerse. All rights reserved.</p>
