@@ -365,114 +365,148 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
               <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">3. Assets & Liabilities</h2>
               
-              <div className="space-y-6">
+              <div className="space-y-8">
+                {/* Assets Section */}
                 <div>
-                  <h3 className="text-lg font-semibold text-brand-blue mb-3">Assets</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Property Value (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.property_value}
-                        onChange={(e) => setFormData({ ...formData, property_value: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-brand-blue">Assets</h3>
+                    <Button
+                      type="button"
+                      onClick={() => addEntry('asset')}
+                      className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
+                      data-testid="add-asset-btn"
+                    >
+                      + Add Asset
+                    </Button>
+                  </div>
 
-                    <div>
-                      <Label>Vehicles Value (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.vehicles_value}
-                        onChange={(e) => setFormData({ ...formData, vehicles_value: e.target.value })}
-                        className="mt-1"
-                      />
+                  {formData.asset_entries.length === 0 ? (
+                    <div className="text-center py-6 bg-slate-50 rounded-xl">
+                      <p className="text-slate-500">No assets added yet.</p>
                     </div>
-
-                    <div>
-                      <Label>Stocks (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.stocks_value}
-                        onChange={(e) => setFormData({ ...formData, stocks_value: e.target.value })}
-                        className="mt-1"
-                      />
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.asset_entries.map((entry, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-green-50 rounded-xl" data-testid={`asset-entry-${index}`}>
+                          <div className="col-span-8">
+                            <Label className="text-xs">Asset Type</Label>
+                            <Input
+                              placeholder="e.g., Property, Stocks, Mutual Funds, Bank Balance"
+                              value={entry.type}
+                              onChange={(e) => updateEntry('asset', index, 'type', e.target.value)}
+                              className="mt-1"
+                              data-testid={`asset-type-${index}`}
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs">Value (₹)</Label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={entry.amount}
+                              onChange={(e) => updateEntry('asset', index, 'amount', e.target.value)}
+                              className="mt-1"
+                              data-testid={`asset-amount-${index}`}
+                            />
+                          </div>
+                          <div className="col-span-1 flex items-end">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeEntry('asset', index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                              data-testid={`remove-asset-${index}`}
+                            >
+                              <span className="text-lg">×</span>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
+                  )}
 
-                    <div>
-                      <Label>Mutual Funds (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.mutual_funds_value}
-                        onChange={(e) => setFormData({ ...formData, mutual_funds_value: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Bank Balance (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.bank_balance}
-                        onChange={(e) => setFormData({ ...formData, bank_balance: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Cash in Hand (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.cash_in_hand}
-                        onChange={(e) => setFormData({ ...formData, cash_in_hand: e.target.value })}
-                        className="mt-1"
-                      />
+                  <div className="pt-3 border-t mt-4">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm text-slate-600">Total Assets:</p>
+                      <p className="text-xl font-bold font-mono text-green-600">₹{totalAssets.toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
 
+                {/* Liabilities Section */}
                 <div>
-                  <h3 className="text-lg font-semibold text-brand-orange mb-3">Liabilities</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Home Loan (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.home_loan}
-                        onChange={(e) => setFormData({ ...formData, home_loan: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-brand-orange">Liabilities</h3>
+                    <Button
+                      type="button"
+                      onClick={() => addEntry('liability')}
+                      className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
+                      data-testid="add-liability-btn"
+                    >
+                      + Add Liability
+                    </Button>
+                  </div>
 
-                    <div>
-                      <Label>Personal Loan (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.personal_loan}
-                        onChange={(e) => setFormData({ ...formData, personal_loan: e.target.value })}
-                        className="mt-1"
-                      />
+                  {formData.liability_entries.length === 0 ? (
+                    <div className="text-center py-6 bg-slate-50 rounded-xl">
+                      <p className="text-slate-500">No liabilities added yet.</p>
                     </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.liability_entries.map((entry, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-red-50 rounded-xl" data-testid={`liability-entry-${index}`}>
+                          <div className="col-span-8">
+                            <Label className="text-xs">Liability Type</Label>
+                            <Input
+                              placeholder="e.g., Home Loan, Personal Loan, Credit Card"
+                              value={entry.type}
+                              onChange={(e) => updateEntry('liability', index, 'type', e.target.value)}
+                              className="mt-1"
+                              data-testid={`liability-type-${index}`}
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs">Amount (₹)</Label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={entry.amount}
+                              onChange={(e) => updateEntry('liability', index, 'amount', e.target.value)}
+                              className="mt-1"
+                              data-testid={`liability-amount-${index}`}
+                            />
+                          </div>
+                          <div className="col-span-1 flex items-end">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeEntry('liability', index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                              data-testid={`remove-liability-${index}`}
+                            >
+                              <span className="text-lg">×</span>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                    <div>
-                      <Label>Vehicle Loan (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.vehicle_loan}
-                        onChange={(e) => setFormData({ ...formData, vehicle_loan: e.target.value })}
-                        className="mt-1"
-                      />
+                  <div className="pt-3 border-t mt-4">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm text-slate-600">Total Liabilities:</p>
+                      <p className="text-xl font-bold font-mono text-red-600">₹{totalLiabilities.toLocaleString()}</p>
                     </div>
+                  </div>
+                </div>
 
-                    <div>
-                      <Label>Credit Card Outstanding (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.credit_card_outstanding}
-                        onChange={(e) => setFormData({ ...formData, credit_card_outstanding: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
+                {/* Net Worth Calculation */}
+                <div className="bg-brand-blue/10 rounded-xl p-6 border-2 border-brand-blue/20">
+                  <div className="flex justify-between items-center">
+                    <p className="text-lg font-semibold text-slate-700">Net Worth:</p>
+                    <p className="text-3xl font-bold font-mono text-brand-blue">₹{(totalAssets - totalLiabilities).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
