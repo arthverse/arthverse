@@ -23,7 +23,8 @@ export default function Layout({ children, token, onLogout }) {
               <Link to="/arthvyay/dashboard" className="font-heading text-2xl font-bold" data-testid="logo-link">
                 <span className="text-brand-blue">a</span>
                 <span className="text-brand-orange">₹</span>
-                <span className="text-brand-blue">thvyay</span>
+                <span className="text-brand-blue">th</span>
+                <span className="text-brand-orange">vyay</span>
               </Link>
               
               <div className="hidden md:flex gap-2" data-testid="nav-links">
