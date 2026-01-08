@@ -193,10 +193,37 @@ export default function Dashboard({ token, user, onLogout }) {
                     <p className="text-lg text-slate-700 font-body">You're losing:</p>
                     <p className="text-3xl font-bold font-mono text-brand-orange">
                       ₹{(() => {
-                        const monthlyExpenses = (questionnaire.expense_entries || []).reduce((sum, entry) => {
-                          const amount = parseFloat(entry.amount) || 0;
-                          return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
-                        }, 0);
+                        const monthlyExpenses = 
+                          // Predefined monthly
+                          (parseFloat(questionnaire.rent_expense) || 0) +
+                          (parseFloat(questionnaire.emis) || 0) +
+                          (parseFloat(questionnaire.household_maid) || 0) +
+                          (parseFloat(questionnaire.groceries) || 0) +
+                          (parseFloat(questionnaire.food_dining) || 0) +
+                          (parseFloat(questionnaire.fuel) || 0) +
+                          (parseFloat(questionnaire.travel) || 0) +
+                          (parseFloat(questionnaire.shopping) || 0) +
+                          (parseFloat(questionnaire.online_shopping) || 0) +
+                          (parseFloat(questionnaire.electronics) || 0) +
+                          (parseFloat(questionnaire.entertainment) || 0) +
+                          (parseFloat(questionnaire.telecom_utilities) || 0) +
+                          (parseFloat(questionnaire.healthcare) || 0) +
+                          (parseFloat(questionnaire.education) || 0) +
+                          (parseFloat(questionnaire.cash_withdrawals) || 0) +
+                          (parseFloat(questionnaire.foreign_transactions) || 0) +
+                          // Predefined yearly to monthly
+                          ((parseFloat(questionnaire.term_insurance) || 0) / 12) +
+                          ((parseFloat(questionnaire.health_insurance) || 0) / 12) +
+                          ((parseFloat(questionnaire.vehicle_2w_1) || 0) / 12) +
+                          ((parseFloat(questionnaire.vehicle_2w_2) || 0) / 12) +
+                          ((parseFloat(questionnaire.vehicle_4w_1) || 0) / 12) +
+                          ((parseFloat(questionnaire.vehicle_4w_2) || 0) / 12) +
+                          ((parseFloat(questionnaire.vehicle_4w_3) || 0) / 12) +
+                          // Custom entries
+                          (questionnaire.expense_entries || []).reduce((sum, entry) => {
+                            const amount = parseFloat(entry.amount) || 0;
+                            return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                          }, 0);
                         return Math.round(monthlyExpenses).toLocaleString();
                       })()} to expenses
                     </p>
