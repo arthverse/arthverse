@@ -233,7 +233,7 @@ async def register(user_data: UserCreate):
 
 @api_router.post("/auth/login", response_model=AuthResponse)
 async def login(credentials: UserLogin):
-    user = await db.users.find_one({"email": credentials.email}, {"_id": 0})
+    user = await db.users.find_one({"client_id": credentials.client_id}, {"_id": 0})
     if not user or not verify_password(credentials.password, user['password_hash']):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
@@ -241,10 +241,17 @@ async def login(credentials: UserLogin):
     
     user_response = UserResponse(
         id=user['id'],
+        client_id=user['client_id'],
         email=user['email'],
         name=user['name'],
+        mobile_number=user['mobile_number'],
+        age=user['age'],
+        city=user['city'],
+        marital_status=user['marital_status'],
+        no_of_dependents=user['no_of_dependents'],
         monthly_income=user['monthly_income'],
-        created_at=user['created_at']
+        created_at=user['created_at'],
+        networth=user.get('networth', 0)
     )
     
     return AuthResponse(token=token, user=user_response)
