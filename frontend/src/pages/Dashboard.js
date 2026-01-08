@@ -136,30 +136,125 @@ export default function Dashboard({ token, user, onLogout }) {
             </div>
           </div>
 
-          <div className="col-span-1 md:col-span-4 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm" data-testid="recent-transactions-card">
-            <h3 className="text-xl font-semibold font-heading mb-4">Recent Transactions</h3>
-            <div className="space-y-3">
-              {recentTransactions.length === 0 ? (
-                <p className="text-slate-500 text-center py-8" data-testid="no-transactions-message">No transactions yet. Add your first transaction!</p>
-              ) : (
-                recentTransactions.map((transaction, idx) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors" data-testid={`transaction-${idx}`}>
-                    <div>
-                      <p className="font-medium font-body">{transaction.description}</p>
-                      <p className="text-sm text-slate-500 font-mono">{transaction.category}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className={`font-bold font-mono ${
-                        transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.type === 'income' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
+          {/* Your Money Story */}
+          <div className="col-span-1 md:col-span-4 bg-gradient-to-br from-brand-orange/10 to-brand-blue/10 rounded-2xl p-8 border-2 border-brand-blue/20 shadow-sm" data-testid="money-story-card">
+            <h3 className="text-2xl font-bold font-heading mb-6 text-brand-blue">YOUR MONEY STORY</h3>
+            
+            {questionnaire ? (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-lg text-slate-700 font-body">Every month, you earn:</p>
+                    <p className="text-3xl font-bold font-mono text-green-600">
+                      ₹{(() => {
+                        const monthlyIncome = 
+                          (parseFloat(questionnaire.rental_income?.property1 || 0)) +
+                          (parseFloat(questionnaire.rental_income?.property2 || 0)) +
+                          (parseFloat(questionnaire.salary_income || 0) / 12) +
+                          (parseFloat(questionnaire.business_income || 0) / 12) +
+                          (parseFloat(questionnaire.interest_income || 0) / 12) +
+                          (parseFloat(questionnaire.dividend_income || 0) / 12);
+                        return Math.round(monthlyIncome).toLocaleString();
+                      })()}
+                    </p>
+                  </div>
+
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-lg text-slate-700 font-body">But only keep:</p>
+                    <p className="text-3xl font-bold font-mono text-brand-blue">
+                      ₹{(() => {
+                        const monthlyIncome = 
+                          (parseFloat(questionnaire.rental_income?.property1 || 0)) +
+                          (parseFloat(questionnaire.rental_income?.property2 || 0)) +
+                          (parseFloat(questionnaire.salary_income || 0) / 12) +
+                          (parseFloat(questionnaire.business_income || 0) / 12);
+                        const monthlyExpenses = 
+                          (parseFloat(questionnaire.rent_expense || 0)) +
+                          (parseFloat(questionnaire.emis || 0)) +
+                          (parseFloat(questionnaire.household_maid || 0)) +
+                          (parseFloat(questionnaire.groceries || 0)) +
+                          (parseFloat(questionnaire.food_dining || 0)) +
+                          (parseFloat(questionnaire.fuel || 0)) +
+                          (parseFloat(questionnaire.shopping || 0)) +
+                          (parseFloat(questionnaire.entertainment || 0));
+                        const savings = monthlyIncome - monthlyExpenses;
+                        const savingsRate = monthlyIncome > 0 ? (savings / monthlyIncome * 100) : 0;
+                        return Math.round(savings).toLocaleString() + ' (' + Math.round(savingsRate) + '%)';
+                      })()}
+                    </p>
+                  </div>
+
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-lg text-slate-700 font-body">You're losing:</p>
+                    <p className="text-3xl font-bold font-mono text-brand-orange">
+                      ₹{(() => {
+                        const monthlyExpenses = 
+                          (parseFloat(questionnaire.rent_expense || 0)) +
+                          (parseFloat(questionnaire.emis || 0)) +
+                          (parseFloat(questionnaire.household_maid || 0)) +
+                          (parseFloat(questionnaire.groceries || 0)) +
+                          (parseFloat(questionnaire.food_dining || 0)) +
+                          (parseFloat(questionnaire.fuel || 0)) +
+                          (parseFloat(questionnaire.shopping || 0)) +
+                          (parseFloat(questionnaire.entertainment || 0));
+                        return Math.round(monthlyExpenses).toLocaleString();
+                      })()} to expenses
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t-2 border-brand-blue/20">
+                  <p className="text-lg text-slate-700 font-body mb-3">At this rate, in 10 years you'll have:</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/60 rounded-xl p-4">
+                      <p className="text-sm text-slate-600 mb-1">Saved:</p>
+                      <p className="text-2xl font-bold font-mono text-green-600">
+                        ₹{(() => {
+                          const monthlyIncome = 
+                            (parseFloat(questionnaire.rental_income?.property1 || 0)) +
+                            (parseFloat(questionnaire.rental_income?.property2 || 0)) +
+                            (parseFloat(questionnaire.salary_income || 0) / 12);
+                          const monthlyExpenses = 
+                            (parseFloat(questionnaire.rent_expense || 0)) +
+                            (parseFloat(questionnaire.emis || 0)) +
+                            (parseFloat(questionnaire.household_maid || 0)) +
+                            (parseFloat(questionnaire.groceries || 0)) +
+                            (parseFloat(questionnaire.food_dining || 0));
+                          const monthlySavings = monthlyIncome - monthlyExpenses;
+                          const tenYearSavings = monthlySavings * 12 * 10;
+                          return (tenYearSavings / 100000).toFixed(1) + 'L';
+                        })()}
                       </p>
-                      <p className="text-xs text-slate-500">{new Date(transaction.date).toLocaleDateString()}</p>
+                    </div>
+
+                    <div className="bg-white/60 rounded-xl p-4">
+                      <p className="text-sm text-slate-600 mb-1">Could have:</p>
+                      <p className="text-2xl font-bold font-mono text-brand-blue">
+                        ₹{(() => {
+                          const monthlyIncome = 
+                            (parseFloat(questionnaire.rental_income?.property1 || 0)) +
+                            (parseFloat(questionnaire.rental_income?.property2 || 0)) +
+                            (parseFloat(questionnaire.salary_income || 0) / 12);
+                          const potentialSavings = monthlyIncome * 0.5; // Assuming 50% savings rate
+                          const tenYearPotential = potentialSavings * 12 * 10 * 1.12; // With 12% returns
+                          return (tenYearPotential / 100000).toFixed(1) + 'L';
+                        })()}
+                      </p>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-slate-500 mb-4">Complete your financial profile to see your money story</p>
+                <Button 
+                  onClick={() => navigate('/arthvyay/questionnaire')}
+                  className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
+                >
+                  Complete Profile
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
