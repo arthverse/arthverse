@@ -148,10 +148,23 @@ export default function Dashboard({ token, user, onLogout }) {
                     <p className="text-lg text-slate-700 font-body">Every month, you earn:</p>
                     <p className="text-3xl font-bold font-mono text-green-600">
                       ₹{(() => {
-                        const monthlyIncome = (questionnaire.income_entries || []).reduce((sum, entry) => {
-                          const amount = parseFloat(entry.amount) || 0;
-                          return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
-                        }, 0);
+                        const monthlyIncome = 
+                          // Predefined monthly
+                          (parseFloat(questionnaire.rental_property1) || 0) +
+                          (parseFloat(questionnaire.rental_property2) || 0) +
+                          // Predefined yearly to monthly
+                          ((parseFloat(questionnaire.salary_income) || 0) / 12) +
+                          ((parseFloat(questionnaire.business_income) || 0) / 12) +
+                          ((parseFloat(questionnaire.interest_income) || 0) / 12) +
+                          ((parseFloat(questionnaire.dividend_income) || 0) / 12) +
+                          ((parseFloat(questionnaire.capital_gains) || 0) / 12) +
+                          ((parseFloat(questionnaire.freelance_income) || 0) / 12) +
+                          ((parseFloat(questionnaire.other_income) || 0) / 12) +
+                          // Custom entries
+                          (questionnaire.income_entries || []).reduce((sum, entry) => {
+                            const amount = parseFloat(entry.amount) || 0;
+                            return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                          }, 0);
                         return Math.round(monthlyIncome).toLocaleString();
                       })()}
                     </p>
