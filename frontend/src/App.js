@@ -5,6 +5,7 @@ import ArthVerseLanding from './pages/ArthVerseLanding';
 import ArthVerseAuth from './pages/ArthVerseAuth';
 import ArthVersePortal from './pages/ArthVersePortal';
 import Dashboard from './pages/Dashboard';
+import FinancialQuestionnaire from './pages/FinancialQuestionnaire';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
 import { Toaster } from './components/ui/sonner';
