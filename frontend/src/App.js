@@ -1,8 +1,9 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import LandingPage from './pages/LandingPage';
-import AuthPage from './pages/AuthPage';
+import ArthVerseLanding from './pages/ArthVerseLanding';
+import ArthVerseAuth from './pages/ArthVerseAuth';
+import ArthVersePortal from './pages/ArthVersePortal';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
@@ -39,19 +40,26 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={!token ? <LandingPage /> : <Navigate to="/dashboard" />} />
-          <Route path="/auth" element={!token ? <AuthPage onAuth={handleAuth} /> : <Navigate to="/dashboard" />} />
+          {/* ArthVerse Main Routes */}
+          <Route path="/" element={!token ? <ArthVerseLanding /> : <Navigate to="/arthverse/portal" />} />
+          <Route path="/arthverse/auth" element={!token ? <ArthVerseAuth onAuth={handleAuth} /> : <Navigate to="/arthverse/portal" />} />
           <Route 
-            path="/dashboard" 
-            element={token ? <Dashboard token={token} user={user} onLogout={handleLogout} /> : <Navigate to="/auth" />} 
+            path="/arthverse/portal" 
+            element={token ? <ArthVersePortal token={token} user={user} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+          />
+
+          {/* Arthvyay App Routes */}
+          <Route 
+            path="/arthvyay/dashboard" 
+            element={token ? <Dashboard token={token} user={user} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
           />
           <Route 
-            path="/transactions" 
-            element={token ? <Transactions token={token} onLogout={handleLogout} /> : <Navigate to="/auth" />} 
+            path="/arthvyay/transactions" 
+            element={token ? <Transactions token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
           />
           <Route 
-            path="/reports" 
-            element={token ? <Reports token={token} onLogout={handleLogout} /> : <Navigate to="/auth" />} 
+            path="/arthvyay/reports" 
+            element={token ? <Reports token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
           />
         </Routes>
       </BrowserRouter>
