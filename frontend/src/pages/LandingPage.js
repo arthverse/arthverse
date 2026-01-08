@@ -11,7 +11,8 @@ export default function LandingPage() {
             <div className="font-heading text-2xl font-bold">
               <span className="text-brand-blue">a</span>
               <span className="text-brand-orange">₹</span>
-              <span className="text-brand-blue">thvyay</span>
+              <span className="text-brand-blue">th</span>
+              <span className="text-brand-orange">vyay</span>
             </div>
           </div>
           <Link to="/auth" data-testid="nav-login-btn">
