@@ -279,7 +279,7 @@ async def delete_transaction(transaction_id: str, credentials: HTTPAuthorization
 # ============= AI Routes =============
 
 @api_router.post("/ai/categorize", response_model=CategorizeExpenseResponse)
-async def categorize_expense(request: CategorizeExpenseRequest, credentials: HTTPAuthorizationCredentials = security):
+async def categorize_expense(request: CategorizeExpenseRequest, credentials: HTTPAuthorizationCredentials = Depends(security)):
     await verify_token(credentials)
     
     result = await categorize_with_ai(request.description, request.amount)
