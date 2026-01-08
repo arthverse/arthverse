@@ -18,67 +18,17 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const [step, setStep] = useState(1);
   
   const [formData, setFormData] = useState({
-    // Income
-    rental_income: { property1: 0, property2: 0 },
-    salary_income: 0,
-    business_income: 0,
-    interest_income: 0,
-    dividend_income: 0,
-    capital_gains: 0,
-    freelance_income: 0,
-    other_income: 0,
-    stable_income: 'Yes',
+    // Income - Dynamic arrays
+    income_entries: [],
     
-    // Fixed Expenses
-    rent_expense: 0,
-    emis: 0,
-    term_insurance: 0,
-    health_insurance: 0,
-    vehicle_insurance: {
-      two_wheeler_1: 0,
-      two_wheeler_2: 0,
-      two_wheeler_3: 0,
-      four_wheeler_1: 0,
-      four_wheeler_2: 0,
-      four_wheeler_3: 0
-    },
+    // Expenses - Dynamic arrays
+    expense_entries: [],
     
-    // Variable Expenses
-    household_maid: 0,
-    groceries: 0,
-    food_dining: 0,
-    fuel: 0,
-    travel: 0,
-    shopping: 0,
-    online_shopping: 0,
-    electronics: 0,
-    entertainment: 0,
-    telecom_utilities: 0,
-    healthcare: 0,
-    education: 0,
-    insurance_premiums: 0,
-    other_expenses: 0,
-    cash_withdrawals: 0,
-    foreign_transactions: 0,
+    // Assets - Dynamic arrays
+    asset_entries: [],
     
-    // Assets
-    property_value: 0,
-    vehicles_value: 0,
-    gold_value: 0,
-    silver_value: 0,
-    business_investment: 0,
-    stocks_value: 0,
-    mutual_funds_value: 0,
-    pf_nps_value: 0,
-    bank_balance: 0,
-    cash_in_hand: 0,
-    
-    // Liabilities
-    home_loan: 0,
-    personal_loan: 0,
-    vehicle_loan: 0,
-    credit_card_outstanding: 0,
-    other_loans: {},
+    // Liabilities - Dynamic arrays
+    liability_entries: [],
     
     // Financial Stability
     has_health_insurance: false,
