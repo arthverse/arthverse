@@ -256,7 +256,7 @@ async def create_transaction(transaction_data: TransactionCreate, credentials: H
     return Transaction(**transaction_doc)
 
 @api_router.get("/transactions", response_model=List[Transaction])
-async def get_transactions(credentials: HTTPAuthorizationCredentials = security, limit: int = 100):
+async def get_transactions(credentials: HTTPAuthorizationCredentials = Depends(security), limit: int = 100):
     user_id = await verify_token(credentials)
     
     transactions = await db.transactions.find(
