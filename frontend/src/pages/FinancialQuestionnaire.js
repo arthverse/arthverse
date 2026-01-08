@@ -94,6 +94,33 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     });
   };
 
+  // Helper functions for dynamic entries
+  const addEntry = (type) => {
+    const key = `${type}_entries`;
+    setFormData({
+      ...formData,
+      [key]: [...formData[key], { type: '', amount: 0, frequency: 'monthly' }]
+    });
+  };
+
+  const removeEntry = (type, index) => {
+    const key = `${type}_entries`;
+    setFormData({
+      ...formData,
+      [key]: formData[key].filter((_, i) => i !== index)
+    });
+  };
+
+  const updateEntry = (type, index, field, value) => {
+    const key = `${type}_entries`;
+    const updated = [...formData[key]];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({
+      ...formData,
+      [key]: updated
+    });
+  };
+
   const creditCardsList = [
     'HDFC Bank INFINIA Metal Edition', 'HDFC Regalia Gold', 'HDFC Millennia',
     'SBI CASHBACK', 'SBI SimplyCLICK', 'SBI Card PRIME',
