@@ -1,7 +1,3 @@
-#====================================================================================================
-# START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
-#====================================================================================================
-
 # THIS SECTION CONTAINS CRITICAL TESTING INSTRUCTIONS FOR BOTH AGENTS
 # BOTH MAIN_AGENT AND TESTING_AGENT MUST PRESERVE THIS ENTIRE BLOCK
 
@@ -101,3 +97,152 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build Arthverse - a personal finance super-app with six sub-applications. The main focus is on Arthvyay (Expense Tracking) which includes a comprehensive Financial Questionnaire with predefined and custom fields for Income, Expenses, Assets, and Liabilities."
+
+backend:
+  - task: "User Authentication (Login/Signup)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Login with Client ID AV271676A7 and password Demo123! works correctly"
+
+  - task: "Financial Questionnaire API - Save/Retrieve"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "API endpoints /api/arthvyay/questionnaire (POST/GET) exist but need E2E testing"
+
+frontend:
+  - task: "ArthVerse Auth Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ArthVerseAuth.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Login and Signup tabs work correctly, verified via screenshots"
+
+  - task: "ArthVerse Portal Dashboard"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ArthVersePortal.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Portal shows user info, net worth, and 6 sub-app cards correctly"
+
+  - task: "Financial Questionnaire - Step 1 (Income)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/FinancialQuestionnaire.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Step 1 shows all predefined income fields (Rental, Salary, Business, etc.) and Add Custom Income option"
+
+  - task: "Financial Questionnaire - Step 2 (Expenses)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/FinancialQuestionnaire.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported predefined expense fields were not showing"
+      - working: true
+        agent: "main"
+        comment: "FIXED - Verified via screenshots: Fixed Expenses (Rent, EMIs, Insurance) and Variable Expenses (Groceries, Fuel, etc.) now display correctly"
+
+  - task: "Financial Questionnaire - Step 3 (Assets & Liabilities)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/FinancialQuestionnaire.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported predefined asset/liability fields were not showing"
+      - working: true
+        agent: "main"
+        comment: "FIXED - Verified via screenshots: Common Assets (Property, Vehicles, Gold, Stocks, etc.) and Common Liabilities (Home Loan, Personal Loan, etc.) now display correctly"
+
+  - task: "Financial Questionnaire - Step 4 (Financial Stability & Credit Cards)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/FinancialQuestionnaire.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Step 4 exists but needs testing"
+
+  - task: "Financial Questionnaire - Form Submission & Dashboard Update"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/FinancialQuestionnaire.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Full E2E flow needs testing - submit questionnaire and verify Money Story dashboard updates"
+
+  - task: "Arthvyay Dashboard - Money Story"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Dashboard should show personalized Money Story based on questionnaire data"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Financial Questionnaire - Step 2 (Expenses)"
+    - "Financial Questionnaire - Step 3 (Assets & Liabilities)"
+    - "Financial Questionnaire - Form Submission & Dashboard Update"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Fixed the P0 bug where predefined fields for Expenses (Step 2) and Assets/Liabilities (Step 3) were not displaying. Verified fix via multiple screenshots. The testing agent should now perform a complete E2E test: 1) Login with Client ID AV271676A7, Password Demo123! 2) Navigate to Arthvyay questionnaire 3) Fill out all 4 steps with sample data 4) Submit the form 5) Verify the Money Story dashboard updates correctly."
