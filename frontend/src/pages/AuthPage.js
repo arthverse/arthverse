@@ -49,7 +49,8 @@ export default function AuthPage({ onAuth }) {
           <div className="font-heading text-3xl font-bold mb-2">
             <span className="text-brand-blue">a</span>
             <span className="text-brand-orange">₹</span>
-            <span className="text-brand-blue">thvyay</span>
+            <span className="text-brand-blue">th</span>
+            <span className="text-brand-orange">vyay</span>
           </div>
           <p className="text-slate-600 font-body">Your balance sheet. Your life.</p>
         </div>
