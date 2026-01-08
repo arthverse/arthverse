@@ -124,6 +124,82 @@ class CategorizeExpenseResponse(BaseModel):
     category: str
     confidence: str
 
+class FinancialQuestionnaire(BaseModel):
+    # Income sources
+    rental_income: dict = {}
+    salary_income: float = 0
+    business_income: float = 0
+    interest_income: float = 0
+    dividend_income: float = 0
+    capital_gains: float = 0
+    freelance_income: float = 0
+    other_income: float = 0
+    stable_income: str = "Yes"
+    
+    # Fixed expenses
+    rent_expense: float = 0
+    emis: float = 0
+    term_insurance: float = 0
+    health_insurance: float = 0
+    vehicle_insurance: dict = {}
+    
+    # Variable expenses
+    household_maid: float = 0
+    groceries: float = 0
+    food_dining: float = 0
+    fuel: float = 0
+    travel: float = 0
+    shopping: float = 0
+    online_shopping: float = 0
+    electronics: float = 0
+    entertainment: float = 0
+    telecom_utilities: float = 0
+    healthcare: float = 0
+    education: float = 0
+    insurance_premiums: float = 0
+    other_expenses: float = 0
+    cash_withdrawals: float = 0
+    foreign_transactions: float = 0
+    
+    # Assets
+    property_value: float = 0
+    vehicles_value: float = 0
+    gold_value: float = 0
+    silver_value: float = 0
+    business_investment: float = 0
+    stocks_value: float = 0
+    mutual_funds_value: float = 0
+    pf_nps_value: float = 0
+    bank_balance: float = 0
+    cash_in_hand: float = 0
+    
+    # Liabilities
+    home_loan: float = 0
+    personal_loan: float = 0
+    vehicle_loan: float = 0
+    credit_card_outstanding: float = 0
+    other_loans: dict = {}
+    
+    # Financial stability
+    has_health_insurance: bool = False
+    has_term_insurance: bool = False
+    invests_in_mutual_funds: bool = False
+    takes_tds_refund: bool = False
+    has_emergency_fund: bool = False
+    files_itr_yearly: bool = False
+    
+    # Credit cards
+    credit_cards: List[str] = []
+    
+    # Amount invested monthly
+    monthly_investment: float = 0
+    
+    completed_at: str = ""
+
+class QuestionnaireResponse(BaseModel):
+    message: str
+    questionnaire: FinancialQuestionnaire
+
 # ============= Helper Functions =============
 
 def hash_password(password: str) -> str:
