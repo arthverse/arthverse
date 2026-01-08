@@ -43,19 +43,32 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     name: str
+    mobile_number: str
+    age: int
+    city: str
+    marital_status: str
+    no_of_dependents: int
+    data_privacy_consent: bool
     monthly_income: float = 0
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    client_id: str
     password: str
 
 class UserResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
+    client_id: str
     email: str
     name: str
+    mobile_number: str
+    age: int
+    city: str
+    marital_status: str
+    no_of_dependents: int
     monthly_income: float
     created_at: str
+    networth: float = 0
 
 class AuthResponse(BaseModel):
     token: str
