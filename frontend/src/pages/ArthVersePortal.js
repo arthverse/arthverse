@@ -39,7 +39,8 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       icon: TrendingUp,
       color: 'blue',
       link: '/arthvyay/dashboard',
-      available: true
+      available: true,
+      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/xkf0jjlw_image.png'
     },
     {
       name: 'Arthrakshak',
@@ -48,7 +49,8 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       icon: Shield,
       color: 'orange',
       link: '#',
-      available: false
+      available: false,
+      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/b80clgwt_image.png'
     },
     {
       name: 'ArthYojna',
@@ -57,7 +59,8 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       icon: Landmark,
       color: 'blue',
       link: '#',
-      available: false
+      available: false,
+      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/oy6psxie_image.png'
     },
     {
       name: 'ArthNivesh',
@@ -66,7 +69,8 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       icon: PiggyBank,
       color: 'orange',
       link: '#',
-      available: false
+      available: false,
+      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/j5ar06cr_image.png'
     },
     {
       name: 'ArthDhan',
@@ -75,7 +79,8 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       icon: Banknote,
       color: 'blue',
       link: '#',
-      available: false
+      available: false,
+      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/ubdv403d_image.png'
     },
     {
       name: 'ArthUnnati',
@@ -84,7 +89,8 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       icon: CircleDollarSign,
       color: 'orange',
       link: '#',
-      available: false
+      available: false,
+      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/w9yhnupf_image.png'
     }
   ];
 
