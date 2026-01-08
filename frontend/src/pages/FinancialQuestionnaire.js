@@ -901,32 +901,133 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
               <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">3. Assets & Liabilities</h2>
               
               <div className="space-y-8">
-                {/* Assets Section */}
+                {/* Predefined Assets */}
+                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                  <h3 className="text-lg font-semibold text-green-700 mb-4">Common Assets</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Property Value (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.property_value}
+                        onChange={(e) => setFormData({ ...formData, property_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Vehicles Value (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicles_value}
+                        onChange={(e) => setFormData({ ...formData, vehicles_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Gold Value (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.gold_value}
+                        onChange={(e) => setFormData({ ...formData, gold_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Silver Value (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.silver_value}
+                        onChange={(e) => setFormData({ ...formData, silver_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Stocks (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.stocks_value}
+                        onChange={(e) => setFormData({ ...formData, stocks_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Mutual Funds (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.mutual_funds_value}
+                        onChange={(e) => setFormData({ ...formData, mutual_funds_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">PF / NPS (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.pf_nps_value}
+                        onChange={(e) => setFormData({ ...formData, pf_nps_value: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Bank Balance (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.bank_balance}
+                        onChange={(e) => setFormData({ ...formData, bank_balance: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Cash in Hand (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.cash_in_hand}
+                        onChange={(e) => setFormData({ ...formData, cash_in_hand: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Custom Assets Section */}
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-brand-blue">Assets</h3>
+                    <h3 className="text-lg font-semibold text-brand-blue">Additional Assets (Optional)</h3>
                     <Button
                       type="button"
                       onClick={() => addEntry('asset')}
                       className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
                       data-testid="add-asset-btn"
                     >
-                      + Add Asset
+                      + Add Custom Asset
                     </Button>
                   </div>
 
-                  {formData.asset_entries.length === 0 ? (
-                    <div className="text-center py-6 bg-slate-50 rounded-xl">
-                      <p className="text-slate-500">No assets added yet.</p>
-                    </div>
-                  ) : (
+                  {formData.asset_entries.length > 0 && (
                     <div className="space-y-3">
                       {formData.asset_entries.map((entry, index) => (
                         <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-green-50 rounded-xl" data-testid={`asset-entry-${index}`}>
                           <div className="col-span-8">
                             <Label className="text-xs">Asset Type</Label>
                             <Input
-                              placeholder="e.g., Property, Stocks, Mutual Funds, Bank Balance"
+                              placeholder="e.g., Cryptocurrency, Art Collection"
                               value={entry.type}
                               onChange={(e) => updateEntry('asset', index, 'type', e.target.value)}
                               className="mt-1"
@@ -960,41 +1061,87 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                       ))}
                     </div>
                   )}
+                </div>
 
-                  <div className="pt-3 border-t mt-4">
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-slate-600">Total Assets:</p>
-                      <p className="text-xl font-bold font-mono text-green-600">₹{totalAssets.toLocaleString()}</p>
+                <div className="pt-3 border-t">
+                  <div className="flex justify-between items-center bg-green-50 p-4 rounded-xl">
+                    <p className="text-sm font-semibold text-slate-700">Total Assets:</p>
+                    <p className="text-2xl font-bold font-mono text-green-600">₹{Math.round(totalAssets).toLocaleString()}</p>
+                  </div>
+                </div>
+
+                {/* Predefined Liabilities */}
+                <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                  <h3 className="text-lg font-semibold text-red-600 mb-4">Common Liabilities</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Home Loan Outstanding (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.home_loan}
+                        onChange={(e) => setFormData({ ...formData, home_loan: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Personal Loan (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.personal_loan}
+                        onChange={(e) => setFormData({ ...formData, personal_loan: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Vehicle Loan (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.vehicle_loan}
+                        onChange={(e) => setFormData({ ...formData, vehicle_loan: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Credit Card Outstanding (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.credit_card_outstanding}
+                        onChange={(e) => setFormData({ ...formData, credit_card_outstanding: e.target.value })}
+                        className="mt-1"
+                        placeholder="0"
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* Liabilities Section */}
+                {/* Custom Liabilities Section */}
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-brand-orange">Liabilities</h3>
+                    <h3 className="text-lg font-semibold text-brand-orange">Additional Liabilities (Optional)</h3>
                     <Button
                       type="button"
                       onClick={() => addEntry('liability')}
                       className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
                       data-testid="add-liability-btn"
                     >
-                      + Add Liability
+                      + Add Custom Liability
                     </Button>
                   </div>
 
-                  {formData.liability_entries.length === 0 ? (
-                    <div className="text-center py-6 bg-slate-50 rounded-xl">
-                      <p className="text-slate-500">No liabilities added yet.</p>
-                    </div>
-                  ) : (
+                  {formData.liability_entries.length > 0 && (
                     <div className="space-y-3">
                       {formData.liability_entries.map((entry, index) => (
                         <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-red-50 rounded-xl" data-testid={`liability-entry-${index}`}>
                           <div className="col-span-8">
                             <Label className="text-xs">Liability Type</Label>
                             <Input
-                              placeholder="e.g., Home Loan, Personal Loan, Credit Card"
+                              placeholder="e.g., Education Loan, Medical Debt"
                               value={entry.type}
                               onChange={(e) => updateEntry('liability', index, 'type', e.target.value)}
                               className="mt-1"
@@ -1028,20 +1175,20 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                       ))}
                     </div>
                   )}
+                </div>
 
-                  <div className="pt-3 border-t mt-4">
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-slate-600">Total Liabilities:</p>
-                      <p className="text-xl font-bold font-mono text-red-600">₹{totalLiabilities.toLocaleString()}</p>
-                    </div>
+                <div className="pt-3 border-t">
+                  <div className="flex justify-between items-center bg-red-50 p-4 rounded-xl">
+                    <p className="text-sm font-semibold text-slate-700">Total Liabilities:</p>
+                    <p className="text-2xl font-bold font-mono text-red-600">₹{Math.round(totalLiabilities).toLocaleString()}</p>
                   </div>
                 </div>
 
                 {/* Net Worth Calculation */}
-                <div className="bg-brand-blue/10 rounded-xl p-6 border-2 border-brand-blue/20">
+                <div className="bg-gradient-to-r from-brand-blue/10 to-brand-orange/10 rounded-xl p-6 border-2 border-brand-blue/30">
                   <div className="flex justify-between items-center">
-                    <p className="text-lg font-semibold text-slate-700">Net Worth:</p>
-                    <p className="text-3xl font-bold font-mono text-brand-blue">₹{(totalAssets - totalLiabilities).toLocaleString()}</p>
+                    <p className="text-xl font-bold text-slate-800">Net Worth (Assets - Liabilities):</p>
+                    <p className="text-4xl font-bold font-mono text-brand-blue">₹{Math.round(totalAssets - totalLiabilities).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
