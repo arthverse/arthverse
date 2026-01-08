@@ -197,16 +197,14 @@ export default function Dashboard({ token, user, onLogout }) {
                       <p className="text-sm text-slate-600 mb-1">Saved:</p>
                       <p className="text-2xl font-bold font-mono text-green-600">
                         ₹{(() => {
-                          const monthlyIncome = 
-                            (parseFloat(questionnaire.rental_income?.property1 || 0)) +
-                            (parseFloat(questionnaire.rental_income?.property2 || 0)) +
-                            (parseFloat(questionnaire.salary_income || 0) / 12);
-                          const monthlyExpenses = 
-                            (parseFloat(questionnaire.rent_expense || 0)) +
-                            (parseFloat(questionnaire.emis || 0)) +
-                            (parseFloat(questionnaire.household_maid || 0)) +
-                            (parseFloat(questionnaire.groceries || 0)) +
-                            (parseFloat(questionnaire.food_dining || 0));
+                          const monthlyIncome = (questionnaire.income_entries || []).reduce((sum, entry) => {
+                            const amount = parseFloat(entry.amount) || 0;
+                            return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                          }, 0);
+                          const monthlyExpenses = (questionnaire.expense_entries || []).reduce((sum, entry) => {
+                            const amount = parseFloat(entry.amount) || 0;
+                            return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                          }, 0);
                           const monthlySavings = monthlyIncome - monthlyExpenses;
                           const tenYearSavings = monthlySavings * 12 * 10;
                           return (tenYearSavings / 100000).toFixed(1) + 'L';
@@ -218,10 +216,10 @@ export default function Dashboard({ token, user, onLogout }) {
                       <p className="text-sm text-slate-600 mb-1">Could have:</p>
                       <p className="text-2xl font-bold font-mono text-brand-blue">
                         ₹{(() => {
-                          const monthlyIncome = 
-                            (parseFloat(questionnaire.rental_income?.property1 || 0)) +
-                            (parseFloat(questionnaire.rental_income?.property2 || 0)) +
-                            (parseFloat(questionnaire.salary_income || 0) / 12);
+                          const monthlyIncome = (questionnaire.income_entries || []).reduce((sum, entry) => {
+                            const amount = parseFloat(entry.amount) || 0;
+                            return sum + (entry.frequency === 'yearly' ? amount / 12 : amount);
+                          }, 0);
                           const potentialSavings = monthlyIncome * 0.5; // Assuming 50% savings rate
                           const tenYearPotential = potentialSavings * 12 * 10 * 1.12; // With 12% returns
                           return (tenYearPotential / 100000).toFixed(1) + 'L';
