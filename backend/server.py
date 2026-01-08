@@ -265,10 +265,17 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     
     return UserResponse(
         id=user['id'],
+        client_id=user['client_id'],
         email=user['email'],
         name=user['name'],
+        mobile_number=user['mobile_number'],
+        age=user['age'],
+        city=user['city'],
+        marital_status=user['marital_status'],
+        no_of_dependents=user['no_of_dependents'],
         monthly_income=user['monthly_income'],
-        created_at=user['created_at']
+        created_at=user['created_at'],
+        networth=user.get('networth', 0)
     )
 
 # ============= Transaction Routes =============
