@@ -195,9 +195,20 @@ export default function ArthVersePortal({ token, user, onLogout }) {
                       <div className={`w-14 h-14 rounded-2xl ${isBlue ? 'bg-gradient-to-br from-brand-blue to-blue-600' : 'bg-gradient-to-br from-brand-orange to-orange-600'} flex items-center justify-center mb-4`}>
                         <Icon className="w-7 h-7 text-white" />
                       </div>
-                      <h3 className={`text-2xl font-bold font-heading mb-1 ${isBlue ? 'text-brand-blue' : 'text-brand-orange'}`}>
-                        {app.name}
-                      </h3>
+                      {app.name === 'Arthvyay' ? (
+                        <div className="mb-1">
+                          <img 
+                            src="https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/xkf0jjlw_image.png" 
+                            alt="Arthvyay"
+                            className="h-12 object-contain"
+                            style={{ maxWidth: '200px' }}
+                          />
+                        </div>
+                      ) : (
+                        <h3 className={`text-2xl font-bold font-heading mb-1 ${isBlue ? 'text-brand-blue' : 'text-brand-orange'}`}>
+                          {app.name}
+                        </h3>
+                      )}
                       <p className={`text-sm font-semibold mb-2 ${isBlue ? 'text-brand-orange' : 'text-brand-blue'}`}>
                         {app.tagline}
                       </p>
