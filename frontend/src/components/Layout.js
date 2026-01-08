@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { LayoutDashboard, Receipt, FileText, LogOut } from 'lucide-react';
+import { LayoutDashboard, Receipt, FileText, LogOut, ArrowLeft } from 'lucide-react';
 
 export default function Layout({ children, token, onLogout }) {
   const location = useLocation();
@@ -12,19 +12,26 @@ export default function Layout({ children, token, onLogout }) {
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50" data-testid="main-nav">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-8">
-              <Link to="/dashboard" className="font-heading text-2xl font-bold" data-testid="logo-link">
+            <div className="flex items-center gap-6">
+              <Link to="/arthverse/portal" className="flex items-center gap-2 text-slate-600 hover:text-brand-blue transition-colors" data-testid="back-to-portal">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-sm font-medium">Portal</span>
+              </Link>
+              
+              <div className="h-8 w-px bg-slate-200" />
+              
+              <Link to="/arthvyay/dashboard" className="font-heading text-2xl font-bold" data-testid="logo-link">
                 <span className="text-brand-blue">a</span>
                 <span className="text-brand-orange">₹</span>
                 <span className="text-brand-blue">thvyay</span>
               </Link>
               
               <div className="hidden md:flex gap-2" data-testid="nav-links">
-                <Link to="/dashboard" data-testid="nav-dashboard-link">
+                <Link to="/arthvyay/dashboard" data-testid="nav-dashboard-link">
                   <Button 
                     variant="ghost"
                     className={`rounded-full ${
-                      isActive('/dashboard') 
+                      isActive('/arthvyay/dashboard') 
                         ? 'bg-brand-blue/10 text-brand-blue' 
                         : 'text-slate-600 hover:text-brand-blue hover:bg-brand-blue/5'
                     }`}
@@ -34,11 +41,11 @@ export default function Layout({ children, token, onLogout }) {
                   </Button>
                 </Link>
                 
-                <Link to="/transactions" data-testid="nav-transactions-link">
+                <Link to="/arthvyay/transactions" data-testid="nav-transactions-link">
                   <Button 
                     variant="ghost"
                     className={`rounded-full ${
-                      isActive('/transactions') 
+                      isActive('/arthvyay/transactions') 
                         ? 'bg-brand-blue/10 text-brand-blue' 
                         : 'text-slate-600 hover:text-brand-blue hover:bg-brand-blue/5'
                     }`}
@@ -48,11 +55,11 @@ export default function Layout({ children, token, onLogout }) {
                   </Button>
                 </Link>
                 
-                <Link to="/reports" data-testid="nav-reports-link">
+                <Link to="/arthvyay/reports" data-testid="nav-reports-link">
                   <Button 
                     variant="ghost"
                     className={`rounded-full ${
-                      isActive('/reports') 
+                      isActive('/arthvyay/reports') 
                         ? 'bg-brand-blue/10 text-brand-blue' 
                         : 'text-slate-600 hover:text-brand-blue hover:bg-brand-blue/5'
                     }`}
