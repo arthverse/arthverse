@@ -187,14 +187,25 @@ async def register(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Generate unique client ID
+    client_id = f"AV{str(uuid.uuid4())[:8].upper()}"
+    
     # Create user
     user_id = str(uuid.uuid4())
     user_doc = {
         "id": user_id,
+        "client_id": client_id,
         "email": user_data.email,
         "password_hash": hash_password(user_data.password),
         "name": user_data.name,
+        "mobile_number": user_data.mobile_number,
+        "age": user_data.age,
+        "city": user_data.city,
+        "marital_status": user_data.marital_status,
+        "no_of_dependents": user_data.no_of_dependents,
+        "data_privacy_consent": user_data.data_privacy_consent,
         "monthly_income": user_data.monthly_income,
+        "networth": 0,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
@@ -205,10 +216,17 @@ async def register(user_data: UserCreate):
     
     user_response = UserResponse(
         id=user_id,
+        client_id=client_id,
         email=user_data.email,
         name=user_data.name,
+        mobile_number=user_data.mobile_number,
+        age=user_data.age,
+        city=user_data.city,
+        marital_status=user_data.marital_status,
+        no_of_dependents=user_data.no_of_dependents,
         monthly_income=user_data.monthly_income,
-        created_at=user_doc['created_at']
+        created_at=user_doc['created_at'],
+        networth=0
     )
     
     return AuthResponse(token=token, user=user_response)
