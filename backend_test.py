@@ -3,7 +3,7 @@ import sys
 import json
 from datetime import datetime
 
-class ArthvyayAPITester:
+class ArthverseAPITester:
     def __init__(self, base_url="https://arth-verse-launch.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
@@ -12,6 +12,9 @@ class ArthvyayAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.transaction_ids = []
+        # Test credentials from review request
+        self.test_client_id = "AV271676A7"
+        self.test_password = "Demo123!"
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
