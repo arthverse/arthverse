@@ -630,8 +630,7 @@ async def initiate_setu_consent(
     Returns consent ID and redirect URL for user approval.
     """
     try:
-        user = await get_current_user(credentials.credentials)
-        user_id = user['id']
+        user_id = await verify_token(credentials.credentials)
         
         # Create consent request
         consent_response = await setu_service.create_consent_request(
