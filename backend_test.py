@@ -64,45 +64,49 @@ class ArthverseAPITester:
             print(f"❌ Failed - Error: {str(e)}")
             return False, {}
 
-    def test_user_registration(self):
-        """Test user registration"""
-        test_email = f"test_{datetime.now().strftime('%H%M%S')}@arthvyay.com"
+    def test_user_login_with_client_id(self):
+        """Test user login with Client ID and Password (as per review request)"""
         success, response = self.run_test(
-            "User Registration",
-            "POST",
-            "auth/register",
+            "User Login with Client ID",
+            "POST", 
+            "auth/login",
             200,
             data={
-                "email": test_email,
-                "password": "Test123!",
-                "name": "Test User",
-                "monthly_income": 50000
+                "client_id": self.test_client_id,
+                "password": self.test_password
             }
         )
         if success and 'token' in response:
             self.token = response['token']
             self.user_id = response['user']['id']
             print(f"   Token obtained: {self.token[:20]}...")
+            print(f"   User ID: {self.user_id}")
+            print(f"   Client ID: {response['user']['client_id']}")
             return True
         return False
 
-    def test_user_login(self):
-        """Test user login with existing credentials"""
+    def test_user_signup(self):
+        """Test user signup endpoint (if it exists)"""
+        test_email = f"test_{datetime.now().strftime('%H%M%S')}@arthverse.com"
         success, response = self.run_test(
-            "User Login",
-            "POST", 
-            "auth/login",
+            "User Signup",
+            "POST",
+            "auth/signup",
             200,
             data={
-                "email": "test@arthvyay.com",
-                "password": "Test123!"
+                "email": test_email,
+                "password": "NewUser123!",
+                "name": "New Test User",
+                "mobile_number": "9876543210",
+                "age": 30,
+                "city": "Mumbai",
+                "marital_status": "Single",
+                "no_of_dependents": 0,
+                "data_privacy_consent": True,
+                "monthly_income": 75000
             }
         )
-        if success and 'token' in response:
-            self.token = response['token']
-            self.user_id = response['user']['id']
-            return True
-        return False
+        return success
 
     def test_get_current_user(self):
         """Test getting current user info"""
