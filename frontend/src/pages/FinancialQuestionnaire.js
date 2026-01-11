@@ -135,7 +135,8 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             properties: response.data.properties || [],
             vehicles: response.data.vehicles || [],
             loans: response.data.loans || [],
-            interest_investments: response.data.interest_investments || []
+            interest_investments: response.data.interest_investments || [],
+            insurance_policies: response.data.insurance_policies || []
           });
           setIsEditing(true);
           toast.info('Your saved financial data has been loaded. Make any changes and submit to update.');
