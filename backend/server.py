@@ -418,7 +418,7 @@ async def categorize_expense(request: CategorizeExpenseRequest, credentials: HTT
 # ============= Questionnaire Routes =============
 
 @api_router.post("/questionnaire", response_model=QuestionnaireResponse)
-async def submit_questionnaire(questionnaire: FinancialQuestionnaire, credentials: HTTPAuthorizationCredentials = security):
+async def submit_questionnaire(questionnaire: FinancialQuestionnaire, credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     questionnaire_data = questionnaire.dict()
@@ -438,7 +438,7 @@ async def submit_questionnaire(questionnaire: FinancialQuestionnaire, credential
     )
 
 @api_router.get("/questionnaire", response_model=FinancialQuestionnaire)
-async def get_questionnaire(credentials: HTTPAuthorizationCredentials = security):
+async def get_questionnaire(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
@@ -451,7 +451,7 @@ async def get_questionnaire(credentials: HTTPAuthorizationCredentials = security
 # ============= Reports Routes =============
 
 @api_router.get("/reports/health-score", response_model=FinancialHealthScore)
-async def get_health_score(credentials: HTTPAuthorizationCredentials = security):
+async def get_health_score(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     # Get user's monthly income
