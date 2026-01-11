@@ -2,7 +2,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { X } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 
 export default function InsuranceSection({ insurancePolicies, onChange, onAutoPopulateVehicle }) {
   
@@ -16,7 +16,7 @@ export default function InsuranceSection({ insurancePolicies, onChange, onAutoPo
       cover_dependents: false,
       self_name: '',
       spouse_name: '',
-      dependent_names: '',
+      dependents: [], // Changed to array for multiple dependents
       // Vehicle fields
       vehicle_type: '', // 2-wheeler or 4-wheeler
       vehicle_number: ''
@@ -43,6 +43,28 @@ export default function InsuranceSection({ insurancePolicies, onChange, onAutoPo
 
   const removeInsurance = (index) => {
     const updated = insurancePolicies.filter((_, i) => i !== index);
+    onChange(updated);
+  };
+
+  // Dependent management functions
+  const addDependent = (insuranceIndex) => {
+    const updated = [...insurancePolicies];
+    if (!updated[insuranceIndex].dependents) {
+      updated[insuranceIndex].dependents = [];
+    }
+    updated[insuranceIndex].dependents.push({ name: '', relationship: '' });
+    onChange(updated);
+  };
+
+  const updateDependent = (insuranceIndex, dependentIndex, field, value) => {
+    const updated = [...insurancePolicies];
+    updated[insuranceIndex].dependents[dependentIndex][field] = value;
+    onChange(updated);
+  };
+
+  const removeDependent = (insuranceIndex, dependentIndex) => {
+    const updated = [...insurancePolicies];
+    updated[insuranceIndex].dependents = updated[insuranceIndex].dependents.filter((_, i) => i !== dependentIndex);
     onChange(updated);
   };
 
@@ -158,23 +180,63 @@ export default function InsuranceSection({ insurancePolicies, onChange, onAutoPo
                           </div>
                         </div>
 
-                        {/* Dependents */}
+                        {/* Dependents - Multiple */}
                         <div className="flex items-start gap-3">
                           <input
                             type="checkbox"
                             checked={insurance.cover_dependents}
-                            onChange={(e) => updateInsurance(index, 'cover_dependents', e.target.checked)}
+                            onChange={(e) => {
+                              updateInsurance(index, 'cover_dependents', e.target.checked);
+                              if (e.target.checked && (!insurance.dependents || insurance.dependents.length === 0)) {
+                                addDependent(index);
+                              }
+                            }}
                             className="mt-1"
                           />
                           <div className="flex-1">
-                            <Label className="text-sm">Dependents</Label>
-                            {insurance.cover_dependents && (
-                              <Input
-                                placeholder="Names (comma-separated)"
-                                value={insurance.dependent_names}
-                                onChange={(e) => updateInsurance(index, 'dependent_names', e.target.value)}
-                                className="mt-1"
-                              />
+                            <div className="flex items-center justify-between mb-2">
+                              <Label className="text-sm">Dependents</Label>
+                              {insurance.cover_dependents && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => addDependent(index)}
+                                  className="h-7 text-xs"
+                                >
+                                  <Plus className="w-3 h-3 mr-1" />
+                                  Add Dependent
+                                </Button>
+                              )}
+                            </div>
+                            {insurance.cover_dependents && insurance.dependents && insurance.dependents.length > 0 && (
+                              <div className="space-y-2">
+                                {insurance.dependents.map((dependent, depIndex) => (
+                                  <div key={depIndex} className="flex gap-2 items-start">
+                                    <div className="flex-1 grid grid-cols-2 gap-2">
+                                      <Input
+                                        placeholder="Name"
+                                        value={dependent.name}
+                                        onChange={(e) => updateDependent(index, depIndex, 'name', e.target.value)}
+                                      />
+                                      <Input
+                                        placeholder="Relationship (e.g., Son, Daughter, Parent)"
+                                        value={dependent.relationship}
+                                        onChange={(e) => updateDependent(index, depIndex, 'relationship', e.target.value)}
+                                      />
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeDependent(index, depIndex)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 h-9"
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
                         </div>
