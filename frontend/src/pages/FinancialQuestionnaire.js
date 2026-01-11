@@ -124,7 +124,10 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             expense_entries: response.data.expense_entries || [],
             asset_entries: response.data.asset_entries || [],
             liability_entries: response.data.liability_entries || [],
-            credit_cards: response.data.credit_cards || []
+            credit_cards: response.data.credit_cards || [],
+            properties: response.data.properties || [],
+            loans: response.data.loans || [],
+            interest_investments: response.data.interest_investments || []
           });
           setIsEditing(true);
           toast.info('Your saved financial data has been loaded. Make any changes and submit to update.');
