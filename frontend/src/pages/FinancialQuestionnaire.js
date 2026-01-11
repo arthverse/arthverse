@@ -95,7 +95,61 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     
     // Investment
     monthly_investment: 0
-  });
+  };
+
+  const [formData, setFormData] = useState(defaultFormData);
+
+  // Load existing questionnaire data on mount
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      try {
+        const response = await axios.get(`${API}/questionnaire`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data) {
+          setFormData({
+            ...defaultFormData,
+            ...response.data,
+            // Ensure arrays are properly set
+            income_entries: response.data.income_entries || [],
+            expense_entries: response.data.expense_entries || [],
+            asset_entries: response.data.asset_entries || [],
+            liability_entries: response.data.liability_entries || [],
+            credit_cards: response.data.credit_cards || []
+          });
+          setIsEditing(true);
+          toast.info('Your saved financial data has been loaded. Make any changes and submit to update.');
+        }
+      } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error('Error fetching questionnaire:', error);
+        }
+        // 404 means no existing data, which is fine
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    fetchExistingData();
+  }, [token]);
+
+  const handleReset = async () => {
+    if (!window.confirm('Are you sure you want to reset all your financial data? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/questionnaire`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFormData(defaultFormData);
+      setIsEditing(false);
+      setStep(1);
+      toast.success('Financial data has been reset successfully!');
+    } catch (error) {
+      toast.error('Failed to reset data. Please try again.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
