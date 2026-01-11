@@ -95,41 +95,33 @@ class SetuService:
         format: str = "json"
     ) -> Dict:
         """
-        TODO (POST-DEPLOYMENT): Implement actual Setu data session creation
-        
         Create a data session for fetching financial information.
         This API is used only after customer has approved consent.
         """
         logger.info(f"Creating data session for consent: {consent_id}")
         
-        # TODO: Uncomment and implement post-deployment
-        # headers = await self._get_headers()
-        # 
-        # payload = {
-        #     "consentId": consent_id,
-        #     "dataRange": {
-        #         "from": (datetime.now() - timedelta(days=365)).isoformat() + "Z",
-        #         "to": datetime.now().isoformat() + "Z"
-        #     },
-        #     "format": format
-        # }
-        # 
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.post(
-        #         f"{self.base_url}/v2/data-sessions",
-        #         headers=headers,
-        #         json=payload
-        #     ) as response:
-        #         if response.status != 200:
-        #             raise Exception("Data session creation failed")
-        #         return await response.json()
+        headers = await self._get_headers()
         
-        # Mock response for UI testing
-        session_id = f"session_{consent_id}_{int(datetime.now().timestamp())}"
-        return {
-            "id": session_id,
-            "status": "INITIATED"
+        payload = {
+            "consentId": consent_id,
+            "dataRange": {
+                "from": (datetime.now() - timedelta(days=365)).isoformat() + "Z",
+                "to": datetime.now().isoformat() + "Z"
+            },
+            "format": format
         }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{self.base_url}/v2/data-sessions",
+                headers=headers,
+                json=payload
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Data session creation failed: {error_text}")
+                    raise Exception(f"Data session creation failed: {error_text}")
+                return await response.json()
     
     async def fetch_financial_data(self, session_id: str) -> Dict:
         """
