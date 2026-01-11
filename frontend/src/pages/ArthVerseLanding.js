@@ -141,7 +141,7 @@ export default function ArthVerseLanding() {
             Ready to Transform Your Financial Journey?
           </h2>
           <p className="text-xl text-white/90 font-body mb-8">
-            Join thousands managing their complete financial life on ArthVerse
+            Join thousands managing their complete financial life on arth-verse
           </p>
           <Link to="/arthverse/auth?mode=signup" data-testid="cta-signup-link">
             <Button 
