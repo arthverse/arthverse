@@ -1924,7 +1924,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
               </Button>
             )}
             
-            {step < 5 ? (
+            {step < 4 ? (
               <Button
                 type="button"
                 onClick={() => setStep(step + 1)}
