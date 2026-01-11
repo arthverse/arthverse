@@ -266,7 +266,10 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           cover_dependents: ins.cover_dependents || false,
           self_name: ins.self_name || '',
           spouse_name: ins.spouse_name || '',
-          dependent_names: ins.dependent_names || '',
+          dependents: (ins.dependents || []).map(dep => ({
+            name: dep.name || '',
+            relationship: dep.relationship || ''
+          })),
           vehicle_type: ins.vehicle_type || '',
           vehicle_number: ins.vehicle_number || ''
         })),
