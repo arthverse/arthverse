@@ -72,43 +72,22 @@ class SetuService:
     
     async def get_consent_status(self, consent_id: str) -> Dict:
         """
-        TODO (POST-DEPLOYMENT): Implement actual Setu consent status check
-        
         Get the current status of a consent request.
         """
         logger.info(f"Checking consent status for: {consent_id}")
         
-        # TODO: Uncomment and implement post-deployment
-        # headers = await self._get_headers()
-        # 
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.get(
-        #         f"{self.base_url}/v2/consents/{consent_id}",
-        #         headers=headers
-        #     ) as response:
-        #         if response.status != 200:
-        #             raise Exception(f"Failed to fetch consent status")
-        #         return await response.json()
+        headers = await self._get_headers()
         
-        # Mock response for UI testing
-        return {
-            "id": consent_id,
-            "status": "ACTIVE",
-            "accounts": [
-                {
-                    "fipId": "HDFC-FIP",
-                    "maskedAccNumber": "XXXXXXXX1234",
-                    "accType": "SAVINGS",
-                    "fiType": "DEPOSIT"
-                },
-                {
-                    "fipId": "ICICI-FIP",
-                    "maskedAccNumber": "XXXXXXXX5678",
-                    "accType": "SAVINGS",
-                    "fiType": "DEPOSIT"
-                }
-            ]
-        }
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{self.base_url}/v2/consents/{consent_id}",
+                headers=headers
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Failed to fetch consent status: {error_text}")
+                    raise Exception(f"Failed to fetch consent status: {error_text}")
+                return await response.json()
     
     async def create_data_session(
         self,
