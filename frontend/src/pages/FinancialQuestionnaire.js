@@ -11,6 +11,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
 import { Loader2, ChevronRight, ChevronLeft, RefreshCw } from 'lucide-react';
+import InsuranceSection from '../components/InsuranceSection';
 
 export default function FinancialQuestionnaire({ token, onLogout }) {
   const navigate = useNavigate();
