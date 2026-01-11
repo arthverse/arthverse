@@ -571,8 +571,9 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const totalAssets = 
     // Property value from detailed properties list
     totalPropertyValue +
+    // Vehicle value from detailed vehicles list
+    totalVehicleValue +
     // Other predefined assets
-    (parseFloat(formData.vehicles_value) || 0) +
     (parseFloat(formData.gold_value) || 0) +
     (parseFloat(formData.silver_value) || 0) +
     (parseFloat(formData.stocks_value) || 0) +
