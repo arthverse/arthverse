@@ -33,7 +33,7 @@ export default function ArthVerseLanding() {
       <div className="pt-32 pb-16 px-6" data-testid="arthverse-hero-section">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-none font-heading text-slate-900 mb-6">
-            <span className="text-brand-blue">ArthVerse</span>
+            <span className="text-brand-blue">arth-verse</span>
           </h1>
           <p className="text-2xl md:text-3xl text-brand-orange font-heading mb-8">
             "Universe Where Every Rupee Finds Its Place."
