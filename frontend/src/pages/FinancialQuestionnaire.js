@@ -1595,16 +1595,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   <h3 className="text-lg font-semibold text-green-700 mb-4">Other Assets</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-sm font-medium">Vehicles Value (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.vehicles_value}
-                        onChange={(e) => setFormData({ ...formData, vehicles_value: e.target.value })}
-                        className="mt-1"
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
                       <Label className="text-sm font-medium">Gold Value (₹)</Label>
                       <Input
                         type="number"
