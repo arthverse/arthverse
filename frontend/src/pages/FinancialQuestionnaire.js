@@ -129,6 +129,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             liability_entries: response.data.liability_entries || [],
             credit_cards: response.data.credit_cards || [],
             properties: response.data.properties || [],
+            vehicles: response.data.vehicles || [],
             loans: response.data.loans || [],
             interest_investments: response.data.interest_investments || []
           });
