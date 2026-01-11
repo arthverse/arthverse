@@ -842,6 +842,229 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   )}
                 </div>
 
+                {/* Interest-bearing Investments (FDs, Bonds) - For Interest Income */}
+                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-700">Fixed Deposits, RDs & Bonds</h3>
+                      <p className="text-sm text-slate-500">Interest income will be auto-calculated and added to your total income</p>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={addInterestInvestment}
+                      className="bg-green-600 hover:bg-green-700 rounded-full text-white"
+                    >
+                      + Add FD/Bond
+                    </Button>
+                  </div>
+                  
+                  {formData.interest_investments.length > 0 ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-green-100 rounded-lg text-sm font-medium text-green-700">
+                        <div className="col-span-3">Name</div>
+                        <div className="col-span-2">Type</div>
+                        <div className="col-span-3">Principal (₹)</div>
+                        <div className="col-span-2">Rate (%)</div>
+                        <div className="col-span-1">Yearly Interest</div>
+                        <div className="col-span-1"></div>
+                      </div>
+                      {formData.interest_investments.map((inv, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                          <div className="col-span-3">
+                            <Input
+                              placeholder="e.g., SBI FD"
+                              value={inv.name}
+                              onChange={(e) => updateInterestInvestment(index, 'name', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Select
+                              value={inv.investment_type}
+                              onValueChange={(value) => updateInterestInvestment(index, 'investment_type', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="FD">Fixed Deposit</SelectItem>
+                                <SelectItem value="RD">Recurring Deposit</SelectItem>
+                                <SelectItem value="Bonds">Bonds</SelectItem>
+                                <SelectItem value="Debentures">Debentures</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-3">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={inv.principal_amount}
+                              onChange={(e) => updateInterestInvestment(index, 'principal_amount', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="0"
+                              value={inv.interest_rate}
+                              onChange={(e) => updateInterestInvestment(index, 'interest_rate', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-1 flex items-center">
+                            <span className="text-sm font-mono text-green-600">
+                              ₹{Math.round(calculateInterestIncome(
+                                parseFloat(inv.principal_amount) || 0,
+                                parseFloat(inv.interest_rate) || 0
+                              )).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="col-span-1 flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeInterestInvestment(index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-between pt-2 px-2 bg-green-100 rounded-lg p-3">
+                        <span className="text-sm font-semibold text-green-700">
+                          Total FD/Bond Principal (Asset): ₹{Math.round(totalInterestInvestmentPrincipal).toLocaleString()}
+                        </span>
+                        <span className="text-sm font-semibold text-green-700">
+                          Total Yearly Interest Income: ₹{Math.round(totalYearlyInterestIncome).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-400 py-4">No FDs/Bonds added yet. Click "Add FD/Bond" to start.</p>
+                  )}
+                </div>
+
+                {/* Loans Section - For Interest Expense & Liabilities */}
+                <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-red-600">Loans & Advances</h3>
+                      <p className="text-sm text-slate-500">EMI will be auto-calculated. Principal goes to Liabilities, EMI to Expenses.</p>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={addLoan}
+                      className="bg-red-600 hover:bg-red-700 rounded-full text-white"
+                    >
+                      + Add Loan
+                    </Button>
+                  </div>
+                  
+                  {formData.loans.length > 0 ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-red-100 rounded-lg text-xs font-medium text-red-700">
+                        <div className="col-span-2">Type</div>
+                        <div className="col-span-2">Name</div>
+                        <div className="col-span-2">Principal (₹)</div>
+                        <div className="col-span-1">Rate %</div>
+                        <div className="col-span-2">Tenure (months)</div>
+                        <div className="col-span-2">Monthly EMI</div>
+                        <div className="col-span-1"></div>
+                      </div>
+                      {formData.loans.map((loan, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                          <div className="col-span-2">
+                            <Select
+                              value={loan.loan_type}
+                              onValueChange={(value) => updateLoan(index, 'loan_type', value)}
+                            >
+                              <SelectTrigger className="text-xs">
+                                <SelectValue placeholder="Type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Home">Home Loan</SelectItem>
+                                <SelectItem value="Personal">Personal Loan</SelectItem>
+                                <SelectItem value="Vehicle">Vehicle Loan</SelectItem>
+                                <SelectItem value="Education">Education Loan</SelectItem>
+                                <SelectItem value="Gold">Gold Loan</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              placeholder="Loan name"
+                              value={loan.name}
+                              onChange={(e) => updateLoan(index, 'name', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={loan.principal_amount}
+                              onChange={(e) => updateLoan(index, 'principal_amount', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="0"
+                              value={loan.interest_rate}
+                              onChange={(e) => updateLoan(index, 'interest_rate', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={loan.tenure_months}
+                              onChange={(e) => updateLoan(index, 'tenure_months', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2 flex items-center">
+                            <span className="text-sm font-mono text-red-600">
+                              ₹{Math.round(calculateEMI(
+                                parseFloat(loan.principal_amount) || 0,
+                                parseFloat(loan.interest_rate) || 0,
+                                parseInt(loan.tenure_months) || 0
+                              )).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="col-span-1 flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeLoan(index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-between pt-2 px-2 bg-red-100 rounded-lg p-3">
+                        <span className="text-sm font-semibold text-red-700">
+                          Total Principal (Liability): ₹{Math.round(totalLoanPrincipal).toLocaleString()}
+                        </span>
+                        <span className="text-sm font-semibold text-red-700">
+                          Total Monthly EMI (Expense): ₹{Math.round(totalMonthlyEMI).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-400 py-4">No loans added yet. Click "Add Loan" to start.</p>
+                  )}
+                </div>
+
                 <div className="pt-4 border-t mt-6 bg-green-50 p-4 rounded-xl">
                   <div className="flex justify-between items-center mb-4">
                     <p className="text-sm font-semibold text-slate-700">Total Monthly Income:</p>
