@@ -209,6 +209,9 @@ class FinancialQuestionnaire(BaseModel):
     # Detailed Properties List
     properties: List[dict] = []  # List of PropertyEntry dicts
     
+    # Detailed Vehicles List
+    vehicles: List[dict] = []  # List of VehicleEntry dicts
+    
     # Predefined Liabilities
     home_loan: float = 0
     personal_loan: float = 0
