@@ -385,6 +385,24 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     setFormData({ ...formData, vehicles: updated });
   };
 
+  // Auto-populate vehicle from insurance
+  const handleAutoPopulateVehicle = (vehicleData) => {
+    const exists = formData.vehicles.some(v => v.registration_number === vehicleData.vehicle_number);
+    if (!exists) {
+      setFormData({
+        ...formData,
+        vehicles: [...formData.vehicles, {
+          vehicle_type: vehicleData.vehicle_type,
+          name: vehicleData.name,
+          registration_number: vehicleData.vehicle_number,
+          estimated_value: vehicleData.estimated_value || '',
+          is_insured: true
+        }]
+      });
+      toast.success(`Vehicle ${vehicleData.vehicle_number} added to assets!`);
+    }
+  };
+
   // Loan management functions
   const addLoan = () => {
     setFormData({
