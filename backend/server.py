@@ -136,6 +136,13 @@ class PropertyEntry(BaseModel):
     area_sqft: float = 0
     # value_per_sqft calculated on frontend
 
+class VehicleEntry(BaseModel):
+    vehicle_type: str = ""  # 2-Wheeler / 4-Wheeler
+    name: str = ""  # e.g., Honda Activa, Maruti Swift
+    registration_number: str = ""  # e.g., CG04ND1195
+    estimated_value: float = 0
+    is_insured: bool = False
+
 class LoanEntry(BaseModel):
     loan_type: str = ""  # Home/Personal/Vehicle/Education/Gold/Other
     name: str = ""
