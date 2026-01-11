@@ -296,6 +296,148 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     });
   };
 
+  // Property management functions
+  const addProperty = () => {
+    setFormData({
+      ...formData,
+      properties: [...formData.properties, { name: '', estimated_value: 0, area_sqft: 0 }]
+    });
+  };
+
+  const removeProperty = (index) => {
+    setFormData({
+      ...formData,
+      properties: formData.properties.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateProperty = (index, field, value) => {
+    const updated = [...formData.properties];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, properties: updated });
+  };
+
+  // Loan management functions
+  const addLoan = () => {
+    setFormData({
+      ...formData,
+      loans: [...formData.loans, { 
+        loan_type: 'Home', 
+        name: '', 
+        principal_amount: 0, 
+        interest_rate: 0, 
+        tenure_months: 0 
+      }]
+    });
+  };
+
+  const removeLoan = (index) => {
+    setFormData({
+      ...formData,
+      loans: formData.loans.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateLoan = (index, field, value) => {
+    const updated = [...formData.loans];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, loans: updated });
+  };
+
+  // Interest Investment management functions (FDs, Bonds)
+  const addInterestInvestment = () => {
+    setFormData({
+      ...formData,
+      interest_investments: [...formData.interest_investments, {
+        name: '',
+        investment_type: 'FD',
+        principal_amount: 0,
+        interest_rate: 0
+      }]
+    });
+  };
+
+  const removeInterestInvestment = (index) => {
+    setFormData({
+      ...formData,
+      interest_investments: formData.interest_investments.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateInterestInvestment = (index, field, value) => {
+    const updated = [...formData.interest_investments];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, interest_investments: updated });
+  };
+
+  // Calculate EMI for a loan
+  const calculateEMI = (principal, rate, tenureMonths) => {
+    if (!principal || !rate || !tenureMonths) return 0;
+    const monthlyRate = rate / 12 / 100;
+    const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / 
+                (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+    return isFinite(emi) ? emi : 0;
+  };
+
+  // Calculate yearly interest expense for a loan
+  const calculateYearlyInterest = (principal, rate, tenureMonths) => {
+    if (!principal || !rate || !tenureMonths) return 0;
+    const emi = calculateEMI(principal, rate, tenureMonths);
+    const yearlyPayment = emi * 12;
+    const principalPaymentPerYear = (principal / tenureMonths) * 12;
+    return yearlyPayment - principalPaymentPerYear;
+  };
+
+  // Calculate yearly interest income from FDs/Bonds
+  const calculateInterestIncome = (principal, rate) => {
+    if (!principal || !rate) return 0;
+    return (principal * rate / 100);
+  };
+
+  // Calculate total property value
+  const totalPropertyValue = formData.properties.reduce((sum, prop) => {
+    return sum + (parseFloat(prop.estimated_value) || 0);
+  }, 0);
+
+  // Calculate total loan principal (liability)
+  const totalLoanPrincipal = formData.loans.reduce((sum, loan) => {
+    return sum + (parseFloat(loan.principal_amount) || 0);
+  }, 0);
+
+  // Calculate total monthly EMI from loans
+  const totalMonthlyEMI = formData.loans.reduce((sum, loan) => {
+    const emi = calculateEMI(
+      parseFloat(loan.principal_amount) || 0,
+      parseFloat(loan.interest_rate) || 0,
+      parseInt(loan.tenure_months) || 0
+    );
+    return sum + emi;
+  }, 0);
+
+  // Calculate total yearly interest expense from loans
+  const totalYearlyInterestExpense = formData.loans.reduce((sum, loan) => {
+    const interest = calculateYearlyInterest(
+      parseFloat(loan.principal_amount) || 0,
+      parseFloat(loan.interest_rate) || 0,
+      parseInt(loan.tenure_months) || 0
+    );
+    return sum + interest;
+  }, 0);
+
+  // Calculate total yearly interest income from investments
+  const totalYearlyInterestIncome = formData.interest_investments.reduce((sum, inv) => {
+    const income = calculateInterestIncome(
+      parseFloat(inv.principal_amount) || 0,
+      parseFloat(inv.interest_rate) || 0
+    );
+    return sum + income;
+  }, 0);
+
+  // Calculate total FD/Bond principal (asset)
+  const totalInterestInvestmentPrincipal = formData.interest_investments.reduce((sum, inv) => {
+    return sum + (parseFloat(inv.principal_amount) || 0);
+  }, 0);
+
   const creditCardsList = [
     'HDFC Bank INFINIA Metal Edition', 'HDFC Regalia Gold', 'HDFC Millennia',
     'SBI CASHBACK', 'SBI SimplyCLICK', 'SBI Card PRIME',
@@ -315,7 +457,8 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     // Predefined yearly income (convert to monthly)
     ((parseFloat(formData.salary_income) || 0) / 12) +
     ((parseFloat(formData.business_income) || 0) / 12) +
-    ((parseFloat(formData.interest_income) || 0) / 12) +
+    // Include interest income from FDs/Bonds (auto-calculated)
+    (totalYearlyInterestIncome / 12) +
     ((parseFloat(formData.dividend_income) || 0) / 12) +
     ((parseFloat(formData.capital_gains) || 0) / 12) +
     ((parseFloat(formData.freelance_income) || 0) / 12) +
@@ -329,7 +472,8 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const totalMonthlyExpenses = 
     // Predefined fixed monthly expenses
     (parseFloat(formData.rent_expense) || 0) +
-    (parseFloat(formData.emis) || 0) +
+    // Include EMI from loans (auto-calculated)
+    totalMonthlyEMI +
     ((parseFloat(formData.term_insurance) || 0) / 12) +
     ((parseFloat(formData.health_insurance) || 0) / 12) +
     ((parseFloat(formData.vehicle_2w_1) || 0) / 12) +
