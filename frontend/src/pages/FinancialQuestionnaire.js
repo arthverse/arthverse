@@ -1066,7 +1066,18 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                 </div>
 
                 <div className="pt-4 border-t mt-6 bg-green-50 p-4 rounded-xl">
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-slate-600">Other Income (Monthly):</span>
+                      <span className="font-mono">₹{Math.round(totalMonthlyIncome - (totalYearlyInterestIncome / 12)).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-green-600">
+                      <span>+ Interest Income from FDs/Bonds (Monthly):</span>
+                      <span className="font-mono">₹{Math.round(totalYearlyInterestIncome / 12).toLocaleString()}</span>
+                    </div>
+                    <div className="border-t pt-2"></div>
+                  </div>
+                  <div className="flex justify-between items-center">
                     <p className="text-sm font-semibold text-slate-700">Total Monthly Income:</p>
                     <p className="text-3xl font-bold font-mono text-green-600">₹{Math.round(totalMonthlyIncome).toLocaleString()}</p>
                   </div>
