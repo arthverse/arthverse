@@ -345,6 +345,33 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     setFormData({ ...formData, properties: updated });
   };
 
+  // Vehicle management functions
+  const addVehicle = (vehicleType) => {
+    setFormData({
+      ...formData,
+      vehicles: [...formData.vehicles, { 
+        vehicle_type: vehicleType,
+        name: '', 
+        registration_number: '', 
+        estimated_value: 0,
+        is_insured: false
+      }]
+    });
+  };
+
+  const removeVehicle = (index) => {
+    setFormData({
+      ...formData,
+      vehicles: formData.vehicles.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateVehicle = (index, field, value) => {
+    const updated = [...formData.vehicles];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, vehicles: updated });
+  };
+
   // Loan management functions
   const addLoan = () => {
     setFormData({
