@@ -118,45 +118,140 @@ class ArthverseAPITester:
         )
         return success
 
-    def test_create_income_transaction(self):
-        """Test creating income transaction"""
+    def test_save_questionnaire(self):
+        """Test saving financial questionnaire with comprehensive data"""
+        questionnaire_data = {
+            # Income data
+            "salary_income": 50000,
+            "rental_property1": 10000,
+            "business_income": 20000,
+            "interest_income": 2000,
+            "dividend_income": 1500,
+            
+            # Expenses data
+            "rent_expense": 15000,
+            "groceries": 5000,
+            "fuel": 3000,
+            "food_dining": 4000,
+            "entertainment": 2000,
+            "healthcare": 1500,
+            "telecom_utilities": 2500,
+            
+            # Assets data
+            "property_value": 5000000,
+            "stocks_value": 200000,
+            "mutual_funds_value": 150000,
+            "bank_balance": 100000,
+            "cash_in_hand": 10000,
+            "gold_value": 50000,
+            
+            # Liabilities data
+            "home_loan": 2000000,
+            "personal_loan": 100000,
+            "credit_card_outstanding": 25000,
+            
+            # Financial stability
+            "has_health_insurance": True,
+            "has_term_insurance": True,
+            "invests_in_mutual_funds": True,
+            "takes_tds_refund": True,
+            "has_emergency_fund": True,
+            "files_itr_yearly": True,
+            
+            # Credit cards
+            "credit_cards": ["HDFC Regalia", "SBI SimplyCLICK"],
+            
+            # Monthly investment
+            "monthly_investment": 15000,
+            
+            # Properties list
+            "properties": [
+                {
+                    "name": "Primary Residence",
+                    "estimated_value": 3000000,
+                    "area_sqft": 1200
+                },
+                {
+                    "name": "Investment Property",
+                    "estimated_value": 2000000,
+                    "area_sqft": 800
+                }
+            ],
+            
+            # Vehicles list
+            "vehicles": [
+                {
+                    "vehicle_type": "4-Wheeler",
+                    "name": "Maruti Swift",
+                    "registration_number": "MH12AB1234",
+                    "estimated_value": 400000,
+                    "is_insured": True
+                }
+            ],
+            
+            # Loans list
+            "loans": [
+                {
+                    "loan_type": "Home",
+                    "name": "HDFC Home Loan",
+                    "principal_amount": 2000000,
+                    "interest_rate": 8.5,
+                    "tenure_months": 240
+                }
+            ],
+            
+            # Interest investments
+            "interest_investments": [
+                {
+                    "name": "HDFC Bank FD",
+                    "investment_type": "FD",
+                    "principal_amount": 500000,
+                    "interest_rate": 6.5
+                }
+            ]
+        }
+        
         success, response = self.run_test(
-            "Create Income Transaction",
+            "Save Financial Questionnaire",
             "POST",
-            "transactions",
+            "questionnaire",
             200,
-            data={
-                "amount": 50000,
-                "type": "income",
-                "category": "Salary",
-                "description": "Monthly Salary",
-                "date": datetime.now().strftime('%Y-%m-%d')
-            }
+            data=questionnaire_data
         )
-        if success and 'id' in response:
-            self.transaction_ids.append(response['id'])
-            return True
-        return False
+        if success:
+            print(f"   Message: {response.get('message', 'N/A')}")
+        return success
 
-    def test_create_expense_transaction(self):
-        """Test creating expense transaction"""
+    def test_get_questionnaire(self):
+        """Test retrieving saved questionnaire"""
         success, response = self.run_test(
-            "Create Expense Transaction",
+            "Get Financial Questionnaire",
+            "GET",
+            "questionnaire",
+            200
+        )
+        if success:
+            print(f"   Retrieved questionnaire data")
+            print(f"   Salary Income: ${response.get('salary_income', 0)}")
+            print(f"   Property Value: ${response.get('property_value', 0)}")
+            print(f"   Home Loan: ${response.get('home_loan', 0)}")
+            print(f"   Properties Count: {len(response.get('properties', []))}")
+            print(f"   Vehicles Count: {len(response.get('vehicles', []))}")
+        return success
+
+    def test_invalid_credentials(self):
+        """Test login with invalid credentials"""
+        success, response = self.run_test(
+            "Invalid Credentials Test",
             "POST",
-            "transactions",
-            200,
+            "auth/login",
+            401,  # Expecting 401 Unauthorized
             data={
-                "amount": 500,
-                "type": "expense",
-                "category": "Food & Dining",
-                "description": "Lunch at restaurant",
-                "date": datetime.now().strftime('%Y-%m-%d')
+                "client_id": "INVALID123",
+                "password": "wrongpassword"
             }
         )
-        if success and 'id' in response:
-            self.transaction_ids.append(response['id'])
-            return True
-        return False
+        return success
 
     def test_ai_categorization(self):
         """Test AI expense categorization"""
