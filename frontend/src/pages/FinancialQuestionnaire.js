@@ -25,7 +25,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     rental_property2: 0,
     salary_income: 0,
     business_income: 0,
-    interest_income: 0,
+    interest_income: 0,  // Will be auto-calculated from interest_investments
     dividend_income: 0,
     capital_gains: 0,
     freelance_income: 0,
@@ -33,7 +33,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     
     // Predefined Expense fields - Fixed
     rent_expense: 0,
-    emis: 0,
+    emis: 0,  // Will be auto-calculated from loans
     term_insurance: 0,
     health_insurance: 0,
     vehicle_2w_1: 0,
@@ -59,7 +59,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     foreign_transactions: 0,
     
     // Predefined Assets
-    property_value: 0,
+    property_value: 0,  // Will be auto-calculated from properties list
     vehicles_value: 0,
     gold_value: 0,
     silver_value: 0,
@@ -69,11 +69,20 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     bank_balance: 0,
     cash_in_hand: 0,
     
-    // Predefined Liabilities
+    // Detailed Properties List (NEW)
+    properties: [],
+    
+    // Predefined Liabilities (legacy - will be derived from loans)
     home_loan: 0,
     personal_loan: 0,
     vehicle_loan: 0,
     credit_card_outstanding: 0,
+    
+    // Detailed Loans List (NEW)
+    loans: [],
+    
+    // Interest-bearing Investments - FDs, Bonds, etc. (NEW)
+    interest_investments: [],
     
     // Dynamic/Manual entries
     income_entries: [],
