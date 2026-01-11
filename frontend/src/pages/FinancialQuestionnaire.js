@@ -191,13 +191,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         // Predefined expenses
         rent_expense: parseFloat(formData.rent_expense) || 0,
         emis: totalMonthlyEMI, // Auto-calculated from loans
-        term_insurance: parseFloat(formData.term_insurance) || 0,
-        health_insurance: parseFloat(formData.health_insurance) || 0,
-        vehicle_2w_1: parseFloat(formData.vehicle_2w_1) || 0,
-        vehicle_2w_2: parseFloat(formData.vehicle_2w_2) || 0,
-        vehicle_4w_1: parseFloat(formData.vehicle_4w_1) || 0,
-        vehicle_4w_2: parseFloat(formData.vehicle_4w_2) || 0,
-        vehicle_4w_3: parseFloat(formData.vehicle_4w_3) || 0,
         household_maid: parseFloat(formData.household_maid) || 0,
         groceries: parseFloat(formData.groceries) || 0,
         food_dining: parseFloat(formData.food_dining) || 0,
