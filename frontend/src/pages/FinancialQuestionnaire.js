@@ -227,6 +227,15 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           area_sqft: parseFloat(p.area_sqft) || 0
         })),
         
+        // Detailed Vehicles
+        vehicles: formData.vehicles.map(v => ({
+          vehicle_type: v.vehicle_type || '',
+          name: v.name || '',
+          registration_number: v.registration_number || '',
+          estimated_value: parseFloat(v.estimated_value) || 0,
+          is_insured: v.is_insured || false
+        })),
+        
         // Liabilities (auto-calculated from loans)
         home_loan: totalLoanPrincipal, // Total loan principal
         personal_loan: 0, // Legacy - kept for backward compatibility
