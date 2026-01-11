@@ -174,7 +174,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         rental_property2: parseFloat(formData.rental_property2) || 0,
         salary_income: parseFloat(formData.salary_income) || 0,
         business_income: parseFloat(formData.business_income) || 0,
-        interest_income: parseFloat(formData.interest_income) || 0,
+        interest_income: totalYearlyInterestIncome, // Auto-calculated from FDs/Bonds
         dividend_income: parseFloat(formData.dividend_income) || 0,
         capital_gains: parseFloat(formData.capital_gains) || 0,
         freelance_income: parseFloat(formData.freelance_income) || 0,
@@ -182,7 +182,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         
         // Predefined expenses
         rent_expense: parseFloat(formData.rent_expense) || 0,
-        emis: parseFloat(formData.emis) || 0,
+        emis: totalMonthlyEMI, // Auto-calculated from loans
         term_insurance: parseFloat(formData.term_insurance) || 0,
         health_insurance: parseFloat(formData.health_insurance) || 0,
         vehicle_2w_1: parseFloat(formData.vehicle_2w_1) || 0,
@@ -205,8 +205,8 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         cash_withdrawals: parseFloat(formData.cash_withdrawals) || 0,
         foreign_transactions: parseFloat(formData.foreign_transactions) || 0,
         
-        // Predefined assets
-        property_value: parseFloat(formData.property_value) || 0,
+        // Assets (auto-calculated property value from properties list)
+        property_value: totalPropertyValue,
         vehicles_value: parseFloat(formData.vehicles_value) || 0,
         gold_value: parseFloat(formData.gold_value) || 0,
         silver_value: parseFloat(formData.silver_value) || 0,
@@ -216,11 +216,35 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         bank_balance: parseFloat(formData.bank_balance) || 0,
         cash_in_hand: parseFloat(formData.cash_in_hand) || 0,
         
-        // Predefined liabilities
-        home_loan: parseFloat(formData.home_loan) || 0,
-        personal_loan: parseFloat(formData.personal_loan) || 0,
-        vehicle_loan: parseFloat(formData.vehicle_loan) || 0,
+        // Detailed Properties
+        properties: formData.properties.map(p => ({
+          name: p.name || '',
+          estimated_value: parseFloat(p.estimated_value) || 0,
+          area_sqft: parseFloat(p.area_sqft) || 0
+        })),
+        
+        // Liabilities (auto-calculated from loans)
+        home_loan: totalLoanPrincipal, // Total loan principal
+        personal_loan: 0, // Legacy - kept for backward compatibility
+        vehicle_loan: 0, // Legacy - kept for backward compatibility
         credit_card_outstanding: parseFloat(formData.credit_card_outstanding) || 0,
+        
+        // Detailed Loans
+        loans: formData.loans.map(l => ({
+          loan_type: l.loan_type || '',
+          name: l.name || '',
+          principal_amount: parseFloat(l.principal_amount) || 0,
+          interest_rate: parseFloat(l.interest_rate) || 0,
+          tenure_months: parseInt(l.tenure_months) || 0
+        })),
+        
+        // Interest-bearing Investments (FDs, Bonds)
+        interest_investments: formData.interest_investments.map(i => ({
+          name: i.name || '',
+          investment_type: i.investment_type || '',
+          principal_amount: parseFloat(i.principal_amount) || 0,
+          interest_rate: parseFloat(i.interest_rate) || 0
+        })),
         
         // Custom entries
         income_entries: formData.income_entries,
