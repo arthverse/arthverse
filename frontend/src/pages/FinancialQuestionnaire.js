@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API } from '../App';
@@ -10,14 +10,16 @@ import { Card } from '../components/ui/card';
 import { Checkbox } from '../components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
-import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Loader2, ChevronRight, ChevronLeft, RefreshCw } from 'lucide-react';
 
 export default function FinancialQuestionnaire({ token, onLogout }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [step, setStep] = useState(1);
   
-  const [formData, setFormData] = useState({
+  const defaultFormData = {
     // Predefined Income fields
     rental_property1: 0,
     rental_property2: 0,
