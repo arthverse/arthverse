@@ -14,8 +14,18 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize token from localStorage on mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+    }
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -36,6 +46,15 @@ function App() {
     setUser(null);
     localStorage.removeItem('token');
   };
+
+  // Show loading while checking auth state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
