@@ -16,7 +16,7 @@ export default function Dashboard({ token, user, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [questionnaire, setQuestionnaire] = useState(null);
   const [showBankData, setShowBankData] = useState(false);
-  const [hasPremiumAccess, setHasPremiumAccess] = useState(false); // Premium access flag
+  const [hasPremiumAccess, setHasPremiumAccess] = useState(true); // Temporarily enabled for testing
   const navigate = useNavigate();
 
   useEffect(() => {
