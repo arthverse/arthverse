@@ -509,7 +509,7 @@ async def get_health_score(credentials: HTTPAuthorizationCredentials = Depends(s
     )
 
 @api_router.get("/reports/pl", response_model=PLStatement)
-async def get_pl_statement(credentials: HTTPAuthorizationCredentials = security):
+async def get_pl_statement(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     transactions = await db.transactions.find({"user_id": user_id}, {"_id": 0}).to_list(1000)
@@ -541,7 +541,7 @@ async def get_pl_statement(credentials: HTTPAuthorizationCredentials = security)
     )
 
 @api_router.get("/reports/balance-sheet", response_model=BalanceSheet)
-async def get_balance_sheet(credentials: HTTPAuthorizationCredentials = security):
+async def get_balance_sheet(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
     transactions = await db.transactions.find({"user_id": user_id}, {"_id": 0}).to_list(1000)
