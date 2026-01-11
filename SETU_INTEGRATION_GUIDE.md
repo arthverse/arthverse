@@ -63,99 +63,79 @@ All credentials are now properly configured:
 
 ---
 
-## 🚀 How It Works (Current Implementation)
+## 🚀 How It Works (LIVE Integration)
 
 ### User Flow
 1. **Navigate to Arthvyay Dashboard** → User sees "Link Bank Accounts" section
-2. **Enter Phone Number** → User enters their 10-digit phone number
-3. **Initiate Consent** → Backend creates consent request (currently mock)
-4. **Approve Consent** → User would approve in Setu AA window (simulated)
-5. **Data Fetched** → Mock financial data is displayed:
-   - Bank accounts with balances
-   - Transaction history
-   - Mutual funds holdings
-   - Insurance policies
+2. **Enter Phone Number** → User enters their 10-digit phone number  
+3. **Initiate Consent** → Backend creates **REAL** consent request via Setu API
+4. **Redirect to Setu** → User redirected to Setu's secure consent approval screen
+5. **Complete OTP Verification** → User verifies phone via OTP
+6. **Select Bank Accounts** → User chooses which accounts to link
+7. **Approve Consent** → User approves the data sharing consent
+8. **Data Fetched** → Real financial data fetched from linked banks:
+   - Bank accounts with live balances
+   - Actual transaction history (last 12 months)
+   - Mutual funds holdings (if linked)
+   - Insurance policies (if linked)
 
-### API Endpoints
+### API Endpoints (ALL ACTIVE)
 ```
-POST   /api/setu/consent/initiate       # Start consent flow
-GET    /api/setu/consent/status/{id}    # Check approval status
-POST   /api/setu/financial-data/fetch/{id}  # Fetch account data
-GET    /api/setu/financial-data         # Get user's aggregated data
+POST   /api/setu/consent/initiate       # ✅ Creates real Setu consent
+GET    /api/setu/consent/status/{id}    # ✅ Checks real approval status
+POST   /api/setu/financial-data/fetch/{id}  # ✅ Fetches real account data
+GET    /api/setu/financial-data         # ✅ Returns user's live data
 ```
 
 ---
 
-## 🔧 Post-Deployment Activation Steps
+## 🧪 Testing the Integration
 
-### Step 1: Add Real Credentials
-1. Log into Setu Bridge: https://bridge.setu.co
-   - Email: Mehul.s@arth-verse.in
-   - Password: Mehul17@#$
+### Test with Setu Sandbox
 
-2. Navigate to your Account Aggregator product
-3. Copy the three credentials:
-   - `x-client-id`
-   - `x-client-secret`
-   - `x-product-instance-id` (already added)
+Setu provides mock Financial Information Providers (FIPs) for testing:
 
-4. Update `/app/backend/.env`:
-```bash
-SETU_CLIENT_ID=<actual_client_id>
-SETU_CLIENT_SECRET=<actual_client_secret>
-```
-
-5. Restart backend:
-```bash
-sudo supervisorctl restart backend
-```
-
-### Step 2: Activate Real API Calls
-
-Edit `/app/backend/services/setu_service.py` and uncomment the TODO sections in these methods:
-- `create_consent_request()` - Line ~48
-- `get_consent_status()` - Line ~80
-- `create_data_session()` - Line ~115
-- `fetch_financial_data()` - Line ~147
-
-**Search for**: `# TODO (POST-DEPLOYMENT):`
-
-Remove the mock responses and uncomment the actual API call code blocks.
-
-### Step 3: Test the Integration
-
-1. Login to ArthVerse with test credentials:
+1. **Login to ArthVerse**:
    - Client ID: `AV271676A7`
    - Password: `Demo123!`
 
-2. Navigate to Arthvyay Dashboard
+2. **Navigate to Arthvyay Dashboard**
 
-3. Click "Link Bank Account"
+3. **Click "Link Bank Account"**
 
-4. Enter a valid 10-digit phone number
+4. **Enter Phone Number**: Any 10-digit number (e.g., `9999999999`)
 
-5. Complete the consent flow in the Setu AA window
+5. **Setu Consent Screen Opens**:
+   - You'll see Setu's sandbox consent approval interface
+   - Mock banks available for testing
+   - Complete OTP verification (sandbox provides test OTPs)
 
-6. Verify financial data appears in the dashboard
+6. **Select Test Banks**:
+   - Choose from Setu's mock FIPs
+   - Approve the consent
+
+7. **View Aggregated Data**:
+   - Real data from Setu's sandbox FIPs
+   - Transactions, balances, etc.
+
+### Expected Sandbox Behavior
+- Phone OTP verification works with any 10-digit number
+- Mock banks provide realistic test data
+- All consent flows are fully functional
+- Data fetching returns standardized FI data
 
 ---
 
-## 🧪 Mock Data (Current State)
+## 🔧 No Post-Deployment Steps Needed!
 
-The integration currently returns mock data for testing:
+The integration is **FULLY ACTIVATED**. No additional configuration required.
 
-### Mock Bank Accounts
-- **HDFC Bank**: Account XXXXXXXX1234, Balance: ₹2,50,000
-- **ICICI Bank**: Account XXXXXXXX5678, Balance: ₹1,25,000
-
-### Mock Transactions
-- Sample credit/debit transactions with narrations
-
-### Mock Mutual Funds
-- SBI Blue Chip Fund: 500 units @ ₹85.50 = ₹42,750
-
-### Mock Insurance
-- LIC Term Insurance: Sum Assured ₹50,00,000
+### What's Already Done
+- ✅ Real credentials configured
+- ✅ All API calls activated
+- ✅ Mock code removed
+- ✅ Live Setu API integration working
+- ✅ Backend restarted and verified
 
 ---
 
