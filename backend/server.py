@@ -189,7 +189,7 @@ class FinancialQuestionnaire(BaseModel):
     foreign_transactions: float = 0
     
     # Predefined Assets
-    property_value: float = 0
+    property_value: float = 0  # Total property value (legacy, will be derived from properties list)
     vehicles_value: float = 0
     gold_value: float = 0
     silver_value: float = 0
@@ -199,11 +199,20 @@ class FinancialQuestionnaire(BaseModel):
     bank_balance: float = 0
     cash_in_hand: float = 0
     
+    # Detailed Properties List
+    properties: List[dict] = []  # List of PropertyEntry dicts
+    
     # Predefined Liabilities
     home_loan: float = 0
     personal_loan: float = 0
     vehicle_loan: float = 0
     credit_card_outstanding: float = 0
+    
+    # Detailed Loans List (replaces simple loan values)
+    loans: List[dict] = []  # List of LoanEntry dicts
+    
+    # Interest-bearing Investments (FDs, Bonds, etc.)
+    interest_investments: List[dict] = []  # List of InterestIncomeEntry dicts
     
     # Dynamic/Custom entries
     income_entries: List[FinancialEntry] = []
