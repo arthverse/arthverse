@@ -677,7 +677,7 @@ async def get_setu_consent_status(
     Returns PENDING, ACTIVE, REJECTED, or REVOKED.
     """
     try:
-        user = await get_current_user(credentials.credentials)
+        user_id = await verify_token(credentials.credentials)
         
         # Get status from Setu
         status_response = await setu_service.get_consent_status(consent_id)
