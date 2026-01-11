@@ -256,6 +256,20 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           interest_rate: parseFloat(i.interest_rate) || 0
         })),
         
+        // Insurance Policies
+        insurance_policies: formData.insurance_policies.map(ins => ({
+          type: ins.type || '',
+          insurance_amount: parseFloat(ins.insurance_amount) || 0,
+          cover_self: ins.cover_self || false,
+          cover_spouse: ins.cover_spouse || false,
+          cover_dependents: ins.cover_dependents || false,
+          self_name: ins.self_name || '',
+          spouse_name: ins.spouse_name || '',
+          dependent_names: ins.dependent_names || '',
+          vehicle_type: ins.vehicle_type || '',
+          vehicle_number: ins.vehicle_number || ''
+        })),
+        
         // Custom entries
         income_entries: formData.income_entries,
         expense_entries: formData.expense_entries,
