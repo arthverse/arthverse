@@ -125,118 +125,22 @@ class SetuService:
     
     async def fetch_financial_data(self, session_id: str) -> Dict:
         """
-        TODO (POST-DEPLOYMENT): Implement actual Setu financial data fetching
-        
         Fetch the actual financial information for an approved consent.
         """
         logger.info(f"Fetching financial data for session: {session_id}")
         
-        # TODO: Uncomment and implement post-deployment
-        # headers = await self._get_headers()
-        # 
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.get(
-        #         f"{self.base_url}/v2/data-sessions/{session_id}",
-        #         headers=headers
-        #     ) as response:
-        #         if response.status != 200:
-        #             raise Exception("Failed to fetch financial data")
-        #         return await response.json()
+        headers = await self._get_headers()
         
-        # Mock response for UI testing - simulating bank data
-        return {
-            "accounts": [
-                {
-                    "fipId": "HDFC-FIP",
-                    "fipName": "HDFC Bank",
-                    "maskedAccNumber": "XXXXXXXX1234",
-                    "accType": "SAVINGS",
-                    "fiType": "DEPOSIT",
-                    "profile": {
-                        "holders": {
-                            "holder": [{"name": "Demo User", "email": "demo@example.com"}]
-                        }
-                    },
-                    "summary": {
-                        "currentBalance": "250000.50",
-                        "currency": "INR",
-                        "balanceDateTime": datetime.now().isoformat()
-                    },
-                    "transactions": {
-                        "transaction": [
-                            {
-                                "txnId": "TXN001",
-                                "type": "CREDIT",
-                                "mode": "UPI",
-                                "amount": "5000.00",
-                                "currentBalance": "250000.50",
-                                "transactionTimestamp": (datetime.now() - timedelta(days=2)).isoformat(),
-                                "narration": "Salary Credit"
-                            },
-                            {
-                                "txnId": "TXN002",
-                                "type": "DEBIT",
-                                "mode": "UPI",
-                                "amount": "1500.00",
-                                "currentBalance": "245000.50",
-                                "transactionTimestamp": (datetime.now() - timedelta(days=5)).isoformat(),
-                                "narration": "Shopping - Amazon"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "fipId": "ICICI-FIP",
-                    "fipName": "ICICI Bank",
-                    "maskedAccNumber": "XXXXXXXX5678",
-                    "accType": "SAVINGS",
-                    "fiType": "DEPOSIT",
-                    "profile": {
-                        "holders": {
-                            "holder": [{"name": "Demo User"}]
-                        }
-                    },
-                    "summary": {
-                        "currentBalance": "125000.00",
-                        "currency": "INR",
-                        "balanceDateTime": datetime.now().isoformat()
-                    },
-                    "transactions": {
-                        "transaction": []
-                    }
-                }
-            ],
-            "mutualFunds": [
-                {
-                    "fipId": "MUTUAL-FUND-FIP",
-                    "fipName": "SBI Mutual Fund",
-                    "folioNumber": "MF123456",
-                    "fiType": "MUTUAL_FUNDS",
-                    "holdings": [
-                        {
-                            "schemeName": "SBI Blue Chip Fund",
-                            "units": "500.00",
-                            "nav": "85.50",
-                            "currentValue": "42750.00"
-                        }
-                    ]
-                }
-            ],
-            "insurance": [
-                {
-                    "fipId": "INSURANCE-FIP",
-                    "fipName": "LIC",
-                    "policyNumber": "LIC987654",
-                    "fiType": "INSURANCE",
-                    "policyDetails": {
-                        "policyType": "TERM",
-                        "sumAssured": "5000000",
-                        "premium": "25000",
-                        "premiumFrequency": "YEARLY"
-                    }
-                }
-            ]
-        }
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{self.base_url}/v2/data-sessions/{session_id}",
+                headers=headers
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Failed to fetch financial data: {error_text}")
+                    raise Exception(f"Failed to fetch financial data: {error_text}")
+                return await response.json()
 
 # Instantiate the service
 setu_service = SetuService()
