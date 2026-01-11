@@ -522,10 +522,9 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     }, 0);
 
   const totalLiabilities = 
-    // Predefined liabilities
-    (parseFloat(formData.home_loan) || 0) +
-    (parseFloat(formData.personal_loan) || 0) +
-    (parseFloat(formData.vehicle_loan) || 0) +
+    // Loan principal from detailed loans list
+    totalLoanPrincipal +
+    // Credit card outstanding
     (parseFloat(formData.credit_card_outstanding) || 0) +
     // Custom entries
     formData.liability_entries.reduce((sum, entry) => {
