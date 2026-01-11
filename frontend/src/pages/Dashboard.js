@@ -325,6 +325,24 @@ export default function Dashboard({ token, user, onLogout }) {
             )}
           </div>
         </div>
+
+        {/* Setu Account Aggregator - Bank Linking Section */}
+        <div className="col-span-1 md:col-span-4 mt-8">
+          <h2 className="text-2xl font-bold font-heading mb-4 text-brand-blue">
+            Connected Financial Accounts
+          </h2>
+          <p className="text-slate-600 font-body mb-6">
+            Link your bank accounts, mutual funds, and insurance policies to get a complete financial picture.
+          </p>
+          
+          <BankLinking token={token} onConsentApproved={handleConsentApproved} />
+          
+          {showBankData && (
+            <div className="mt-6">
+              <AggregatedFinancialData token={token} />
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );
