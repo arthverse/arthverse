@@ -129,6 +129,28 @@ class FinancialEntry(BaseModel):
     amount: float
     frequency: str = "monthly"
 
+# New detailed models for properties, loans, and investments
+class PropertyEntry(BaseModel):
+    name: str = ""
+    estimated_value: float = 0
+    area_sqft: float = 0
+    # value_per_sqft calculated on frontend
+
+class LoanEntry(BaseModel):
+    loan_type: str = ""  # Home/Personal/Vehicle/Education/Gold/Other
+    name: str = ""
+    principal_amount: float = 0
+    interest_rate: float = 0  # Annual %
+    tenure_months: int = 0
+    # EMI and yearly interest calculated on frontend
+
+class InterestIncomeEntry(BaseModel):
+    name: str = ""  # FD name, Bond name, etc.
+    investment_type: str = ""  # FD/RD/Bonds/Debentures/Other
+    principal_amount: float = 0
+    interest_rate: float = 0  # Annual %
+    # Yearly interest income calculated on frontend
+
 class FinancialQuestionnaire(BaseModel):
     # Predefined Income
     rental_property1: float = 0
