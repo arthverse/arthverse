@@ -87,6 +87,9 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     // Interest-bearing Investments - FDs, Bonds, etc. (NEW)
     interest_investments: [],
     
+    // Insurance Policies (NEW)
+    insurance_policies: [],
+    
     // Dynamic/Manual entries
     income_entries: [],
     expense_entries: [],
