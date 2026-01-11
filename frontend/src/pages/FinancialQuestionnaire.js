@@ -1147,21 +1147,195 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
               <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">3. Assets & Liabilities</h2>
               
               <div className="space-y-8">
-                {/* Predefined Assets */}
-                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
-                  <h3 className="text-lg font-semibold text-green-700 mb-4">Common Assets</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                {/* Properties Section - NEW */}
+                <div className="bg-blue-50 p-6 rounded-xl border border-brand-blue/20">
+                  <div className="flex justify-between items-center mb-4">
                     <div>
-                      <Label className="text-sm font-medium">Property Value (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.property_value}
-                        onChange={(e) => setFormData({ ...formData, property_value: e.target.value })}
-                        className="mt-1"
-                        placeholder="0"
-                      />
+                      <h3 className="text-lg font-semibold text-brand-blue">Real Estate Properties</h3>
+                      <p className="text-sm text-slate-500">Add all your properties with details</p>
                     </div>
+                    <Button
+                      type="button"
+                      onClick={addProperty}
+                      className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
+                    >
+                      + Add Property
+                    </Button>
+                  </div>
+                  
+                  {formData.properties.length > 0 ? (
+                    <div className="space-y-3">
+                      {/* Table Header */}
+                      <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-brand-blue/10 rounded-lg text-sm font-medium text-brand-blue">
+                        <div className="col-span-4">Property Name</div>
+                        <div className="col-span-3">Estimated Value (₹)</div>
+                        <div className="col-span-2">Area (sqft)</div>
+                        <div className="col-span-2">₹/sqft</div>
+                        <div className="col-span-1"></div>
+                      </div>
+                      {formData.properties.map((prop, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                          <div className="col-span-4">
+                            <Input
+                              placeholder="e.g., Flat in Mumbai"
+                              value={prop.name}
+                              onChange={(e) => updateProperty(index, 'name', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={prop.estimated_value}
+                              onChange={(e) => updateProperty(index, 'estimated_value', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={prop.area_sqft}
+                              onChange={(e) => updateProperty(index, 'area_sqft', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-2 flex items-center">
+                            <span className="text-sm font-mono text-slate-600">
+                              ₹{prop.area_sqft > 0 ? Math.round((parseFloat(prop.estimated_value) || 0) / parseFloat(prop.area_sqft)).toLocaleString() : 0}
+                            </span>
+                          </div>
+                          <div className="col-span-1 flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeProperty(index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-end pt-2">
+                        <span className="text-sm font-semibold text-brand-blue">
+                          Total Property Value: ₹{Math.round(totalPropertyValue).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-400 py-4">No properties added yet. Click "Add Property" to start.</p>
+                  )}
+                </div>
 
+                {/* Interest-bearing Investments (FDs, Bonds) - NEW */}
+                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-700">Fixed Deposits & Bonds</h3>
+                      <p className="text-sm text-slate-500">Interest income will be auto-calculated</p>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={addInterestInvestment}
+                      className="bg-green-600 hover:bg-green-700 rounded-full text-white"
+                    >
+                      + Add FD/Bond
+                    </Button>
+                  </div>
+                  
+                  {formData.interest_investments.length > 0 ? (
+                    <div className="space-y-3">
+                      {/* Table Header */}
+                      <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-green-100 rounded-lg text-sm font-medium text-green-700">
+                        <div className="col-span-3">Name</div>
+                        <div className="col-span-2">Type</div>
+                        <div className="col-span-3">Principal (₹)</div>
+                        <div className="col-span-2">Rate (%)</div>
+                        <div className="col-span-1">Yearly Interest</div>
+                        <div className="col-span-1"></div>
+                      </div>
+                      {formData.interest_investments.map((inv, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                          <div className="col-span-3">
+                            <Input
+                              placeholder="e.g., SBI FD"
+                              value={inv.name}
+                              onChange={(e) => updateInterestInvestment(index, 'name', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Select
+                              value={inv.investment_type}
+                              onValueChange={(value) => updateInterestInvestment(index, 'investment_type', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="FD">Fixed Deposit</SelectItem>
+                                <SelectItem value="RD">Recurring Deposit</SelectItem>
+                                <SelectItem value="Bonds">Bonds</SelectItem>
+                                <SelectItem value="Debentures">Debentures</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-3">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={inv.principal_amount}
+                              onChange={(e) => updateInterestInvestment(index, 'principal_amount', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="0"
+                              value={inv.interest_rate}
+                              onChange={(e) => updateInterestInvestment(index, 'interest_rate', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-1 flex items-center">
+                            <span className="text-sm font-mono text-green-600">
+                              ₹{Math.round(calculateInterestIncome(
+                                parseFloat(inv.principal_amount) || 0,
+                                parseFloat(inv.interest_rate) || 0
+                              )).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="col-span-1 flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeInterestInvestment(index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-between pt-2 px-2">
+                        <span className="text-sm font-semibold text-green-700">
+                          Total Principal: ₹{Math.round(totalInterestInvestmentPrincipal).toLocaleString()}
+                        </span>
+                        <span className="text-sm font-semibold text-green-700">
+                          Total Yearly Interest Income: ₹{Math.round(totalYearlyInterestIncome).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-400 py-4">No FDs/Bonds added yet. Click "Add FD/Bond" to start.</p>
+                  )}
+                </div>
+
+                {/* Other Assets */}
+                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                  <h3 className="text-lg font-semibold text-green-700 mb-4">Other Assets</h3>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">Vehicles Value (₹)</Label>
                       <Input
@@ -1172,7 +1346,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">Gold Value (₹)</Label>
                       <Input
@@ -1183,7 +1356,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">Silver Value (₹)</Label>
                       <Input
@@ -1194,7 +1366,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">Stocks (₹)</Label>
                       <Input
@@ -1205,7 +1376,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">Mutual Funds (₹)</Label>
                       <Input
@@ -1216,7 +1386,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">PF / NPS (₹)</Label>
                       <Input
@@ -1227,7 +1396,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">Bank Balance (₹)</Label>
                       <Input
@@ -1238,7 +1406,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         placeholder="0"
                       />
                     </div>
-
                     <div>
                       <Label className="text-sm font-medium">Cash in Hand (₹)</Label>
                       <Input
@@ -1252,63 +1419,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   </div>
                 </div>
 
-                {/* Custom Assets Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-brand-blue">Additional Assets (Optional)</h3>
-                    <Button
-                      type="button"
-                      onClick={() => addEntry('asset')}
-                      className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
-                      data-testid="add-asset-btn"
-                    >
-                      + Add Custom Asset
-                    </Button>
-                  </div>
-
-                  {formData.asset_entries.length > 0 && (
-                    <div className="space-y-3">
-                      {formData.asset_entries.map((entry, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-green-50 rounded-xl" data-testid={`asset-entry-${index}`}>
-                          <div className="col-span-8">
-                            <Label className="text-xs">Asset Type</Label>
-                            <Input
-                              placeholder="e.g., Cryptocurrency, Art Collection"
-                              value={entry.type}
-                              onChange={(e) => updateEntry('asset', index, 'type', e.target.value)}
-                              className="mt-1"
-                              data-testid={`asset-type-${index}`}
-                            />
-                          </div>
-                          <div className="col-span-3">
-                            <Label className="text-xs">Value (₹)</Label>
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={entry.amount}
-                              onChange={(e) => updateEntry('asset', index, 'amount', e.target.value)}
-                              className="mt-1"
-                              data-testid={`asset-amount-${index}`}
-                            />
-                          </div>
-                          <div className="col-span-1 flex items-end">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeEntry('asset', index)}
-                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                              data-testid={`remove-asset-${index}`}
-                            >
-                              <span className="text-lg">×</span>
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
                 <div className="pt-3 border-t">
                   <div className="flex justify-between items-center bg-green-50 p-4 rounded-xl">
                     <p className="text-sm font-semibold text-slate-700">Total Assets:</p>
@@ -1316,43 +1426,130 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   </div>
                 </div>
 
-                {/* Predefined Liabilities */}
+                {/* Loans Section - NEW */}
                 <div className="bg-red-50 p-6 rounded-xl border border-red-200">
-                  <h3 className="text-lg font-semibold text-red-600 mb-4">Common Liabilities</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-red-600">Loans</h3>
+                      <p className="text-sm text-slate-500">EMI and interest expense will be auto-calculated</p>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={addLoan}
+                      className="bg-red-600 hover:bg-red-700 rounded-full text-white"
+                    >
+                      + Add Loan
+                    </Button>
+                  </div>
+                  
+                  {formData.loans.length > 0 ? (
+                    <div className="space-y-3">
+                      {/* Table Header */}
+                      <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-red-100 rounded-lg text-xs font-medium text-red-700">
+                        <div className="col-span-2">Type</div>
+                        <div className="col-span-2">Name</div>
+                        <div className="col-span-2">Principal (₹)</div>
+                        <div className="col-span-1">Rate %</div>
+                        <div className="col-span-2">Tenure (months)</div>
+                        <div className="col-span-2">Monthly EMI</div>
+                        <div className="col-span-1"></div>
+                      </div>
+                      {formData.loans.map((loan, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                          <div className="col-span-2">
+                            <Select
+                              value={loan.loan_type}
+                              onValueChange={(value) => updateLoan(index, 'loan_type', value)}
+                            >
+                              <SelectTrigger className="text-xs">
+                                <SelectValue placeholder="Type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Home">Home Loan</SelectItem>
+                                <SelectItem value="Personal">Personal Loan</SelectItem>
+                                <SelectItem value="Vehicle">Vehicle Loan</SelectItem>
+                                <SelectItem value="Education">Education Loan</SelectItem>
+                                <SelectItem value="Gold">Gold Loan</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              placeholder="Loan name"
+                              value={loan.name}
+                              onChange={(e) => updateLoan(index, 'name', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={loan.principal_amount}
+                              onChange={(e) => updateLoan(index, 'principal_amount', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="0"
+                              value={loan.interest_rate}
+                              onChange={(e) => updateLoan(index, 'interest_rate', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={loan.tenure_months}
+                              onChange={(e) => updateLoan(index, 'tenure_months', e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2 flex items-center">
+                            <span className="text-sm font-mono text-red-600">
+                              ₹{Math.round(calculateEMI(
+                                parseFloat(loan.principal_amount) || 0,
+                                parseFloat(loan.interest_rate) || 0,
+                                parseInt(loan.tenure_months) || 0
+                              )).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="col-span-1 flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeLoan(index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-between pt-2 px-2">
+                        <span className="text-sm font-semibold text-red-700">
+                          Total Principal: ₹{Math.round(totalLoanPrincipal).toLocaleString()}
+                        </span>
+                        <span className="text-sm font-semibold text-red-700">
+                          Total Monthly EMI: ₹{Math.round(totalMonthlyEMI).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-400 py-4">No loans added yet. Click "Add Loan" to start.</p>
+                  )}
+                </div>
+
+                {/* Credit Card Outstanding */}
+                <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                  <h3 className="text-lg font-semibold text-red-600 mb-4">Other Liabilities</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium">Home Loan Outstanding (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.home_loan}
-                        onChange={(e) => setFormData({ ...formData, home_loan: e.target.value })}
-                        className="mt-1"
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Personal Loan (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.personal_loan}
-                        onChange={(e) => setFormData({ ...formData, personal_loan: e.target.value })}
-                        className="mt-1"
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Vehicle Loan (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.vehicle_loan}
-                        onChange={(e) => setFormData({ ...formData, vehicle_loan: e.target.value })}
-                        className="mt-1"
-                        placeholder="0"
-                      />
-                    </div>
-
                     <div>
                       <Label className="text-sm font-medium">Credit Card Outstanding (₹)</Label>
                       <Input
@@ -1364,63 +1561,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                       />
                     </div>
                   </div>
-                </div>
-
-                {/* Custom Liabilities Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-brand-orange">Additional Liabilities (Optional)</h3>
-                    <Button
-                      type="button"
-                      onClick={() => addEntry('liability')}
-                      className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
-                      data-testid="add-liability-btn"
-                    >
-                      + Add Custom Liability
-                    </Button>
-                  </div>
-
-                  {formData.liability_entries.length > 0 && (
-                    <div className="space-y-3">
-                      {formData.liability_entries.map((entry, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-red-50 rounded-xl" data-testid={`liability-entry-${index}`}>
-                          <div className="col-span-8">
-                            <Label className="text-xs">Liability Type</Label>
-                            <Input
-                              placeholder="e.g., Education Loan, Medical Debt"
-                              value={entry.type}
-                              onChange={(e) => updateEntry('liability', index, 'type', e.target.value)}
-                              className="mt-1"
-                              data-testid={`liability-type-${index}`}
-                            />
-                          </div>
-                          <div className="col-span-3">
-                            <Label className="text-xs">Amount (₹)</Label>
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={entry.amount}
-                              onChange={(e) => updateEntry('liability', index, 'amount', e.target.value)}
-                              className="mt-1"
-                              data-testid={`liability-amount-${index}`}
-                            />
-                          </div>
-                          <div className="col-span-1 flex items-end">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeEntry('liability', index)}
-                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                              data-testid={`remove-liability-${index}`}
-                            >
-                              <span className="text-lg">×</span>
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div className="pt-3 border-t">
