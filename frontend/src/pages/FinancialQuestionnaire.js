@@ -373,13 +373,45 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
       return sum + (parseFloat(entry.amount) || 0);
     }, 0);
 
+  // Show loading state while fetching existing data
+  if (initialLoading) {
+    return (
+      <Layout token={token} onLogout={onLogout}>
+        <div className="flex items-center justify-center h-96">
+          <div className="flex items-center gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-brand-blue" />
+            <span className="text-lg text-slate-600">Loading your financial data...</span>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout token={token} onLogout={onLogout}>
       <div className="max-w-4xl mx-auto p-6 py-12" data-testid="financial-questionnaire">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold font-heading text-brand-blue mb-2">Financial Profile Setup</h1>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-4xl font-bold font-heading text-brand-blue">
+              {isEditing ? 'Edit Financial Profile' : 'Financial Profile Setup'}
+            </h1>
+            {isEditing && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleReset}
+                className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset All Data
+              </Button>
+            )}
+          </div>
           <p className="text-slate-600 font-body">
-            Please fill all your income and expense details for better analysis. Your data is secured with us.
+            {isEditing 
+              ? 'Update your income and expense details. Changes will be saved when you submit.'
+              : 'Please fill all your income and expense details for better analysis. Your data is secured with us.'
+            }
           </p>
           <div className="mt-4 flex gap-2">
             {[1, 2, 3, 4].map((s) => (
