@@ -763,8 +763,7 @@ async def get_user_financial_data(
     Returns bank accounts, mutual funds, and insurance data.
     """
     try:
-        user = await get_current_user(credentials.credentials)
-        user_id = user['id']
+        user_id = await verify_token(credentials.credentials)
         
         # Get latest financial data
         financial_data = await db.setu_financial_data.find_one(
