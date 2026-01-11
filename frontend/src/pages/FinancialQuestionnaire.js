@@ -1293,6 +1293,188 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   )}
                 </div>
 
+                {/* Vehicles Section - NEW */}
+                <div className="bg-purple-50 p-6 rounded-xl border border-purple-200">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-purple-700">Vehicles</h3>
+                    <p className="text-sm text-slate-500">Add your 2-wheelers and 4-wheelers with details</p>
+                  </div>
+                  
+                  {/* 2-Wheeler Section */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-md font-medium text-purple-600">🏍️ 2-Wheeler Vehicles</h4>
+                      <Button
+                        type="button"
+                        onClick={() => addVehicle('2-Wheeler')}
+                        className="bg-purple-600 hover:bg-purple-700 rounded-full text-white text-sm"
+                      >
+                        + Add 2-Wheeler
+                      </Button>
+                    </div>
+                    
+                    {formData.vehicles.filter(v => v.vehicle_type === '2-Wheeler').length > 0 ? (
+                      <div className="space-y-2">
+                        {/* Table Header */}
+                        <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-purple-100 rounded-lg text-xs font-medium text-purple-700">
+                          <div className="col-span-3">Vehicle Name</div>
+                          <div className="col-span-3">Registration No.</div>
+                          <div className="col-span-3">Estimated Value (₹)</div>
+                          <div className="col-span-2">Insured?</div>
+                          <div className="col-span-1"></div>
+                        </div>
+                        {formData.vehicles.map((vehicle, index) => (
+                          vehicle.vehicle_type === '2-Wheeler' && (
+                            <div key={index} className="grid grid-cols-12 gap-2 p-2 bg-white rounded-lg border">
+                              <div className="col-span-3">
+                                <Input
+                                  placeholder="e.g., Honda Activa"
+                                  value={vehicle.name}
+                                  onChange={(e) => updateVehicle(index, 'name', e.target.value)}
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="col-span-3">
+                                <Input
+                                  placeholder="e.g., CG04ND1195"
+                                  value={vehicle.registration_number}
+                                  onChange={(e) => updateVehicle(index, 'registration_number', e.target.value.toUpperCase())}
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="col-span-3">
+                                <Input
+                                  type="number"
+                                  placeholder="0"
+                                  value={vehicle.estimated_value}
+                                  onChange={(e) => updateVehicle(index, 'estimated_value', e.target.value)}
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="col-span-2 flex items-center">
+                                <Checkbox
+                                  checked={vehicle.is_insured}
+                                  onCheckedChange={(checked) => updateVehicle(index, 'is_insured', checked)}
+                                />
+                                <span className="ml-2 text-xs text-slate-600">{vehicle.is_insured ? 'Yes' : 'No'}</span>
+                              </div>
+                              <div className="col-span-1 flex items-center justify-center">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeVehicle(index)}
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                >
+                                  ×
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        ))}
+                        <div className="flex justify-end pt-1">
+                          <span className="text-sm font-semibold text-purple-700">
+                            Total 2-Wheeler Value: ₹{Math.round(total2WheelerValue).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-center text-slate-400 py-3 text-sm">No 2-wheelers added yet.</p>
+                    )}
+                  </div>
+                  
+                  {/* 4-Wheeler Section */}
+                  <div>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-md font-medium text-purple-600">🚗 4-Wheeler Vehicles</h4>
+                      <Button
+                        type="button"
+                        onClick={() => addVehicle('4-Wheeler')}
+                        className="bg-purple-600 hover:bg-purple-700 rounded-full text-white text-sm"
+                      >
+                        + Add 4-Wheeler
+                      </Button>
+                    </div>
+                    
+                    {formData.vehicles.filter(v => v.vehicle_type === '4-Wheeler').length > 0 ? (
+                      <div className="space-y-2">
+                        {/* Table Header */}
+                        <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-purple-100 rounded-lg text-xs font-medium text-purple-700">
+                          <div className="col-span-3">Vehicle Name</div>
+                          <div className="col-span-3">Registration No.</div>
+                          <div className="col-span-3">Estimated Value (₹)</div>
+                          <div className="col-span-2">Insured?</div>
+                          <div className="col-span-1"></div>
+                        </div>
+                        {formData.vehicles.map((vehicle, index) => (
+                          vehicle.vehicle_type === '4-Wheeler' && (
+                            <div key={index} className="grid grid-cols-12 gap-2 p-2 bg-white rounded-lg border">
+                              <div className="col-span-3">
+                                <Input
+                                  placeholder="e.g., Maruti Swift"
+                                  value={vehicle.name}
+                                  onChange={(e) => updateVehicle(index, 'name', e.target.value)}
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="col-span-3">
+                                <Input
+                                  placeholder="e.g., CG04AB1234"
+                                  value={vehicle.registration_number}
+                                  onChange={(e) => updateVehicle(index, 'registration_number', e.target.value.toUpperCase())}
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="col-span-3">
+                                <Input
+                                  type="number"
+                                  placeholder="0"
+                                  value={vehicle.estimated_value}
+                                  onChange={(e) => updateVehicle(index, 'estimated_value', e.target.value)}
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="col-span-2 flex items-center">
+                                <Checkbox
+                                  checked={vehicle.is_insured}
+                                  onCheckedChange={(checked) => updateVehicle(index, 'is_insured', checked)}
+                                />
+                                <span className="ml-2 text-xs text-slate-600">{vehicle.is_insured ? 'Yes' : 'No'}</span>
+                              </div>
+                              <div className="col-span-1 flex items-center justify-center">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeVehicle(index)}
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                >
+                                  ×
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        ))}
+                        <div className="flex justify-end pt-1">
+                          <span className="text-sm font-semibold text-purple-700">
+                            Total 4-Wheeler Value: ₹{Math.round(total4WheelerValue).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-center text-slate-400 py-3 text-sm">No 4-wheelers added yet.</p>
+                    )}
+                  </div>
+                  
+                  {/* Total Vehicles Value */}
+                  <div className="mt-4 pt-3 border-t border-purple-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-semibold text-purple-700">Total Vehicles Value:</span>
+                      <span className="text-lg font-bold font-mono text-purple-700">₹{Math.round(totalVehicleValue).toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Interest-bearing Investments (FDs, Bonds) - NEW */}
                 <div className="bg-green-50 p-6 rounded-xl border border-green-200">
                   <div className="flex justify-between items-center mb-4">
