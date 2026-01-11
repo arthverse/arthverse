@@ -454,6 +454,17 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     return sum + (parseFloat(prop.estimated_value) || 0);
   }, 0);
 
+  // Calculate total vehicle values
+  const total2WheelerValue = formData.vehicles
+    .filter(v => v.vehicle_type === '2-Wheeler')
+    .reduce((sum, v) => sum + (parseFloat(v.estimated_value) || 0), 0);
+  
+  const total4WheelerValue = formData.vehicles
+    .filter(v => v.vehicle_type === '4-Wheeler')
+    .reduce((sum, v) => sum + (parseFloat(v.estimated_value) || 0), 0);
+  
+  const totalVehicleValue = total2WheelerValue + total4WheelerValue;
+
   // Calculate total loan principal (liability)
   const totalLoanPrincipal = formData.loans.reduce((sum, loan) => {
     return sum + (parseFloat(loan.principal_amount) || 0);
