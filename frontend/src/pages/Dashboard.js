@@ -90,9 +90,28 @@ export default function Dashboard({ token, user, onLogout }) {
   return (
     <Layout token={token} onLogout={onLogout}>
       <div className="max-w-7xl mx-auto p-6" data-testid="dashboard-page">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold font-heading text-slate-900 mb-2" data-testid="dashboard-title">Dashboard</h1>
-          <p className="text-slate-600 font-body">Welcome back! Here's your financial overview.</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold font-heading text-slate-900 mb-2" data-testid="dashboard-title">Dashboard</h1>
+            <p className="text-slate-600 font-body">Welcome back! Here's your financial overview.</p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => navigate('/arthvyay/questionnaire')}
+              className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit Financials
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleResetData}
+              className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700 rounded-full"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Reset Data
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
