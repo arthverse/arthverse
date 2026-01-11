@@ -503,8 +503,9 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     }, 0);
 
   const totalAssets = 
-    // Predefined assets
-    (parseFloat(formData.property_value) || 0) +
+    // Property value from detailed properties list
+    totalPropertyValue +
+    // Other predefined assets
     (parseFloat(formData.vehicles_value) || 0) +
     (parseFloat(formData.gold_value) || 0) +
     (parseFloat(formData.silver_value) || 0) +
@@ -513,6 +514,8 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     (parseFloat(formData.pf_nps_value) || 0) +
     (parseFloat(formData.bank_balance) || 0) +
     (parseFloat(formData.cash_in_hand) || 0) +
+    // FD/Bond principal as assets
+    totalInterestInvestmentPrincipal +
     // Custom entries
     formData.asset_entries.reduce((sum, entry) => {
       return sum + (parseFloat(entry.amount) || 0);
