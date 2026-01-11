@@ -34,53 +34,41 @@ class SetuService:
         consent_duration_months: int = 12,
     ) -> Dict:
         """
-        TODO (POST-DEPLOYMENT): Implement actual Setu consent creation API call
-        
         Create a consent request with Setu AA.
         The consent object is the core binding contract.
-        
-        For now, returning mock response for UI testing.
         """
         logger.info(f"Creating consent request for phone: {phone_number}, user: {user_id}")
         
-        # TODO: Uncomment and implement post-deployment
-        # headers = await self._get_headers()
-        # vua = f"{phone_number}@setu"
-        # 
-        # payload = {
-        #     "vua": vua,
-        #     "dataRange": {
-        #         "from": data_range_from.isoformat() + "Z",
-        #         "to": data_range_to.isoformat() + "Z"
-        #     },
-        #     "consentDuration": {
-        #         "unit": "MONTH",
-        #         "value": consent_duration_months
-        #     },
-        #     "context": [],
-        #     "additionalParams": {
-        #         "tags": ["ArthVerse", "PersonalFinance"]
-        #     }
-        # }
-        # 
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.post(
-        #         f"{self.base_url}/v2/consents",
-        #         headers=headers,
-        #         json=payload
-        #     ) as response:
-        #         if response.status != 200:
-        #             error_text = await response.text()
-        #             raise Exception(f"Consent creation failed: {error_text}")
-        #         return await response.json()
+        headers = await self._get_headers()
+        vua = f"{phone_number}@setu"
         
-        # Mock response for UI testing
-        consent_id = f"consent_{user_id}_{int(datetime.now().timestamp())}"
-        return {
-            "id": consent_id,
-            "url": f"https://fiu-sandbox.setu.co/consents/{consent_id}",
-            "status": "PENDING"
+        payload = {
+            "vua": vua,
+            "dataRange": {
+                "from": data_range_from.isoformat() + "Z",
+                "to": data_range_to.isoformat() + "Z"
+            },
+            "consentDuration": {
+                "unit": "MONTH",
+                "value": consent_duration_months
+            },
+            "context": [],
+            "additionalParams": {
+                "tags": ["ArthVerse", "PersonalFinance"]
+            }
         }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{self.base_url}/v2/consents",
+                headers=headers,
+                json=payload
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Consent creation failed: {error_text}")
+                    raise Exception(f"Consent creation failed: {error_text}")
+                return await response.json()
     
     async def get_consent_status(self, consent_id: str) -> Dict:
         """
