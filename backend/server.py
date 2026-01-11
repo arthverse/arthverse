@@ -630,6 +630,180 @@ async def get_balance_sheet(credentials: HTTPAuthorizationCredentials = Depends(
         liabilities_breakdown=liabilities_breakdown
     )
 
+# ============= Setu Account Aggregator Endpoints =============
+
+@api_router.post("/setu/consent/initiate")
+async def initiate_setu_consent(
+    request: ConsentInitiateRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """
+    Initiate consent request for linking bank accounts via Setu AA.
+    Returns consent ID and redirect URL for user approval.
+    """
+    try:
+        user = await get_current_user(credentials.credentials)
+        user_id = user['id']
+        
+        # Create consent request
+        consent_response = await setu_service.create_consent_request(
+            phone_number=request.phone_number,
+            user_id=user_id,
+            data_range_from=datetime.now() - timedelta(days=365),
+            data_range_to=datetime.now(),
+            consent_duration_months=12
+        )
+        
+        consent_id = consent_response.get('id')
+        consent_url = consent_response.get('url')
+        
+        # Store consent record in MongoDB
+        consent_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "consent_id": consent_id,
+            "phone_number": request.phone_number,
+            "status": "PENDING",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+        }
+        
+        await db.setu_consents.insert_one(consent_doc)
+        
+        return {
+            "success": True,
+            "consent_id": consent_id,
+            "redirect_url": consent_url,
+            "message": "Consent request initiated. User should be redirected to approval URL."
+        }
+    except Exception as e:
+        logger.error(f"Error initiating consent: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/setu/consent/status/{consent_id}")
+async def get_setu_consent_status(
+    consent_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """
+    Check the current status of a consent request.
+    Returns PENDING, ACTIVE, REJECTED, or REVOKED.
+    """
+    try:
+        user = await get_current_user(credentials.credentials)
+        
+        # Get status from Setu
+        status_response = await setu_service.get_consent_status(consent_id)
+        current_status = status_response.get('status', 'UNKNOWN')
+        linked_accounts = status_response.get('accounts', [])
+        
+        # Update status in MongoDB
+        await db.setu_consents.update_one(
+            {"consent_id": consent_id},
+            {"$set": {
+                "status": current_status,
+                "linked_accounts": linked_accounts,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        return {
+            "consent_id": consent_id,
+            "status": current_status,
+            "accounts": linked_accounts
+        }
+    except Exception as e:
+        logger.error(f"Error checking consent status: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/setu/financial-data/fetch/{consent_id}")
+async def fetch_setu_financial_data(
+    consent_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """
+    Initiate financial data fetching for an approved consent.
+    Creates a data session and fetches financial information.
+    """
+    try:
+        user = await get_current_user(credentials.credentials)
+        user_id = user['id']
+        
+        # Verify consent exists and is approved
+        consent = await db.setu_consents.find_one({"consent_id": consent_id, "user_id": user_id})
+        if not consent:
+            raise HTTPException(status_code=404, detail="Consent not found")
+        
+        if consent.get("status") != "ACTIVE":
+            raise HTTPException(status_code=400, detail="Consent not approved")
+        
+        # Create data session
+        session_response = await setu_service.create_data_session(consent_id)
+        session_id = session_response.get('id')
+        
+        # Fetch financial data immediately (in production, this would be async/webhook-based)
+        financial_data = await setu_service.fetch_financial_data(session_id)
+        
+        # Store financial data in MongoDB
+        financial_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "consent_id": consent_id,
+            "session_id": session_id,
+            "accounts": financial_data.get('accounts', []),
+            "mutualFunds": financial_data.get('mutualFunds', []),
+            "insurance": financial_data.get('insurance', []),
+            "fetched_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.setu_financial_data.insert_one(financial_doc)
+        
+        return {
+            "success": True,
+            "session_id": session_id,
+            "message": "Financial data fetched successfully",
+            "data": financial_data
+        }
+    except Exception as e:
+        logger.error(f"Error fetching financial data: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/setu/financial-data")
+async def get_user_financial_data(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """
+    Get all aggregated financial data for the current user.
+    Returns bank accounts, mutual funds, and insurance data.
+    """
+    try:
+        user = await get_current_user(credentials.credentials)
+        user_id = user['id']
+        
+        # Get latest financial data
+        financial_data = await db.setu_financial_data.find_one(
+            {"user_id": user_id},
+            sort=[("fetched_at", -1)]
+        )
+        
+        if not financial_data:
+            return {
+                "accounts": [],
+                "mutualFunds": [],
+                "insurance": [],
+                "message": "No financial data found. Please link your bank accounts first."
+            }
+        
+        return {
+            "accounts": financial_data.get('accounts', []),
+            "mutualFunds": financial_data.get('mutualFunds', []),
+            "insurance": financial_data.get('insurance', []),
+            "fetched_at": financial_data.get('fetched_at')
+        }
+    except Exception as e:
+        logger.error(f"Error retrieving financial data: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
