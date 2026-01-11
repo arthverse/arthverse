@@ -231,18 +231,21 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: true
 
 test_plan:
   current_focus:
-    - "Financial Questionnaire - Step 2 (Expenses)"
-    - "Financial Questionnaire - Step 3 (Assets & Liabilities)"
+    - "User Authentication (Login/Signup)"
+    - "Financial Questionnaire API - Save/Retrieve"
     - "Financial Questionnaire - Form Submission & Dashboard Update"
+    - "Arthvyay Dashboard - Money Story"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
     message: "Fixed the P0 bug where predefined fields for Expenses (Step 2) and Assets/Liabilities (Step 3) were not displaying. Verified fix via multiple screenshots. The testing agent should now perform a complete E2E test: 1) Login with Client ID AV271676A7, Password Demo123! 2) Navigate to Arthvyay questionnaire 3) Fill out all 4 steps with sample data 4) Submit the form 5) Verify the Money Story dashboard updates correctly."
+  - agent: "main"
+    message: "PRE-DEPLOYMENT TESTING: User requested full E2E testing before deploying to arth-verse.in. Starting comprehensive backend testing first. Test credentials: Client ID = AV271676A7, Password = Demo123!. Focus on: 1) Auth endpoints (login/signup), 2) Questionnaire save/retrieve APIs, 3) Data persistence in MongoDB, 4) All critical API flows. After backend validation, will proceed with frontend E2E testing."
