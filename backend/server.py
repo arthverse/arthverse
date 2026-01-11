@@ -448,6 +448,18 @@ async def get_questionnaire(credentials: HTTPAuthorizationCredentials = Depends(
     
     return FinancialQuestionnaire(**questionnaire)
 
+@api_router.delete("/questionnaire")
+async def reset_questionnaire(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Reset/delete user's questionnaire data"""
+    user_id = await verify_token(credentials)
+    
+    result = await db.questionnaires.delete_one({"user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="No questionnaire found to reset")
+    
+    return {"message": "Financial data reset successfully"}
+
 # ============= Reports Routes =============
 
 @api_router.get("/reports/health-score", response_model=FinancialHealthScore)
