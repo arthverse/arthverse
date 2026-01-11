@@ -130,13 +130,33 @@ export default function Dashboard({ token, user, onLogout }) {
                 <div className={`text-6xl font-bold font-mono mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="health-score-value">
                   {healthScore?.score || 0}/100
                 </div>
-                <div className="space-y-2">
-                  {healthScore?.insights?.map((insight, idx) => (
-                    <div key={idx} className="flex items-start gap-2" data-testid={`insight-${idx}`}>
-                      <div className="w-1.5 h-1.5 rounded-full bg-brand-blue mt-2" />
-                      <p className="text-slate-600 font-body">{insight}</p>
+                <div className="space-y-3">
+                  {healthScore?.insights?.slice(0, 5).map((insight, idx) => (
+                    <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200" data-testid={`insight-${idx}`}>
+                      <div className="flex items-start gap-2 mb-1">
+                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
+                          insight.priority === 'HIGH' ? 'bg-red-100 text-red-700' : 
+                          insight.priority === 'MEDIUM' ? 'bg-orange-100 text-orange-700' : 
+                          'bg-blue-100 text-blue-700'
+                        }`}>
+                          {insight.priority}
+                        </span>
+                        <p className="text-sm font-semibold text-slate-900">{insight.category}</p>
+                      </div>
+                      <p className="text-sm text-slate-700 mb-2">{insight.issue}</p>
+                      <div className="text-xs text-slate-600 mb-1">
+                        <span className="text-red-600">Current: {insight.current}</span>
+                        <span className="mx-2">→</span>
+                        <span className="text-green-600">Target: {insight.target}</span>
+                      </div>
+                      <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded">
+                        💡 {insight.action}
+                      </p>
                     </div>
                   ))}
+                  {(!healthScore?.insights || healthScore?.insights?.length === 0) && (
+                    <p className="text-slate-500 text-sm">Complete your financial questionnaire to get personalized insights</p>
+                  )}
                 </div>
               </div>
               
