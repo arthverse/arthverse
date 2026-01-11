@@ -1043,6 +1043,13 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   </div>
                 </div>
 
+                {/* Insurance Policies Section - Integrated */}
+                <InsuranceSection
+                  insurancePolicies={formData.insurance_policies}
+                  onChange={(policies) => setFormData({ ...formData, insurance_policies: policies })}
+                  onAutoPopulateVehicle={handleAutoPopulateVehicle}
+                />
+
                 {/* Predefined Variable Expenses */}
                 <div className="bg-red-50 p-6 rounded-xl border border-red-200">
                   <h3 className="text-lg font-semibold text-red-600 mb-4">Variable Expenses (Monthly)</h3>
