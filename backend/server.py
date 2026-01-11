@@ -117,6 +117,21 @@ class BalanceSheet(BaseModel):
     assets_breakdown: dict
     liabilities_breakdown: dict
 
+# ============= Setu Account Aggregator Models =============
+
+class ConsentInitiateRequest(BaseModel):
+    phone_number: str
+
+class ConsentStatusResponse(BaseModel):
+    consent_id: str
+    status: str
+    accounts: Optional[List[dict]] = []
+
+class FinancialDataResponse(BaseModel):
+    accounts: List[dict] = []
+    mutualFunds: List[dict] = []
+    insurance: List[dict] = []
+
 class CategorizeExpenseRequest(BaseModel):
     description: str
     amount: float
