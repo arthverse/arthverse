@@ -55,6 +55,22 @@ export default function Dashboard({ token, user, onLogout }) {
     }
   };
 
+  const handleResetData = async () => {
+    if (!window.confirm('Are you sure you want to reset all your financial data? This will clear your questionnaire responses and you will need to fill them again.')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/questionnaire`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Financial data has been reset!');
+      navigate('/arthvyay/questionnaire');
+    } catch (error) {
+      toast.error('Failed to reset data');
+    }
+  };
+
   const getScoreColor = (score) => {
     if (score >= 75) return 'text-green-600';
     if (score >= 50) return 'text-brand-blue';
