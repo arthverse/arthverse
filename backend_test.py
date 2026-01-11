@@ -108,14 +108,19 @@ class ArthverseAPITester:
         )
         return success
 
-    def test_get_current_user(self):
-        """Test getting current user info"""
+    def test_user_profile(self):
+        """Test getting user profile/dashboard info"""
         success, response = self.run_test(
-            "Get Current User",
+            "Get User Profile",
             "GET",
             "auth/me",
             200
         )
+        if success:
+            print(f"   User Name: {response.get('name', 'N/A')}")
+            print(f"   Client ID: {response.get('client_id', 'N/A')}")
+            print(f"   Net Worth: ${response.get('networth', 0)}")
+            print(f"   Monthly Income: ${response.get('monthly_income', 0)}")
         return success
 
     def test_save_questionnaire(self):
