@@ -1803,123 +1803,38 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   </div>
                 </div>
 
-                {/* Loans Section - NEW */}
+                {/* Loans Summary (Auto-populated from Step 1) */}
                 <div className="bg-red-50 p-6 rounded-xl border border-red-200">
-                  <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-red-600">Loans</h3>
-                      <p className="text-sm text-slate-500">EMI and interest expense will be auto-calculated</p>
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={addLoan}
-                      className="bg-red-600 hover:bg-red-700 rounded-full text-white"
-                    >
-                      + Add Loan
-                    </Button>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-red-600">Loans Summary</h3>
+                    <p className="text-sm text-slate-500">Auto-populated from Income tab. Edit loans in Step 1.</p>
                   </div>
                   
                   {formData.loans.length > 0 ? (
-                    <div className="space-y-3">
-                      {/* Table Header */}
-                      <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-red-100 rounded-lg text-xs font-medium text-red-700">
-                        <div className="col-span-2">Type</div>
-                        <div className="col-span-2">Name</div>
-                        <div className="col-span-2">Principal (₹)</div>
-                        <div className="col-span-1">Rate %</div>
-                        <div className="col-span-2">Tenure (months)</div>
-                        <div className="col-span-2">Monthly EMI</div>
-                        <div className="col-span-1"></div>
-                      </div>
+                    <div className="space-y-2">
                       {formData.loans.map((loan, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
-                          <div className="col-span-2">
-                            <Select
-                              value={loan.loan_type}
-                              onValueChange={(value) => updateLoan(index, 'loan_type', value)}
-                            >
-                              <SelectTrigger className="text-xs">
-                                <SelectValue placeholder="Type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Home">Home Loan</SelectItem>
-                                <SelectItem value="Personal">Personal Loan</SelectItem>
-                                <SelectItem value="Vehicle">Vehicle Loan</SelectItem>
-                                <SelectItem value="Education">Education Loan</SelectItem>
-                                <SelectItem value="Gold">Gold Loan</SelectItem>
-                                <SelectItem value="Other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
+                        <div key={index} className="flex justify-between items-center p-3 bg-white rounded-lg border">
+                          <div>
+                            <span className="font-medium">{loan.name || loan.loan_type + ' Loan'}</span>
+                            <span className="text-sm text-slate-500 ml-2">({loan.loan_type})</span>
                           </div>
-                          <div className="col-span-2">
-                            <Input
-                              placeholder="Loan name"
-                              value={loan.name}
-                              onChange={(e) => updateLoan(index, 'name', e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                          <div className="col-span-2">
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={loan.principal_amount}
-                              onChange={(e) => updateLoan(index, 'principal_amount', e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                          <div className="col-span-1">
-                            <Input
-                              type="number"
-                              step="0.1"
-                              placeholder="0"
-                              value={loan.interest_rate}
-                              onChange={(e) => updateLoan(index, 'interest_rate', e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                          <div className="col-span-2">
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={loan.tenure_months}
-                              onChange={(e) => updateLoan(index, 'tenure_months', e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                          <div className="col-span-2 flex items-center">
-                            <span className="text-sm font-mono text-red-600">
-                              ₹{Math.round(calculateEMI(
-                                parseFloat(loan.principal_amount) || 0,
-                                parseFloat(loan.interest_rate) || 0,
-                                parseInt(loan.tenure_months) || 0
-                              )).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="col-span-1 flex items-center justify-center">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeLoan(index)}
-                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                            >
-                              ×
-                            </Button>
+                          <div className="text-right">
+                            <div className="font-mono text-red-600">₹{Math.round(parseFloat(loan.principal_amount) || 0).toLocaleString()}</div>
+                            <div className="text-xs text-slate-500">EMI: ₹{Math.round(calculateEMI(
+                              parseFloat(loan.principal_amount) || 0,
+                              parseFloat(loan.interest_rate) || 0,
+                              parseInt(loan.tenure_months) || 0
+                            )).toLocaleString()}/month</div>
                           </div>
                         </div>
                       ))}
-                      <div className="flex justify-between pt-2 px-2">
-                        <span className="text-sm font-semibold text-red-700">
-                          Total Principal: ₹{Math.round(totalLoanPrincipal).toLocaleString()}
-                        </span>
-                        <span className="text-sm font-semibold text-red-700">
-                          Total Monthly EMI: ₹{Math.round(totalMonthlyEMI).toLocaleString()}
-                        </span>
+                      <div className="flex justify-between pt-2 mt-2 border-t">
+                        <span className="font-semibold text-red-700">Total Loan Principal:</span>
+                        <span className="font-bold font-mono text-red-700">₹{Math.round(totalLoanPrincipal).toLocaleString()}</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-center text-slate-400 py-4">No loans added yet. Click "Add Loan" to start.</p>
+                    <p className="text-center text-slate-400 py-4">No loans added. Add loans in Step 1 (Income tab).</p>
                   )}
                 </div>
 
