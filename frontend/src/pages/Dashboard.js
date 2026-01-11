@@ -7,17 +7,25 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import BankLinking from '../components/BankLinking';
+import AggregatedFinancialData from '../components/AggregatedFinancialData';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [questionnaire, setQuestionnaire] = useState(null);
+  const [showBankData, setShowBankData] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleConsentApproved = (consentId) => {
+    setShowBankData(true);
+    toast.success('Bank accounts linked! Your financial data is now available.');
+  };
 
   const fetchData = async () => {
     try {
