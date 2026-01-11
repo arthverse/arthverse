@@ -72,6 +72,9 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     // Detailed Properties List (NEW)
     properties: [],
     
+    // Detailed Vehicles List (NEW)
+    vehicles: [],
+    
     // Predefined Liabilities (legacy - will be derived from loans)
     home_loan: 0,
     personal_loan: 0,
