@@ -1844,23 +1844,10 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             </Card>
           )}
 
-          {/* Step 4: Insurance Policies */}
+          {/* Step 4: Financial Stability & Credit Cards */}
           {step === 4 && (
             <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
-              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">4. Insurance Policies</h2>
-              
-              <InsuranceSection
-                insurancePolicies={formData.insurance_policies}
-                onChange={(policies) => setFormData({ ...formData, insurance_policies: policies })}
-                onAutoPopulateVehicle={handleAutoPopulateVehicle}
-              />
-            </Card>
-          )}
-
-          {/* Step 5: Financial Stability & Credit Cards */}
-          {step === 5 && (
-            <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
-              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">5. Financial Stability & Credit Cards</h2>
+              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">4. Financial Stability & Credit Cards</h2>
               
               <div className="space-y-6">
                 <div>
