@@ -520,63 +520,50 @@ async def reset_questionnaire(credentials: HTTPAuthorizationCredentials = Depend
 
 # ============= Reports Routes =============
 
-@api_router.get("/reports/health-score", response_model=FinancialHealthScore)
+@api_router.get("/reports/health-score")
 async def get_health_score(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Calculate comprehensive financial health score based on questionnaire data
+    Uses age-adjusted benchmarks, asset allocation analysis, and financial stability checkpoints
+    """
     user_id = await verify_token(credentials)
     
-    # Get user's monthly income
+    # Get user data
     user = await db.users.find_one({"id": user_id}, {"_id": 0})
-    monthly_income = user.get('monthly_income', 0)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
     
-    # Get all transactions
-    transactions = await db.transactions.find({"user_id": user_id}, {"_id": 0}).to_list(1000)
+    user_age = user.get('age', 30)
     
-    total_income = sum(t['amount'] for t in transactions if t['type'] == 'income')
-    total_expenses = sum(t['amount'] for t in transactions if t['type'] == 'expense')
-    net_savings = total_income - total_expenses
+    # Get questionnaire data
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
     
-    # Calculate ratios
-    savings_rate = (net_savings / total_income * 100) if total_income > 0 else 0
-    expense_to_income_ratio = (total_expenses / total_income) if total_income > 0 else 0
+    if not questionnaire:
+        # Return default/minimal score if no questionnaire filled
+        return {
+            "score": 0,
+            "rating": "No Data",
+            "message": "Please complete the financial questionnaire to calculate your health score",
+            "age": user_age,
+            "age_category": "building",
+            "components": [],
+            "insights": [],
+            "financials": {
+                "monthly_income": 0,
+                "monthly_expenses": 0,
+                "monthly_savings": 0,
+                "total_assets": 0,
+                "total_liabilities": 0,
+                "net_worth": 0
+            },
+            "asset_allocation": {},
+            "checkpoints": {}
+        }
     
-    # Calculate score (0-100)
-    score = 50
-    if savings_rate >= 20:
-        score += 30
-    elif savings_rate >= 10:
-        score += 15
+    # Calculate comprehensive health score
+    result = calculate_financial_health_score(questionnaire, user_age)
     
-    if expense_to_income_ratio <= 0.5:
-        score += 20
-    elif expense_to_income_ratio <= 0.7:
-        score += 10
-    
-    score = min(100, max(0, score))
-    
-    # Generate insights
-    insights = []
-    if savings_rate < 10:
-        insights.append("Consider reducing expenses to improve your savings rate")
-    elif savings_rate >= 20:
-        insights.append("Excellent savings rate! You're on track for financial health")
-    
-    if expense_to_income_ratio > 0.8:
-        insights.append("Your expenses are high relative to income. Review unnecessary spending")
-    elif expense_to_income_ratio <= 0.5:
-        insights.append("Great job keeping expenses low!")
-    
-    if len(transactions) < 5:
-        insights.append("Add more transactions to get better insights")
-    
-    return FinancialHealthScore(
-        score=int(score),
-        total_income=total_income,
-        total_expenses=total_expenses,
-        net_savings=net_savings,
-        savings_rate=round(savings_rate, 2),
-        expense_to_income_ratio=round(expense_to_income_ratio, 2),
-        insights=insights
-    )
+    return result
 
 @api_router.get("/reports/pl", response_model=PLStatement)
 async def get_pl_statement(credentials: HTTPAuthorizationCredentials = Depends(security)):
