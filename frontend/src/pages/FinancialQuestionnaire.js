@@ -209,9 +209,9 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         cash_withdrawals: parseFloat(formData.cash_withdrawals) || 0,
         foreign_transactions: parseFloat(formData.foreign_transactions) || 0,
         
-        // Assets (auto-calculated property value from properties list)
+        // Assets (auto-calculated property and vehicle values)
         property_value: totalPropertyValue,
-        vehicles_value: parseFloat(formData.vehicles_value) || 0,
+        vehicles_value: totalVehicleValue,
         gold_value: parseFloat(formData.gold_value) || 0,
         silver_value: parseFloat(formData.silver_value) || 0,
         stocks_value: parseFloat(formData.stocks_value) || 0,
