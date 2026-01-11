@@ -713,8 +713,7 @@ async def fetch_setu_financial_data(
     Creates a data session and fetches financial information.
     """
     try:
-        user = await get_current_user(credentials.credentials)
-        user_id = user['id']
+        user_id = await verify_token(credentials.credentials)
         
         # Verify consent exists and is approved
         consent = await db.setu_consents.find_one({"consent_id": consent_id, "user_id": user_id})
