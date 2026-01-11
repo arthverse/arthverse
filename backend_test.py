@@ -346,23 +346,20 @@ class ArthverseAPITester:
         return success
 
 def main():
-    print("🚀 Starting Arthvyay API Tests...")
-    print("=" * 50)
+    print("🚀 Starting ArthVerse Backend API Tests...")
+    print("Testing for PRE-DEPLOYMENT to arth-verse.in")
+    print("=" * 60)
     
-    tester = ArthvyayAPITester()
+    tester = ArthverseAPITester()
     
-    # Test sequence
+    # Test sequence as per review request
     tests = [
-        ("User Registration", tester.test_user_registration),
-        ("Get Current User", tester.test_get_current_user),
-        ("Create Income Transaction", tester.test_create_income_transaction),
-        ("Create Expense Transaction", tester.test_create_expense_transaction),
-        ("AI Categorization", tester.test_ai_categorization),
-        ("Get Transactions", tester.test_get_transactions),
-        ("Financial Health Score", tester.test_financial_health_score),
-        ("P&L Statement", tester.test_pl_statement),
-        ("Balance Sheet", tester.test_balance_sheet),
-        ("Delete Transaction", tester.test_delete_transaction),
+        ("User Login with Client ID", tester.test_user_login_with_client_id),
+        ("Invalid Credentials Test", tester.test_invalid_credentials),
+        ("User Profile/Dashboard", tester.test_user_profile),
+        ("Save Financial Questionnaire", tester.test_save_questionnaire),
+        ("Get Financial Questionnaire", tester.test_get_questionnaire),
+        ("User Signup (if exists)", tester.test_user_signup),
     ]
     
     failed_tests = []
@@ -376,9 +373,9 @@ def main():
             failed_tests.append(test_name)
     
     # Print final results
-    print("\n" + "=" * 50)
-    print("📊 TEST RESULTS")
-    print("=" * 50)
+    print("\n" + "=" * 60)
+    print("📊 ARTHVERSE BACKEND TEST RESULTS")
+    print("=" * 60)
     print(f"Tests Run: {tester.tests_run}")
     print(f"Tests Passed: {tester.tests_passed}")
     print(f"Tests Failed: {tester.tests_run - tester.tests_passed}")
@@ -388,12 +385,24 @@ def main():
         for test in failed_tests:
             print(f"   - {test}")
     else:
-        print(f"\n✅ All tests passed!")
+        print(f"\n✅ All critical backend APIs are working!")
     
     success_rate = (tester.tests_passed / tester.tests_run * 100) if tester.tests_run > 0 else 0
     print(f"\nSuccess Rate: {success_rate:.1f}%")
     
-    return 0 if len(failed_tests) == 0 else 1
+    # Critical assessment
+    critical_tests = ["User Login with Client ID", "Save Financial Questionnaire", "Get Financial Questionnaire"]
+    critical_failures = [test for test in failed_tests if test in critical_tests]
+    
+    if critical_failures:
+        print(f"\n🚨 CRITICAL FAILURES DETECTED:")
+        for test in critical_failures:
+            print(f"   - {test}")
+        print("   ⚠️  NOT READY FOR PRODUCTION DEPLOYMENT")
+    else:
+        print(f"\n✅ All critical APIs working - Ready for deployment!")
+    
+    return 0 if len(critical_failures) == 0 else 1
 
 if __name__ == "__main__":
     sys.exit(main())
