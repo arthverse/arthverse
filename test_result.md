@@ -112,18 +112,24 @@ backend:
       - working: true
         agent: "main"
         comment: "Login with Client ID AV271676A7 and password Demo123! works correctly"
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE TESTING COMPLETE: ✅ Login API working with Client ID AV271676A7 and password Demo123! ✅ JWT token generation and validation working correctly ✅ User profile retrieval working ✅ Invalid credentials properly rejected with 401 status ✅ Registration endpoint working at /api/auth/register (note: /api/auth/signup endpoint does not exist) ✅ All authentication flows tested and verified"
 
   - task: "Financial Questionnaire API - Save/Retrieve"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "API endpoints /api/arthvyay/questionnaire (POST/GET) exist but need E2E testing"
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE TESTING COMPLETE: ✅ POST /api/questionnaire - Successfully saves comprehensive financial data including Income (Salary: $50k, Rental: $10k, Business: $20k), Expenses (Rent: $15k, Groceries: $5k, Fuel: $3k), Assets (Property: $5M, Stocks: $200k), Liabilities (Home Loan: $2M), Properties list (2 items), Vehicles list (1 item), Loans list (1 item), Interest investments (1 item), Credit cards, Financial stability flags ✅ GET /api/questionnaire - Successfully retrieves all saved data with correct values ✅ Data persistence in MongoDB verified ✅ All questionnaire endpoints working perfectly for production deployment"
 
 frontend:
   - task: "ArthVerse Auth Page"
