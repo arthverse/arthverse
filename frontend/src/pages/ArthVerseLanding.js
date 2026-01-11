@@ -163,7 +163,7 @@ export default function ArthVerseLanding() {
             <span className="text-brand-orange">.in</span>
           </div>
           <p className="text-slate-400 font-body">Universe Where Every Rupee Finds Its Place.</p>
-          <p className="text-slate-500 text-sm mt-6">© 2025 ArthVerse. All rights reserved.</p>
+          <p className="text-slate-500 text-sm mt-6">© 2025 arth-verse. All rights reserved.</p>
         </div>
       </footer>
     </div>
