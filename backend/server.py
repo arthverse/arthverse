@@ -46,12 +46,13 @@ class UserCreate(BaseModel):
     password: str
     name: str
     mobile_number: str
+    date_of_birth: str  # Required for login ID generation (YYYY-MM-DD or DD-MM-YYYY)
     age: int
     city: str
     marital_status: str
-    no_of_dependents: int
+    major_members: int = 0  # Adults >18, excluding user
+    minor_members: int = 0  # Below 18
     data_privacy_consent: bool
-    monthly_income: float = 0
 
 class UserLogin(BaseModel):
     client_id: str
