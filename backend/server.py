@@ -728,7 +728,7 @@ async def fetch_setu_financial_data(
     Creates a data session and fetches financial information.
     """
     try:
-        user_id = await verify_token(credentials.credentials)
+        user_id = await verify_token(credentials)
         
         # Verify consent exists and is approved
         consent = await db.setu_consents.find_one({"consent_id": consent_id, "user_id": user_id})
@@ -778,7 +778,7 @@ async def get_user_financial_data(
     Returns bank accounts, mutual funds, and insurance data.
     """
     try:
-        user_id = await verify_token(credentials.credentials)
+        user_id = await verify_token(credentials)
         
         # Get latest financial data
         financial_data = await db.setu_financial_data.find_one(
