@@ -328,29 +328,43 @@ async def categorize_with_ai(description: str, amount: float) -> dict:
 
 @api_router.post("/auth/register", response_model=AuthResponse)
 async def register(user_data: UserCreate):
+    # Validate date of birth
+    if not validate_date_of_birth(user_data.date_of_birth):
+        raise HTTPException(status_code=400, detail="Invalid date of birth format. Use YYYY-MM-DD or DD-MM-YYYY")
+    
     # Check if user exists
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Generate unique client ID
-    client_id = f"AV{str(uuid.uuid4())[:8].upper()}"
+    # Function to check if login ID exists
+    async def check_id_exists(login_id: str) -> bool:
+        existing = await db.users.find_one({"client_id": login_id}, {"_id": 0})
+        return existing is not None
+    
+    # Generate unique User Login ID
+    client_id = generate_user_login_id(
+        name=user_data.name,
+        date_of_birth=user_data.date_of_birth,
+        existing_ids_checker=lambda id: asyncio.run(check_id_exists(id))
+    )
     
     # Create user
     user_id = str(uuid.uuid4())
     user_doc = {
         "id": user_id,
-        "client_id": client_id,
+        "client_id": client_id,  # This is now the User Login ID
         "email": user_data.email,
         "password_hash": hash_password(user_data.password),
         "name": user_data.name,
         "mobile_number": user_data.mobile_number,
+        "date_of_birth": user_data.date_of_birth,
         "age": user_data.age,
         "city": user_data.city,
         "marital_status": user_data.marital_status,
-        "no_of_dependents": user_data.no_of_dependents,
+        "major_members": user_data.major_members,
+        "minor_members": user_data.minor_members,
         "data_privacy_consent": user_data.data_privacy_consent,
-        "monthly_income": user_data.monthly_income,
         "networth": 0,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -366,11 +380,12 @@ async def register(user_data: UserCreate):
         email=user_data.email,
         name=user_data.name,
         mobile_number=user_data.mobile_number,
+        date_of_birth=user_data.date_of_birth,
         age=user_data.age,
         city=user_data.city,
         marital_status=user_data.marital_status,
-        no_of_dependents=user_data.no_of_dependents,
-        monthly_income=user_data.monthly_income,
+        major_members=user_data.major_members,
+        minor_members=user_data.minor_members,
         created_at=user_doc['created_at'],
         networth=0
     )
