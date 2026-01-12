@@ -12,7 +12,7 @@ class SetuService:
     
     def __init__(self):
         self.base_url = os.getenv("SETU_BASE_URL", "https://fiu-sandbox.setu.co")
-        self.auth_url = "https://orgservice-prod.setu.co/v1/users/login"  # Token API endpoint
+        self.auth_url = "https://accountservice.setu.co/v1/users/login"  # Token API endpoint
         self.client_id = os.getenv("SETU_CLIENT_ID", "")
         self.client_secret = os.getenv("SETU_CLIENT_SECRET", "")
         self.product_instance_id = os.getenv("SETU_PRODUCT_INSTANCE_ID", "")
