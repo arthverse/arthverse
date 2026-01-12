@@ -30,7 +30,8 @@ export default function ArthVerseAuth({ onAuth }) {
     marital_status: '',
     major_members: 0,
     minor_members: 0,
-    data_privacy_consent: false
+    data_privacy_consent: false,
+    monthly_income: ''
   });
 
   const handleSubmit = async (e) => {
