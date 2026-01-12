@@ -16,18 +16,21 @@ export default function ArthVerseAuth({ onAuth }) {
   const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(searchParams.get('mode') === 'login');
   const [loading, setLoading] = useState(false);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+  const [generatedLoginId, setGeneratedLoginId] = useState('');
   const [formData, setFormData] = useState({
     client_id: '',
     password: '',
     name: '',
     email: '',
     mobile_number: '',
+    date_of_birth: '',
     age: '',
     city: '',
     marital_status: '',
-    no_of_dependents: 0,
-    data_privacy_consent: false,
-    monthly_income: 0
+    major_members: 0,
+    minor_members: 0,
+    data_privacy_consent: false
   });
 
   const handleSubmit = async (e) => {
@@ -35,6 +38,11 @@ export default function ArthVerseAuth({ onAuth }) {
     
     if (!isLogin && !formData.data_privacy_consent) {
       toast.error('Please accept data privacy consent');
+      return;
+    }
+
+    if (!isLogin && !formData.date_of_birth) {
+      toast.error('Date of Birth is required');
       return;
     }
     
@@ -48,6 +56,15 @@ export default function ArthVerseAuth({ onAuth }) {
             email: formData.email,
             password: formData.password,
             name: formData.name,
+            mobile_number: formData.mobile_number,
+            date_of_birth: formData.date_of_birth,
+            age: parseInt(formData.age) || 0,
+            city: formData.city,
+            marital_status: formData.marital_status,
+            major_members: parseInt(formData.major_members) || 0,
+            minor_members: parseInt(formData.minor_members) || 0,
+            data_privacy_consent: formData.data_privacy_consent
+          };
             mobile_number: formData.mobile_number,
             age: parseInt(formData.age),
             city: formData.city,
