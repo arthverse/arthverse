@@ -63,8 +63,7 @@ export default function ArthVerseAuth({ onAuth }) {
             marital_status: formData.marital_status,
             major_members: parseInt(formData.major_members) || 0,
             minor_members: parseInt(formData.minor_members) || 0,
-            data_privacy_consent: formData.data_privacy_consent,
-            monthly_income: parseFloat(formData.monthly_income) || 0
+            data_privacy_consent: formData.data_privacy_consent
           };
 
       const response = await axios.post(`${API}${endpoint}`, payload);
