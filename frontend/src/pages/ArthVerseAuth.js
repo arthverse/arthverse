@@ -285,47 +285,63 @@ export default function ArthVerseAuth({ onAuth }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div data-testid="marital-status-container">
-                    <Label className="font-semibold">Marital Status *</Label>
-                    <Select value={formData.marital_status} onValueChange={(value) => setFormData({ ...formData, marital_status: value })} required>
-                      <SelectTrigger className="mt-1 h-12 bg-slate-50" data-testid="marital-status-select">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="single">Single</SelectItem>
-                        <SelectItem value="married">Married</SelectItem>
-                        <SelectItem value="divorced">Divorced</SelectItem>
-                        <SelectItem value="widowed">Widowed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div data-testid="dob-container">
+                  <Label htmlFor="date_of_birth" className="font-semibold">Date of Birth *</Label>
+                  <Input
+                    id="date_of_birth"
+                    data-testid="dob-input"
+                    type="date"
+                    value={formData.date_of_birth}
+                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                    required
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                  />
+                </div>
 
-                  <div data-testid="dependents-container">
-                    <Label htmlFor="no_of_dependents" className="font-semibold">No of Dependents *</Label>
+                <div data-testid="marital-status-container">
+                  <Label className="font-semibold">Marital Status *</Label>
+                  <Select value={formData.marital_status} onValueChange={(value) => setFormData({ ...formData, marital_status: value })} required>
+                    <SelectTrigger className="mt-1 h-12 bg-slate-50" data-testid="marital-status-select">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="single">Single</SelectItem>
+                      <SelectItem value="married">Married</SelectItem>
+                      <SelectItem value="divorced">Divorced</SelectItem>
+                      <SelectItem value="widowed">Widowed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div data-testid="major-members-container">
+                    <Label htmlFor="major_members" className="font-semibold">Major Members (Adults 18+) *</Label>
                     <Input
-                      id="no_of_dependents"
-                      data-testid="dependents-input"
+                      id="major_members"
+                      data-testid="major-members-input"
                       type="number"
                       min="0"
-                      value={formData.no_of_dependents}
-                      onChange={(e) => setFormData({ ...formData, no_of_dependents: e.target.value })}
+                      value={formData.major_members}
+                      onChange={(e) => setFormData({ ...formData, major_members: e.target.value })}
+                      required
+                      placeholder="Excluding yourself"
+                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    />
+                  </div>
+
+                  <div data-testid="minor-members-container">
+                    <Label htmlFor="minor_members" className="font-semibold">Minor Members (Below 18) *</Label>
+                    <Input
+                      id="minor_members"
+                      data-testid="minor-members-input"
+                      type="number"
+                      min="0"
+                      value={formData.minor_members}
+                      onChange={(e) => setFormData({ ...formData, minor_members: e.target.value })}
                       required
                       className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
                     />
                   </div>
-                </div>
-
-                <div data-testid="monthly-income-container">
-                  <Label htmlFor="monthly_income" className="font-semibold">Monthly Income (₹)</Label>
-                  <Input
-                    id="monthly_income"
-                    data-testid="monthly-income-input"
-                    type="number"
-                    value={formData.monthly_income}
-                    onChange={(e) => setFormData({ ...formData, monthly_income: e.target.value })}
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
                 </div>
 
                 <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl" data-testid="privacy-consent-container">
