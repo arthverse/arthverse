@@ -12,7 +12,7 @@ class SetuService:
     
     def __init__(self):
         self.base_url = os.getenv("SETU_BASE_URL", "https://fiu-sandbox.setu.co")
-        self.auth_url = "https://iam-sandbox.setu.co/auth/token"  # Sandbox auth URL
+        self.auth_url = "https://orgservice-prod.setu.co/v1/users/login"  # Token API endpoint
         self.client_id = os.getenv("SETU_CLIENT_ID", "")
         self.client_secret = os.getenv("SETU_CLIENT_SECRET", "")
         self.product_instance_id = os.getenv("SETU_PRODUCT_INSTANCE_ID", "")
@@ -27,28 +27,31 @@ class SetuService:
         
         logger.info("Fetching new Setu access token...")
         
-        # Request new token
+        # Request new token using Setu's Token API
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 self.auth_url,
                 headers={
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    "Content-Type": "application/json",
+                    "client": "bridge"
                 },
-                data={
-                    "client_id": self.client_id,
-                    "client_secret": self.client_secret,
+                json={
+                    "clientID": self.client_id,
+                    "secret": self.client_secret,
                     "grant_type": "client_credentials"
                 }
             ) as response:
-                if response.status != 200:
-                    error_text = await response.text()
-                    logger.error(f"Failed to get access token: {error_text}")
-                    raise Exception(f"Authentication failed: {error_text}")
+                response_text = await response.text()
+                logger.info(f"Token API response status: {response.status}")
                 
-                data = await response.json()
+                if response.status != 200:
+                    logger.error(f"Failed to get access token: {response_text}")
+                    raise Exception(f"Authentication failed: {response_text}")
+                
+                data = json.loads(response_text)
                 self._access_token = data.get("access_token")
                 # Token typically valid for 300 seconds, cache for 250 to be safe
-                expires_in = data.get("expires_in", 300)
+                expires_in = data.get("expiresIn", 300)
                 self._token_expiry = datetime.now() + timedelta(seconds=expires_in - 50)
                 
                 logger.info("Successfully obtained Setu access token")
