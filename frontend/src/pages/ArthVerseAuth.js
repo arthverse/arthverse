@@ -31,7 +31,8 @@ export default function ArthVerseAuth({ onAuth }) {
     major_members: 0,
     minor_members: 0,
     data_privacy_consent: false,
-    monthly_income: ''
+    monthly_income: '',
+    no_of_dependents: ''
   });
 
   const handleSubmit = async (e) => {
