@@ -61,15 +61,16 @@ class UserLogin(BaseModel):
 class UserResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
-    client_id: str
+    client_id: str  # This will now be the User Login ID
     email: str
     name: str
     mobile_number: str
+    date_of_birth: str
     age: int
     city: str
     marital_status: str
-    no_of_dependents: int
-    monthly_income: float
+    major_members: int = 0
+    minor_members: int = 0
     created_at: str
     networth: float = 0
 
