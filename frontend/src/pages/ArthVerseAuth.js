@@ -90,231 +90,275 @@ export default function ArthVerseAuth({ onAuth }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-blue/5 via-white to-brand-orange/5 flex items-center justify-center px-6 py-12" data-testid="arthverse-auth-page">
-      <Card className="w-full max-w-2xl p-8 bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl" data-testid="arthverse-auth-card">
-        <div className="mb-8 text-center">
-          <div className="font-heading text-3xl font-bold mb-2">
-            <span className="text-brand-blue">a</span>
-            <span className="text-brand-orange">₹</span>
-            <span className="text-brand-blue">th-verse</span>
-            <span className="text-brand-orange">.in</span>
+      {showSuccessScreen ? (
+        <Card className="w-full max-w-md p-8 bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800 mb-2">Account Created Successfully!</h2>
+            <p className="text-slate-600 mb-6">Your account has been created. Please save your Client ID for future logins.</p>
+            
+            <div className="bg-slate-50 p-4 rounded-xl mb-6">
+              <p className="text-sm text-slate-600 mb-2">Your Client ID:</p>
+              <p className="text-xl font-bold text-brand-blue">{generatedLoginId}</p>
+            </div>
+            
+            <Button
+              onClick={() => {
+                setShowSuccessScreen(false);
+                setIsLogin(true);
+                setFormData({
+                  client_id: '',
+                  password: '',
+                  name: '',
+                  email: '',
+                  mobile_number: '',
+                  date_of_birth: '',
+                  age: '',
+                  city: '',
+                  marital_status: '',
+                  major_members: 0,
+                  minor_members: 0,
+                  data_privacy_consent: false,
+                  monthly_income: ''
+                });
+              }}
+              className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-3"
+            >
+              Continue to Login
+            </Button>
           </div>
-          <p className="text-slate-600 font-body">Universe Where Every Rupee Finds Its Place.</p>
-        </div>
+        </Card>
+      ) : (
+        <Card className="w-full max-w-2xl p-8 bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl" data-testid="arthverse-auth-card">
+          <div className="mb-8 text-center">
+            <div className="font-heading text-3xl font-bold mb-2">
+              <span className="text-brand-blue">a</span>
+              <span className="text-brand-orange">₹</span>
+              <span className="text-brand-blue">th-verse</span>
+              <span className="text-brand-orange">.in</span>
+            </div>
+            <p className="text-slate-600 font-body">Universe Where Every Rupee Finds Its Place.</p>
+          </div>
 
-        <div className="flex gap-2 mb-6" data-testid="auth-toggle">
-          <Button
-            onClick={() => setIsLogin(true)}
-            className={`flex-1 rounded-full ${
-              isLogin 
-                ? 'bg-brand-blue text-white' 
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-            data-testid="login-tab-btn"
-          >
-            Login
-          </Button>
-          <Button
-            onClick={() => setIsLogin(false)}
-            className={`flex-1 rounded-full ${
-              !isLogin 
-                ? 'bg-brand-blue text-white' 
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-            data-testid="signup-tab-btn"
-          >
-            Sign Up
-          </Button>
-        </div>
+          <div className="flex gap-2 mb-6" data-testid="auth-toggle">
+            <Button
+              onClick={() => setIsLogin(true)}
+              className={`flex-1 rounded-full ${
+                isLogin 
+                  ? 'bg-brand-blue text-white' 
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+              data-testid="login-tab-btn"
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => setIsLogin(false)}
+              className={`flex-1 rounded-full ${
+                !isLogin 
+                  ? 'bg-brand-blue text-white' 
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+              data-testid="signup-tab-btn"
+            >
+              Sign Up
+            </Button>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4" data-testid="arthverse-auth-form">
-          {isLogin ? (
-            <>
-              <div data-testid="client-id-container">
-                <Label htmlFor="client_id" className="font-semibold">Client ID</Label>
-                <Input
-                  id="client_id"
-                  data-testid="client-id-input"
-                  type="text"
-                  placeholder="e.g., AV12345678"
-                  value={formData.client_id}
-                  onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                  required
-                  className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                />
-              </div>
-
-              <div data-testid="password-container">
-                <Label htmlFor="password" className="font-semibold">Password</Label>
-                <Input
-                  id="password"
-                  data-testid="password-input"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div data-testid="name-container">
-                  <Label htmlFor="name" className="font-semibold">Name *</Label>
-                  <Input
-                    id="name"
-                    data-testid="name-input"
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
-                </div>
-
-                <div data-testid="mobile-container">
-                  <Label htmlFor="mobile_number" className="font-semibold">Mobile Number *</Label>
-                  <Input
-                    id="mobile_number"
-                    data-testid="mobile-input"
-                    type="tel"
-                    value={formData.mobile_number}
-                    onChange={(e) => setFormData({ ...formData, mobile_number: e.target.value })}
-                    required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div data-testid="email-container">
-                <Label htmlFor="email" className="font-semibold">Email ID *</Label>
-                <Input
-                  id="email"
-                  data-testid="email-input"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                />
-              </div>
-
-              <div data-testid="password-signup-container">
-                <Label htmlFor="password_signup" className="font-semibold">Password *</Label>
-                <Input
-                  id="password_signup"
-                  data-testid="password-signup-input"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div data-testid="age-container">
-                  <Label htmlFor="age" className="font-semibold">Age *</Label>
-                  <Input
-                    id="age"
-                    data-testid="age-input"
-                    type="number"
-                    value={formData.age}
-                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                    required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
-                </div>
-
-                <div data-testid="city-container">
-                  <Label htmlFor="city" className="font-semibold">City *</Label>
-                  <Input
-                    id="city"
-                    data-testid="city-input"
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div data-testid="marital-status-container">
-                  <Label className="font-semibold">Marital Status *</Label>
-                  <Select value={formData.marital_status} onValueChange={(value) => setFormData({ ...formData, marital_status: value })} required>
-                    <SelectTrigger className="mt-1 h-12 bg-slate-50" data-testid="marital-status-select">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="single">Single</SelectItem>
-                      <SelectItem value="married">Married</SelectItem>
-                      <SelectItem value="divorced">Divorced</SelectItem>
-                      <SelectItem value="widowed">Widowed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div data-testid="dependents-container">
-                  <Label htmlFor="no_of_dependents" className="font-semibold">No of Dependents *</Label>
-                  <Input
-                    id="no_of_dependents"
-                    data-testid="dependents-input"
-                    type="number"
-                    min="0"
-                    value={formData.no_of_dependents}
-                    onChange={(e) => setFormData({ ...formData, no_of_dependents: e.target.value })}
-                    required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div data-testid="monthly-income-container">
-                <Label htmlFor="monthly_income" className="font-semibold">Monthly Income (₹)</Label>
-                <Input
-                  id="monthly_income"
-                  data-testid="monthly-income-input"
-                  type="number"
-                  value={formData.monthly_income}
-                  onChange={(e) => setFormData({ ...formData, monthly_income: e.target.value })}
-                  className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                />
-              </div>
-
-              <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl" data-testid="privacy-consent-container">
-                <Checkbox
-                  id="data_privacy_consent"
-                  checked={formData.data_privacy_consent}
-                  onCheckedChange={(checked) => setFormData({ ...formData, data_privacy_consent: checked })}
-                  data-testid="privacy-consent-checkbox"
-                  required
-                />
-                <Label htmlFor="data_privacy_consent" className="text-sm leading-relaxed cursor-pointer">
-                  I consent to the collection and processing of my personal data in accordance with the data privacy policy. *
-                </Label>
-              </div>
-            </>
-          )}
-
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-6 text-lg font-semibold mt-6"
-            data-testid="auth-submit-btn"
-          >
-            {loading ? (
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="arthverse-auth-form">
+            {isLogin ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait...
+                <div data-testid="client-id-container">
+                  <Label htmlFor="client_id" className="font-semibold">Client ID</Label>
+                  <Input
+                    id="client_id"
+                    data-testid="client-id-input"
+                    type="text"
+                    placeholder="e.g., AV12345678"
+                    value={formData.client_id}
+                    onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
+                    required
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                  />
+                </div>
+
+                <div data-testid="password-container">
+                  <Label htmlFor="password" className="font-semibold">Password</Label>
+                  <Input
+                    id="password"
+                    data-testid="password-input"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                  />
+                </div>
               </>
             ) : (
-              isLogin ? 'Login' : 'Create Account'
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div data-testid="name-container">
+                    <Label htmlFor="name" className="font-semibold">Name *</Label>
+                    <Input
+                      id="name"
+                      data-testid="name-input"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    />
+                  </div>
+
+                  <div data-testid="mobile-container">
+                    <Label htmlFor="mobile_number" className="font-semibold">Mobile Number *</Label>
+                    <Input
+                      id="mobile_number"
+                      data-testid="mobile-input"
+                      type="tel"
+                      value={formData.mobile_number}
+                      onChange={(e) => setFormData({ ...formData, mobile_number: e.target.value })}
+                      required
+                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div data-testid="email-container">
+                  <Label htmlFor="email" className="font-semibold">Email ID *</Label>
+                  <Input
+                    id="email"
+                    data-testid="email-input"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                  />
+                </div>
+
+                <div data-testid="password-signup-container">
+                  <Label htmlFor="password_signup" className="font-semibold">Password *</Label>
+                  <Input
+                    id="password_signup"
+                    data-testid="password-signup-input"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div data-testid="age-container">
+                    <Label htmlFor="age" className="font-semibold">Age *</Label>
+                    <Input
+                      id="age"
+                      data-testid="age-input"
+                      type="number"
+                      value={formData.age}
+                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                      required
+                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    />
+                  </div>
+
+                  <div data-testid="city-container">
+                    <Label htmlFor="city" className="font-semibold">City *</Label>
+                    <Input
+                      id="city"
+                      data-testid="city-input"
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      required
+                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div data-testid="marital-status-container">
+                    <Label className="font-semibold">Marital Status *</Label>
+                    <Select value={formData.marital_status} onValueChange={(value) => setFormData({ ...formData, marital_status: value })} required>
+                      <SelectTrigger className="mt-1 h-12 bg-slate-50" data-testid="marital-status-select">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="single">Single</SelectItem>
+                        <SelectItem value="married">Married</SelectItem>
+                        <SelectItem value="divorced">Divorced</SelectItem>
+                        <SelectItem value="widowed">Widowed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div data-testid="dependents-container">
+                    <Label htmlFor="no_of_dependents" className="font-semibold">No of Dependents *</Label>
+                    <Input
+                      id="no_of_dependents"
+                      data-testid="dependents-input"
+                      type="number"
+                      min="0"
+                      value={formData.no_of_dependents}
+                      onChange={(e) => setFormData({ ...formData, no_of_dependents: e.target.value })}
+                      required
+                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div data-testid="monthly-income-container">
+                  <Label htmlFor="monthly_income" className="font-semibold">Monthly Income (₹)</Label>
+                  <Input
+                    id="monthly_income"
+                    data-testid="monthly-income-input"
+                    type="number"
+                    value={formData.monthly_income}
+                    onChange={(e) => setFormData({ ...formData, monthly_income: e.target.value })}
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                  />
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl" data-testid="privacy-consent-container">
+                  <Checkbox
+                    id="data_privacy_consent"
+                    checked={formData.data_privacy_consent}
+                    onCheckedChange={(checked) => setFormData({ ...formData, data_privacy_consent: checked })}
+                    data-testid="privacy-consent-checkbox"
+                    required
+                  />
+                  <Label htmlFor="data_privacy_consent" className="text-sm leading-relaxed cursor-pointer">
+                    I consent to the collection and processing of my personal data in accordance with the data privacy policy. *
+                  </Label>
+                </div>
+              </>
             )}
-          </Button>
-        </form>
-      </Card>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-6 text-lg font-semibold mt-6"
+              data-testid="auth-submit-btn"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait...
+                </>
+              ) : (
+                isLogin ? 'Login' : 'Create Account'
+              )}
+            </Button>
+          </form>
+        </Card>
+      )}
     </div>
   );
 }
