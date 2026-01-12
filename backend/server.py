@@ -645,7 +645,7 @@ async def initiate_setu_consent(
     Returns consent ID and redirect URL for user approval.
     """
     try:
-        user_id = await verify_token(credentials.credentials)
+        user_id = await verify_token(credentials)
         
         # Create consent request
         consent_response = await setu_service.create_consent_request(
@@ -692,7 +692,7 @@ async def get_setu_consent_status(
     Returns PENDING, ACTIVE, REJECTED, or REVOKED.
     """
     try:
-        user_id = await verify_token(credentials.credentials)
+        user_id = await verify_token(credentials)
         
         # Get status from Setu
         status_response = await setu_service.get_consent_status(consent_id)
