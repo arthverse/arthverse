@@ -16,6 +16,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from services.setu_service import setu_service
 from services.financial_health_calculator import calculate_financial_health_score
+from services.user_id_generator import generate_user_login_id, validate_date_of_birth
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
