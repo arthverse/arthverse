@@ -337,16 +337,11 @@ async def register(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Function to check if login ID exists
-    async def check_id_exists(login_id: str) -> bool:
-        existing = await db.users.find_one({"client_id": login_id}, {"_id": 0})
-        return existing is not None
-    
     # Generate unique User Login ID
-    client_id = generate_user_login_id(
+    client_id = await generate_user_login_id_async(
         name=user_data.name,
         date_of_birth=user_data.date_of_birth,
-        existing_ids_checker=lambda id: asyncio.run(check_id_exists(id))
+        db_collection=db.users
     )
     
     # Create user
