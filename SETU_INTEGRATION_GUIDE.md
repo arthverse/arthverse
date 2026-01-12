@@ -25,9 +25,9 @@ ArthVerse now includes **Setu Account Aggregator** integration, allowing users t
 All credentials are now properly configured:
 
 ```env
-✅ SETU_CLIENT_ID=1a753902-42a1-4d2e-ad93-1df7343d5b33
+✅ SETU_CLIENT_ID=banklink-1
 ✅ SETU_CLIENT_SECRET=rMGz3OT88S0jJfqfL7dvfP5o59DrHpxz
-✅ SETU_PRODUCT_INSTANCE_ID=918583b0-3495-4a0e-b709-777e840ffb97
+✅ SETU_PRODUCT_INSTANCE_ID=banklink-1
 ✅ SETU_BASE_URL=https://fiu-sandbox.setu.co
 ```
 
