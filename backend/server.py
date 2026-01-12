@@ -406,11 +406,12 @@ async def login(credentials: UserLogin):
         email=user['email'],
         name=user['name'],
         mobile_number=user['mobile_number'],
+        date_of_birth=user.get('date_of_birth', ''),
         age=user['age'],
         city=user['city'],
         marital_status=user['marital_status'],
-        no_of_dependents=user['no_of_dependents'],
-        monthly_income=user['monthly_income'],
+        major_members=user.get('major_members', 0),
+        minor_members=user.get('minor_members', 0),
         created_at=user['created_at'],
         networth=user.get('networth', 0)
     )
