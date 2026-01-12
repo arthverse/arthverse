@@ -30,9 +30,7 @@ export default function ArthVerseAuth({ onAuth }) {
     marital_status: '',
     major_members: 0,
     minor_members: 0,
-    data_privacy_consent: false,
-    monthly_income: '',
-    no_of_dependents: ''
+    data_privacy_consent: false
   });
 
   const handleSubmit = async (e) => {
@@ -123,9 +121,7 @@ export default function ArthVerseAuth({ onAuth }) {
                   marital_status: '',
                   major_members: 0,
                   minor_members: 0,
-                  data_privacy_consent: false,
-                  monthly_income: '',
-                  no_of_dependents: ''
+                  data_privacy_consent: false
                 });
               }}
               className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-3"
