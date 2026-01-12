@@ -69,9 +69,17 @@ export default function ArthVerseAuth({ onAuth }) {
 
       const response = await axios.post(`${API}${endpoint}`, payload);
       
-      onAuth(response.data.token, response.data.user);
-      toast.success(isLogin ? 'Welcome back!' : `Account created! Your Client ID: ${response.data.user.client_id}`);
-      navigate('/arthverse/portal');
+      if (response.data.token) {
+        if (isLogin) {
+          onAuth(response.data.token, response.data.user);
+          toast.success('Welcome back!');
+          navigate('/arthverse/portal');
+        } else {
+          // Show success screen with generated Login ID
+          setGeneratedLoginId(response.data.user.client_id);
+          setShowSuccessScreen(true);
+        }
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Authentication failed');
     } finally {
