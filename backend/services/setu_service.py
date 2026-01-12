@@ -12,16 +12,54 @@ class SetuService:
     
     def __init__(self):
         self.base_url = os.getenv("SETU_BASE_URL", "https://fiu-sandbox.setu.co")
+        self.auth_url = "https://iam-sandbox.setu.co/auth/token"  # Sandbox auth URL
         self.client_id = os.getenv("SETU_CLIENT_ID", "")
         self.client_secret = os.getenv("SETU_CLIENT_SECRET", "")
-        self.product_instance_id = os.getenv("SETU_PRODUCT_INSTANCE_ID", "918583b0-3495-4a0e-b709-777e840ffb97")
+        self.product_instance_id = os.getenv("SETU_PRODUCT_INSTANCE_ID", "")
+        self._access_token = None
+        self._token_expiry = None
+    
+    async def _get_access_token(self) -> str:
+        """Get OAuth access token from Setu"""
+        # Check if we have a valid cached token
+        if self._access_token and self._token_expiry and datetime.now() < self._token_expiry:
+            return self._access_token
+        
+        logger.info("Fetching new Setu access token...")
+        
+        # Request new token
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                self.auth_url,
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                data={
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                    "grant_type": "client_credentials"
+                }
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Failed to get access token: {error_text}")
+                    raise Exception(f"Authentication failed: {error_text}")
+                
+                data = await response.json()
+                self._access_token = data.get("access_token")
+                # Token typically valid for 300 seconds, cache for 250 to be safe
+                expires_in = data.get("expires_in", 300)
+                self._token_expiry = datetime.now() + timedelta(seconds=expires_in - 50)
+                
+                logger.info("Successfully obtained Setu access token")
+                return self._access_token
     
     async def _get_headers(self) -> Dict[str, str]:
         """Generate headers for Setu API requests"""
+        access_token = await self._get_access_token()
         return {
             "Content-Type": "application/json",
-            "x-client-id": self.client_id,
-            "x-client-secret": self.client_secret,
+            "Authorization": f"Bearer {access_token}",
             "x-product-instance-id": self.product_instance_id,
         }
     
@@ -40,35 +78,38 @@ class SetuService:
         logger.info(f"Creating consent request for phone: {phone_number}, user: {user_id}")
         
         headers = await self._get_headers()
+        
+        # VUA format: phone number with @setu handle
         vua = f"{phone_number}@setu"
         
         payload = {
             "vua": vua,
             "dataRange": {
-                "from": data_range_from.isoformat() + "Z",
-                "to": data_range_to.isoformat() + "Z"
+                "from": data_range_from.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "to": data_range_to.strftime("%Y-%m-%dT%H:%M:%SZ")
             },
             "consentDuration": {
                 "unit": "MONTH",
-                "value": consent_duration_months
+                "value": str(consent_duration_months)
             },
             "context": [],
-            "additionalParams": {
-                "tags": ["ArthVerse", "PersonalFinance"]
-            }
         }
         
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                f"{self.base_url}/v2/consents",
+                f"{self.base_url}/consents",
                 headers=headers,
                 json=payload
             ) as response:
-                if response.status != 200:
-                    error_text = await response.text()
-                    logger.error(f"Consent creation failed: {error_text}")
-                    raise Exception(f"Consent creation failed: {error_text}")
-                return await response.json()
+                response_text = await response.text()
+                logger.info(f"Consent creation response status: {response.status}")
+                logger.info(f"Consent creation response: {response_text}")
+                
+                if response.status not in [200, 201]:
+                    logger.error(f"Consent creation failed: {response_text}")
+                    raise Exception(f"Consent creation failed: {response_text}")
+                
+                return json.loads(response_text)
     
     async def get_consent_status(self, consent_id: str) -> Dict:
         """
@@ -80,7 +121,7 @@ class SetuService:
         
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                f"{self.base_url}/v2/consents/{consent_id}",
+                f"{self.base_url}/consents/{consent_id}",
                 headers=headers
             ) as response:
                 if response.status != 200:
@@ -105,19 +146,19 @@ class SetuService:
         payload = {
             "consentId": consent_id,
             "dataRange": {
-                "from": (datetime.now() - timedelta(days=365)).isoformat() + "Z",
-                "to": datetime.now().isoformat() + "Z"
+                "from": (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "to": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
             },
             "format": format
         }
         
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                f"{self.base_url}/v2/data-sessions",
+                f"{self.base_url}/sessions",
                 headers=headers,
                 json=payload
             ) as response:
-                if response.status != 200:
+                if response.status not in [200, 201]:
                     error_text = await response.text()
                     logger.error(f"Data session creation failed: {error_text}")
                     raise Exception(f"Data session creation failed: {error_text}")
@@ -133,7 +174,7 @@ class SetuService:
         
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                f"{self.base_url}/v2/data-sessions/{session_id}",
+                f"{self.base_url}/sessions/{session_id}",
                 headers=headers
             ) as response:
                 if response.status != 200:
