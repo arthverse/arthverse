@@ -124,7 +124,8 @@ export default function ArthVerseAuth({ onAuth }) {
                   major_members: 0,
                   minor_members: 0,
                   data_privacy_consent: false,
-                  monthly_income: ''
+                  monthly_income: '',
+                  no_of_dependents: ''
                 });
               }}
               className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-3"
