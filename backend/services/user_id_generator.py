@@ -13,14 +13,81 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def generate_user_login_id(name: str, date_of_birth: str, existing_ids_checker) -> str:
+def generate_user_login_id_sync(name: str, date_of_birth: str, existing_ids: set = None) -> str:
     """
-    Generate a unique 7-character User Login ID
+    Generate a unique 7-character User Login ID (synchronous version)
     
     Args:
         name: Full name (e.g., "Rahul Sharma")
         date_of_birth: DOB in format YYYY-MM-DD or DD-MM-YYYY
-        existing_ids_checker: Async function to check if ID exists
+        existing_ids: Set of existing IDs to check against (optional)
+    
+    Returns:
+        str: Generated unique login ID (e.g., "RSX1409")
+    """
+    if existing_ids is None:
+        existing_ids = set()
+    
+    # Parse name
+    name_parts = name.strip().split()
+    if len(name_parts) < 2:
+        # If only one name, use first two letters
+        first_initial = name_parts[0][0].upper() if len(name_parts[0]) > 0 else 'A'
+        last_initial = name_parts[0][1].upper() if len(name_parts[0]) > 1 else 'A'
+    else:
+        first_initial = name_parts[0][0].upper()
+        last_initial = name_parts[-1][0].upper()
+    
+    # Parse date of birth
+    try:
+        # Try YYYY-MM-DD format first
+        if '-' in date_of_birth and len(date_of_birth.split('-')[0]) == 4:
+            dob = datetime.strptime(date_of_birth, '%Y-%m-%d')
+        # Try DD-MM-YYYY format
+        elif '-' in date_of_birth:
+            dob = datetime.strptime(date_of_birth, '%d-%m-%Y')
+        # Try YYYY/MM/DD format
+        elif '/' in date_of_birth and len(date_of_birth.split('/')[0]) == 4:
+            dob = datetime.strptime(date_of_birth, '%Y/%m/%d')
+        # Try DD/MM/YYYY format
+        elif '/' in date_of_birth:
+            dob = datetime.strptime(date_of_birth, '%d/%m/%Y')
+        else:
+            raise ValueError("Invalid date format")
+        
+        ddmm = dob.strftime('%d%m')
+    except Exception as e:
+        logger.error(f"Error parsing date of birth: {e}")
+        raise ValueError("Invalid date of birth format. Use YYYY-MM-DD or DD-MM-YYYY")
+    
+    # Generate random alphanumeric character
+    random_chars = string.ascii_uppercase + string.digits
+    
+    # Try to generate unique ID (max 50 attempts)
+    for _ in range(50):
+        random_char = random.choice(random_chars)
+        login_id = f"{first_initial}{last_initial}{random_char}{ddmm}"
+        
+        # Check if ID already exists
+        if login_id not in existing_ids:
+            return login_id
+    
+    # If still not unique after 50 attempts, add an extra random character
+    random_char1 = random.choice(random_chars)
+    random_char2 = random.choice(random_chars)
+    login_id = f"{first_initial}{last_initial}{random_char1}{random_char2}{ddmm[2:]}"
+    
+    return login_id
+
+
+async def generate_user_login_id_async(name: str, date_of_birth: str, db_collection) -> str:
+    """
+    Generate a unique 7-character User Login ID (async version for use with MongoDB)
+    
+    Args:
+        name: Full name (e.g., "Rahul Sharma")
+        date_of_birth: DOB in format YYYY-MM-DD or DD-MM-YYYY
+        db_collection: MongoDB collection to check for existing IDs
     
     Returns:
         str: Generated unique login ID (e.g., "RSX1409")
@@ -65,8 +132,9 @@ def generate_user_login_id(name: str, date_of_birth: str, existing_ids_checker) 
         random_char = random.choice(random_chars)
         login_id = f"{first_initial}{last_initial}{random_char}{ddmm}"
         
-        # Check if ID already exists
-        if not existing_ids_checker(login_id):
+        # Check if ID already exists in database
+        existing = await db_collection.find_one({"client_id": login_id}, {"_id": 0})
+        if existing is None:
             return login_id
     
     # If still not unique after 50 attempts, add an extra random character
@@ -75,6 +143,12 @@ def generate_user_login_id(name: str, date_of_birth: str, existing_ids_checker) 
     login_id = f"{first_initial}{last_initial}{random_char1}{random_char2}{ddmm[2:]}"
     
     return login_id
+
+
+# Keep backward compatibility alias
+def generate_user_login_id(name: str, date_of_birth: str, existing_ids_checker=None) -> str:
+    """Backward compatible wrapper - use generate_user_login_id_async for async contexts"""
+    return generate_user_login_id_sync(name, date_of_birth, set())
 
 
 def validate_date_of_birth(dob_str: str) -> bool:
