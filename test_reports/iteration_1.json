@@ -1,5 +1,5 @@
 {
-  "summary": "Completed testing of ArthVerse authentication and dashboard features. Fixed critical bug in user registration (asyncio.run() error). All 10 backend tests pass. Frontend signup, login with Client ID, and dashboard paywall all working correctly.",
+  "summary": "Completed testing of ArthVerse authentication and dashboard features. Fixed 2 critical bugs: (1) asyncio.run() error in user registration, (2) stale field references in /api/auth/me endpoint. All 10 backend tests pass. Frontend signup, login with Client ID, and dashboard paywall all working correctly.",
   "backend_issues": {
     "critical": [],
     "minor": []
@@ -19,6 +19,11 @@
       "file": "/app/backend/server.py",
       "issue": "Registration endpoint using synchronous ID checker inside async context",
       "fix": "Updated to use generate_user_login_id_async() with db.users collection directly"
+    },
+    {
+      "file": "/app/backend/server.py",
+      "issue": "/api/auth/me endpoint referenced old fields (no_of_dependents, monthly_income) that no longer exist",
+      "fix": "Updated to use new fields (date_of_birth, major_members, minor_members)"
     }
   ],
   "test_report_links": [
@@ -26,9 +31,7 @@
     "/app/test_reports/pytest/pytest_results.xml"
   ],
   "action_items": [],
-  "critical_code_review_comments": [
-    "The /api/auth/me endpoint still references old fields (no_of_dependents, monthly_income) that no longer exist in the user model - lines 437-438 in server.py will cause errors if called"
-  ],
+  "critical_code_review_comments": [],
   "updated_files": [
     "/app/backend/services/user_id_generator.py",
     "/app/backend/server.py",
@@ -78,5 +81,5 @@
   },
   "retest_needed": false,
   "should_main_agent_self_test": false,
-  "context_for_next_testing_agent": "All requested features working. Fixed async bug in registration. The /api/auth/me endpoint has stale field references (no_of_dependents, monthly_income) that should be updated to match new user model fields (date_of_birth, major_members, minor_members)."
+  "context_for_next_testing_agent": "All requested features working. Fixed async bug in registration and stale field references in /api/auth/me. Payment gateway is MOCKED."
 }
