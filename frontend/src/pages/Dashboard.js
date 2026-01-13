@@ -67,10 +67,10 @@ export default function Dashboard({ token, user, onLogout }) {
   };
 
   const handleResetData = async () => {
-    if (!window.confirm('Are you sure you want to reset all your financial data? This will clear your questionnaire responses and you will need to fill them again.')) {
-      return;
-    }
+    setShowResetDialog(true);
+  };
 
+  const confirmResetData = async () => {
     try {
       await axios.delete(`${API}/questionnaire`, {
         headers: { Authorization: `Bearer ${token}` }
