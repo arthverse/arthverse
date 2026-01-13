@@ -358,6 +358,18 @@ export default function Dashboard({ token, user, onLogout }) {
           )}
         </div>
       </div>
+
+      {/* Reset Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showResetDialog}
+        onClose={() => setShowResetDialog(false)}
+        onConfirm={confirmResetData}
+        title="Reset Financial Data"
+        message="Are you sure you want to reset all your financial data? This will clear your questionnaire responses and you will need to fill them again. This action cannot be undone."
+        confirmText="Reset Data"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </Layout>
   );
 }
