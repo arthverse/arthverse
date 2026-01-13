@@ -145,7 +145,7 @@ def create_report(filename, data, plan_type="individual"):
     ))
     
     styles.add(ParagraphStyle(
-        name='BodyText',
+        name='CustomBody',
         fontSize=10,
         textColor=DARK_TEXT,
         spaceAfter=6,
