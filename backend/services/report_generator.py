@@ -231,7 +231,7 @@ def create_report(filename, data, plan_type="individual"):
         interpretation = "⚠️ Needs Attention. Focus on building savings and reducing debt."
         interp_color = DANGER_RED
     
-    elements.append(Paragraph(f"<font color='{interp_color.hexval()}'>{interpretation}</font>", styles['BodyText']))
+    elements.append(Paragraph(f"<font color='{interp_color.hexval()}'>{interpretation}</font>", styles['CustomBody']))
     elements.append(Spacer(1, 15))
     
     # Component scores table
