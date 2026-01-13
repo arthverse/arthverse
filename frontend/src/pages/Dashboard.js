@@ -49,6 +49,16 @@ export default function Dashboard({ token, user, onLogout }) {
         }
       }
 
+      // Check payment status for premium access
+      try {
+        const paymentRes = await axios.get(`${API}/payment/status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setHasPremiumAccess(paymentRes.data.has_premium);
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+      }
+
       const [scoreRes, transactionsRes] = await Promise.all([
         axios.get(`${API}/reports/health-score`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -65,6 +75,11 @@ export default function Dashboard({ token, user, onLogout }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentSuccess = (planType) => {
+    setHasPremiumAccess(true);
+    toast.success(`${planType === 'family' ? 'Family' : 'Individual'} Plan activated! Your report is ready.`);
   };
 
   const handleResetData = async () => {
