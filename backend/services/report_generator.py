@@ -325,8 +325,8 @@ def create_report(filename, data, plan_type="individual"):
     savings_rate = (monthly_savings * 100) // data['income']['total_monthly']
     
     elements.append(Spacer(1, 15))
-    elements.append(Paragraph(f"<b>Monthly Savings:</b> ₹{monthly_savings:,} ({savings_rate}% of income)", styles['BodyText']))
-    elements.append(Paragraph(f"<b>Annual Savings Potential:</b> ₹{monthly_savings*12:,}", styles['BodyText']))
+    elements.append(Paragraph(f"<b>Monthly Savings:</b> ₹{monthly_savings:,} ({savings_rate}% of income)", styles['CustomBody']))
+    elements.append(Paragraph(f"<b>Annual Savings Potential:</b> ₹{monthly_savings*12:,}", styles['CustomBody']))
     elements.append(Spacer(1, 25))
     
     # ===== ASSETS & LIABILITIES =====
