@@ -1956,6 +1956,18 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           </div>
         </form>
       </div>
+
+      {/* Reset Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showResetDialog}
+        onClose={() => setShowResetDialog(false)}
+        onConfirm={confirmReset}
+        title="Reset All Financial Data"
+        message="Are you sure you want to reset all your financial data? This will clear all your income, expenses, assets, and liabilities data. This action cannot be undone."
+        confirmText="Reset All Data"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </Layout>
   );
 }
