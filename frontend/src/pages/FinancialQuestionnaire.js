@@ -157,20 +157,20 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   }, [token]);
 
   const handleReset = async () => {
-    if (!window.confirm('Are you sure you want to reset all your financial data? This action cannot be undone.')) {
-      return;
-    }
+    setShowResetDialog(true);
+  };
 
+  const confirmReset = async () => {
     try {
       await axios.delete(`${API}/questionnaire`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      toast.success('Financial data has been reset!');
       setFormData(defaultFormData);
       setIsEditing(false);
       setStep(1);
-      toast.success('Financial data has been reset successfully!');
     } catch (error) {
-      toast.error('Failed to reset data. Please try again.');
+      toast.error('Failed to reset data');
     }
   };
 
