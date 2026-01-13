@@ -716,6 +716,30 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     );
   }
 
+  // Show bank linking prompt for new users
+  if (showBankLinking) {
+    return (
+      <Layout token={token} onLogout={onLogout}>
+        <div className="max-w-4xl mx-auto p-6 py-12">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold font-heading text-brand-blue mb-2">
+              Financial Profile Setup
+            </h1>
+            <p className="text-slate-600 font-body">
+              Let's start by connecting your bank account for automatic data import
+            </p>
+          </div>
+          
+          <BankLinkingPrompt 
+            token={token}
+            onComplete={handleBankLinkComplete}
+            onSkip={handleSkipBankLinking}
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout token={token} onLogout={onLogout}>
       <div className="max-w-4xl mx-auto p-6 py-12" data-testid="financial-questionnaire">
