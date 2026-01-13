@@ -206,8 +206,8 @@ def create_report(filename, data, plan_type="individual"):
     
     # Score display
     score_table_data = [
-        [Paragraph(f"<font size='48' color='{score_color.hexval()}'><b>{score}</b></font>", styles['BodyText'])],
-        [Paragraph(f"<font size='12' color='#64748b'>out of 100</font>", styles['BodyText'])]
+        [Paragraph(f"<font size='48' color='{score_color.hexval()}'><b>{score}</b></font>", styles['CustomBody'])],
+        [Paragraph(f"<font size='12' color='#64748b'>out of 100</font>", styles['CustomBody'])]
     ]
     score_table = Table(score_table_data, colWidths=[7*inch])
     score_table.setStyle(TableStyle([
