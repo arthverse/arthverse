@@ -807,6 +807,375 @@ async def get_user_financial_data(
         logger.error(f"Error retrieving financial data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ==================== PAYMENT ENDPOINTS ====================
+
+class CreateOrderRequest(BaseModel):
+    plan_type: str = Field(..., description="Plan type: 'individual' or 'family'")
+
+class CreateOrderResponse(BaseModel):
+    order_id: str
+    amount: int
+    currency: str
+    key_id: str
+    plan_name: str
+    plan_description: str
+
+class VerifyPaymentRequest(BaseModel):
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+    plan_type: str
+
+@api_router.get("/payment/plans")
+async def get_payment_plans():
+    """Get available payment plans"""
+    return {
+        "plans": {
+            plan_id: {
+                "name": plan["name"],
+                "amount": plan["amount"] / 100,  # Convert paise to rupees
+                "description": plan["description"],
+                "features": plan["features"]
+            }
+            for plan_id, plan in PLANS.items()
+        }
+    }
+
+@api_router.post("/payment/create-order", response_model=CreateOrderResponse)
+async def create_payment_order(
+    request: CreateOrderRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Create a Razorpay order for payment"""
+    try:
+        user_id = await verify_token(credentials)
+        
+        if request.plan_type not in PLANS:
+            raise HTTPException(status_code=400, detail="Invalid plan type")
+        
+        plan = PLANS[request.plan_type]
+        
+        # Check if user already has an active premium subscription
+        existing_payment = await db.payments.find_one({
+            "user_id": user_id,
+            "status": "completed",
+            "plan_type": request.plan_type
+        })
+        
+        if existing_payment:
+            raise HTTPException(status_code=400, detail="You already have this plan. You can download your report from the dashboard.")
+        
+        # Create Razorpay order
+        order = payment_service.create_order(
+            amount=plan["amount"],
+            currency="INR",
+            receipt=f"rcpt_{user_id[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}",
+            notes={
+                "user_id": user_id,
+                "plan_type": request.plan_type
+            }
+        )
+        
+        # Store order in database
+        await db.orders.insert_one({
+            "order_id": order["id"],
+            "user_id": user_id,
+            "plan_type": request.plan_type,
+            "amount": plan["amount"],
+            "status": "created",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return CreateOrderResponse(
+            order_id=order["id"],
+            amount=plan["amount"],
+            currency="INR",
+            key_id=payment_service.key_id,
+            plan_name=plan["name"],
+            plan_description=plan["description"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating order: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/payment/verify")
+async def verify_payment(
+    request: VerifyPaymentRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Verify Razorpay payment and generate report"""
+    try:
+        user_id = await verify_token(credentials)
+        
+        # Verify payment signature
+        is_valid = payment_service.verify_payment(
+            request.razorpay_order_id,
+            request.razorpay_payment_id,
+            request.razorpay_signature
+        )
+        
+        if not is_valid:
+            raise HTTPException(status_code=400, detail="Payment verification failed")
+        
+        # Update order status
+        await db.orders.update_one(
+            {"order_id": request.razorpay_order_id},
+            {"$set": {
+                "status": "completed",
+                "payment_id": request.razorpay_payment_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Create payment record
+        payment_record = {
+            "user_id": user_id,
+            "order_id": request.razorpay_order_id,
+            "payment_id": request.razorpay_payment_id,
+            "plan_type": request.plan_type,
+            "amount": PLANS[request.plan_type]["amount"],
+            "status": "completed",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.payments.insert_one(payment_record)
+        
+        # Generate the report
+        report_path = await generate_user_report(user_id, request.plan_type)
+        
+        # Update user's premium status
+        await db.users.update_one(
+            {"_id": user_id},
+            {"$set": {
+                "premium_plan": request.plan_type,
+                "premium_activated_at": datetime.now(timezone.utc).isoformat(),
+                "report_path": report_path
+            }}
+        )
+        
+        return {
+            "success": True,
+            "message": "Payment successful! Your report is ready.",
+            "plan_type": request.plan_type,
+            "report_available": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error verifying payment: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def generate_user_report(user_id: str, plan_type: str) -> str:
+    """Generate financial report for user"""
+    try:
+        # Get user data
+        user = await db.users.find_one({"_id": user_id}, {"_id": 0, "hashed_password": 0})
+        if not user:
+            raise Exception("User not found")
+        
+        # Get questionnaire data
+        questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+        if not questionnaire:
+            raise Exception("Financial data not found. Please complete the questionnaire first.")
+        
+        # Get health score
+        health_score = calculate_financial_health_score(questionnaire, user.get("age", 30))
+        
+        # Prepare report data
+        report_data = {
+            "user": {
+                "name": user.get("name", "User"),
+                "client_id": user.get("client_id", "N/A"),
+                "email": user.get("email", "N/A"),
+                "age": user.get("age", 30),
+                "city": user.get("city", "N/A")
+            },
+            "health_score": {
+                "overall": health_score.get("overall_score", 0),
+                "components": health_score.get("component_scores", {})
+            },
+            "income": {
+                "salary": questionnaire.get("salary_income", 0),
+                "rental": questionnaire.get("rental_property1", 0) + questionnaire.get("rental_property2", 0),
+                "investments": questionnaire.get("interest_income", 0) + questionnaire.get("dividend_income", 0),
+                "total_monthly": sum([
+                    questionnaire.get("salary_income", 0),
+                    questionnaire.get("rental_property1", 0),
+                    questionnaire.get("rental_property2", 0),
+                    questionnaire.get("business_income", 0),
+                    questionnaire.get("interest_income", 0),
+                    questionnaire.get("dividend_income", 0),
+                    questionnaire.get("freelance_income", 0),
+                    questionnaire.get("other_income", 0)
+                ])
+            },
+            "expenses": {
+                "rent": questionnaire.get("rent_expense", 0),
+                "emis": questionnaire.get("emis", 0),
+                "groceries": questionnaire.get("groceries", 0),
+                "utilities": questionnaire.get("telecom_utilities", 0),
+                "entertainment": questionnaire.get("entertainment", 0),
+                "healthcare": questionnaire.get("healthcare", 0),
+                "others": sum([
+                    questionnaire.get("food_dining", 0),
+                    questionnaire.get("fuel", 0),
+                    questionnaire.get("travel", 0),
+                    questionnaire.get("shopping", 0),
+                    questionnaire.get("online_shopping", 0),
+                    questionnaire.get("education", 0)
+                ]),
+                "total_monthly": sum([
+                    questionnaire.get("rent_expense", 0),
+                    questionnaire.get("emis", 0),
+                    questionnaire.get("groceries", 0),
+                    questionnaire.get("telecom_utilities", 0),
+                    questionnaire.get("entertainment", 0),
+                    questionnaire.get("healthcare", 0),
+                    questionnaire.get("food_dining", 0),
+                    questionnaire.get("fuel", 0),
+                    questionnaire.get("travel", 0),
+                    questionnaire.get("shopping", 0),
+                    questionnaire.get("online_shopping", 0),
+                    questionnaire.get("education", 0),
+                    questionnaire.get("household_maid", 0)
+                ])
+            },
+            "assets": {
+                "property": questionnaire.get("property_value", 0),
+                "vehicles": questionnaire.get("vehicles_value", 0),
+                "investments": questionnaire.get("stocks_value", 0) + questionnaire.get("mutual_funds_value", 0),
+                "savings": questionnaire.get("bank_balance", 0) + questionnaire.get("pf_nps_value", 0),
+                "gold": questionnaire.get("gold_value", 0) + questionnaire.get("silver_value", 0),
+                "total": sum([
+                    questionnaire.get("property_value", 0),
+                    questionnaire.get("vehicles_value", 0),
+                    questionnaire.get("stocks_value", 0),
+                    questionnaire.get("mutual_funds_value", 0),
+                    questionnaire.get("bank_balance", 0),
+                    questionnaire.get("pf_nps_value", 0),
+                    questionnaire.get("gold_value", 0),
+                    questionnaire.get("silver_value", 0),
+                    questionnaire.get("cash_in_hand", 0)
+                ])
+            },
+            "liabilities": {
+                "home_loan": questionnaire.get("home_loan", 0),
+                "car_loan": questionnaire.get("vehicle_loan", 0),
+                "credit_cards": questionnaire.get("credit_card_outstanding", 0),
+                "total": sum([
+                    questionnaire.get("home_loan", 0),
+                    questionnaire.get("personal_loan", 0),
+                    questionnaire.get("vehicle_loan", 0),
+                    questionnaire.get("credit_card_outstanding", 0)
+                ])
+            },
+            "insurance": {
+                "life": {
+                    "covered": questionnaire.get("has_term_insurance", False),
+                    "amount": questionnaire.get("term_insurance", 0)
+                },
+                "health": {
+                    "covered": questionnaire.get("has_health_insurance", False),
+                    "amount": questionnaire.get("health_insurance", 0)
+                },
+                "vehicle": {
+                    "covered": True,  # Assumed if they have vehicles
+                    "amount": questionnaire.get("vehicles_value", 0)
+                }
+            }
+        }
+        
+        # Generate report
+        reports_dir = Path("/app/backend/reports")
+        reports_dir.mkdir(exist_ok=True)
+        
+        filename = f"report_{user_id}_{plan_type}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+        filepath = reports_dir / filename
+        
+        create_report(str(filepath), report_data, plan_type)
+        
+        logger.info(f"Generated report for user {user_id}: {filepath}")
+        return str(filepath)
+        
+    except Exception as e:
+        logger.error(f"Error generating report: {str(e)}")
+        raise
+
+@api_router.get("/payment/status")
+async def get_payment_status(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get user's payment and premium status"""
+    try:
+        user_id = await verify_token(credentials)
+        
+        # Check for completed payments
+        payments = await db.payments.find(
+            {"user_id": user_id, "status": "completed"}
+        ).to_list(length=10)
+        
+        # Get user's premium status
+        user = await db.users.find_one({"_id": user_id}, {"premium_plan": 1, "report_path": 1})
+        
+        return {
+            "has_premium": bool(payments),
+            "premium_plan": user.get("premium_plan") if user else None,
+            "payments": [
+                {
+                    "plan_type": p["plan_type"],
+                    "amount": p["amount"] / 100,
+                    "date": p["created_at"]
+                }
+                for p in payments
+            ],
+            "report_available": bool(user and user.get("report_path"))
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting payment status: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/report/download")
+async def download_report(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Download the user's financial report PDF"""
+    try:
+        user_id = await verify_token(credentials)
+        
+        # Check if user has premium access
+        user = await db.users.find_one({"_id": user_id}, {"premium_plan": 1, "report_path": 1})
+        
+        if not user or not user.get("premium_plan"):
+            raise HTTPException(status_code=403, detail="Premium access required to download report")
+        
+        report_path = user.get("report_path")
+        
+        if not report_path or not Path(report_path).exists():
+            # Regenerate report if not found
+            report_path = await generate_user_report(user_id, user["premium_plan"])
+            await db.users.update_one(
+                {"_id": user_id},
+                {"$set": {"report_path": report_path}}
+            )
+        
+        return FileResponse(
+            report_path,
+            media_type="application/pdf",
+            filename=f"arth-verse_financial_report.pdf"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error downloading report: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
