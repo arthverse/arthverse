@@ -434,7 +434,7 @@ def create_report(filename, data, plan_type="individual"):
     ]
     
     for title, desc in recommendations:
-        elements.append(Paragraph(f"<b>▸ {title}:</b> {desc}", styles['BodyText']))
+        elements.append(Paragraph(f"<b>▸ {title}:</b> {desc}", styles['CustomBody']))
     
     elements.append(Spacer(1, 25))
     
