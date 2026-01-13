@@ -226,132 +226,13 @@ export default function Dashboard({ token, user, onLogout }) {
             </div>
           </div>
 
-          {/* Unlock Complete Financial Analysis - Paywall */}
+          {/* Payment Section - Replace old paywall */}
           {!hasPremiumAccess && (
             <div className="col-span-1 md:col-span-4">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-brand-blue">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-brand-blue to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-3xl font-bold text-slate-900 mb-2">Unlock Complete Financial Analysis</h3>
-                  <p className="text-lg text-slate-600">Get personalized insights to improve your financial health</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Individual Plan */}
-                  <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-brand-blue rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h4 className="text-xl font-bold text-brand-blue">Individual Plan</h4>
-                        <p className="text-sm text-slate-600">Perfect for personal finance tracking</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold text-brand-blue">₹499</div>
-                        <div className="text-xs text-slate-500">one-time</div>
-                      </div>
-                    </div>
-
-                    <ul className="space-y-2 mb-6">
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Detailed Score Breakdown (9 components)</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Age-Specific Action Plan (prioritized)</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Credit Card Recommendations</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Insurance Gap Analysis</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>5-Year Financial Projection</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Peer Comparison (vs your age group)</span>
-                      </li>
-                    </ul>
-
-                    <Button className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-semibold py-3 rounded-full">
-                      Unlock for ₹499
-                    </Button>
-                  </div>
-
-                  {/* Family Plan */}
-                  <div className="bg-gradient-to-br from-orange-50 to-white border-2 border-brand-orange rounded-xl p-6 relative">
-                    <div className="absolute -top-3 right-4 bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-full">
-                      BEST VALUE
-                    </div>
-                    
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h4 className="text-xl font-bold text-brand-orange">Family Plan</h4>
-                        <p className="text-sm text-slate-600">Complete family financial dashboard</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold text-brand-orange">₹999</div>
-                        <div className="text-xs text-slate-500">one-time</div>
-                      </div>
-                    </div>
-
-                    <ul className="space-y-2 mb-6">
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-semibold">Everything in Individual Plan</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Multi-member access (spouse + dependents)</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Consolidated family financial view</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Priority support</span>
-                      </li>
-                    </ul>
-
-                    <Button className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-semibold py-3 rounded-full">
-                      Unlock Family Plan for ₹999
-                    </Button>
-                  </div>
-                </div>
-
-                <p className="text-center text-sm text-slate-600 mt-6">
-                  🔒 Secure payment • Lifetime access • No recurring charges
-                </p>
-              </div>
+              <PaymentSection 
+                token={token} 
+                onPaymentSuccess={handlePaymentSuccess} 
+              />
             </div>
           )}
         </div>
