@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -17,6 +18,8 @@ import asyncio
 from services.setu_service import setu_service
 from services.financial_health_calculator import calculate_financial_health_score
 from services.user_id_generator import generate_user_login_id_async, validate_date_of_birth
+from services.payment_service import payment_service, PLANS
+from services.report_generator import create_report
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
