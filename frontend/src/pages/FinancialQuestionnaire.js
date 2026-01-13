@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Loader2, ChevronRight, ChevronLeft, RefreshCw } from 'lucide-react';
 import InsuranceSection from '../components/InsuranceSection';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import BankLinkingPrompt from '../components/BankLinkingPrompt';
 
 export default function FinancialQuestionnaire({ token, onLogout }) {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const [isEditing, setIsEditing] = useState(false);
   const [step, setStep] = useState(1);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showBankLinking, setShowBankLinking] = useState(false); // Show bank linking for new users
   
   const defaultFormData = {
     // Predefined Income fields
