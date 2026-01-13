@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { toast } from 'sonner';
 import { Loader2, ChevronRight, ChevronLeft, RefreshCw } from 'lucide-react';
 import InsuranceSection from '../components/InsuranceSection';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 
 export default function FinancialQuestionnaire({ token, onLogout }) {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const [initialLoading, setInitialLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [step, setStep] = useState(1);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   
   const defaultFormData = {
     // Predefined Income fields
