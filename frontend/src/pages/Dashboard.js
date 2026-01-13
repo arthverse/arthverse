@@ -9,6 +9,7 @@ import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw } from 'lucide-rea
 import { toast } from 'sonner';
 import BankLinking from '../components/BankLinking';
 import AggregatedFinancialData from '../components/AggregatedFinancialData';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
@@ -17,6 +18,7 @@ export default function Dashboard({ token, user, onLogout }) {
   const [questionnaire, setQuestionnaire] = useState(null);
   const [showBankData, setShowBankData] = useState(false);
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false); // Paywall enabled
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
