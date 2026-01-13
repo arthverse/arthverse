@@ -143,13 +143,19 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             insurance_policies: response.data.insurance_policies || []
           });
           setIsEditing(true);
+          setShowBankLinking(false); // Don't show bank linking for existing users
           toast.info('Your saved financial data has been loaded. Make any changes and submit to update.');
+        } else {
+          // New user - show bank linking prompt
+          setShowBankLinking(true);
         }
       } catch (error) {
-        if (error.response?.status !== 404) {
+        if (error.response?.status === 404) {
+          // No existing data - show bank linking for new users
+          setShowBankLinking(true);
+        } else {
           console.error('Error fetching questionnaire:', error);
         }
-        // 404 means no existing data, which is fine
       } finally {
         setInitialLoading(false);
       }
@@ -157,6 +163,58 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
 
     fetchExistingData();
   }, [token]);
+
+  // Handle bank linking completion
+  const handleBankLinkComplete = (bankData) => {
+    setShowBankLinking(false);
+    
+    if (bankData && bankData.accounts) {
+      // Auto-fill form with bank data
+      try {
+        let totalBalance = 0;
+        let estimatedIncome = 0;
+        let estimatedExpenses = 0;
+
+        bankData.accounts.forEach(account => {
+          if (account.balance) {
+            totalBalance += parseFloat(account.balance) || 0;
+          }
+        });
+
+        // Try to extract income/expense from transactions if available
+        if (bankData.transactions) {
+          bankData.transactions.forEach(tx => {
+            const amount = parseFloat(tx.amount) || 0;
+            if (tx.type === 'CREDIT') {
+              estimatedIncome += amount;
+            } else if (tx.type === 'DEBIT') {
+              estimatedExpenses += amount;
+            }
+          });
+        }
+
+        // Update form with auto-filled data
+        setFormData(prev => ({
+          ...prev,
+          bank_balance: totalBalance,
+          salary_income: estimatedIncome > 0 ? Math.round(estimatedIncome / 12) : prev.salary_income, // Monthly estimate
+        }));
+
+        toast.success('Bank data imported! Please review and complete the remaining fields.');
+      } catch (error) {
+        console.error('Error processing bank data:', error);
+        toast.info('Please fill in your financial details manually.');
+      }
+    } else {
+      toast.info('Please fill in your financial details.');
+    }
+  };
+
+  // Handle skip bank linking
+  const handleSkipBankLinking = () => {
+    setShowBankLinking(false);
+    toast.info('You can link your bank account later from the dashboard.');
+  };
 
   const handleReset = async () => {
     setShowResetDialog(true);
