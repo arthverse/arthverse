@@ -133,29 +133,37 @@ def calculate_financial_health_score(questionnaire: Dict[str, Any], user_age: in
     for policy in questionnaire.get('insurance_policies', []):
         monthly_expenses += float(policy.get('insurance_amount', 0)) / 12
     
-    # Calculate investments
-    equity_mf = sum([float(p.get('amount', 0)) for p in questionnaire.get('properties', []) if p.get('property_type') == 'equity_mf'])
-    debt_mf = sum([float(p.get('amount', 0)) for p in questionnaire.get('properties', []) if p.get('property_type') == 'debt_mf'])
-    stocks = float(questionnaire.get('stocks', 0))
-    ppf_nps = float(questionnaire.get('ppf', 0)) + float(questionnaire.get('nps', 0))
+    # Calculate investments - using correct field names
+    stocks_value = float(questionnaire.get('stocks_value', 0))
+    mutual_funds_value = float(questionnaire.get('mutual_funds_value', 0))
+    ppf_nps_value = float(questionnaire.get('pf_nps_value', 0))
     fixed_deposits = sum([float(inv.get('principal_amount', 0)) for inv in questionnaire.get('interest_investments', [])])
     
     # Real estate and gold from assets
-    real_estate_investment = sum([float(p.get('estimated_value', 0)) for p in questionnaire.get('properties', []) if p.get('property_type') in ['residential', 'commercial']])
-    gold_investment = float(questionnaire.get('gold', 0))
+    property_value = float(questionnaire.get('property_value', 0))
+    gold_value = float(questionnaire.get('gold_value', 0)) + float(questionnaire.get('silver_value', 0))
+    vehicles_value = float(questionnaire.get('vehicles_value', 0))
     
-    total_investments = equity_mf + debt_mf + stocks + ppf_nps + fixed_deposits + real_estate_investment + gold_investment
+    total_investments = stocks_value + mutual_funds_value + ppf_nps_value + fixed_deposits
     
-    # Calculate assets
-    emergency_fund = float(questionnaire.get('emergency_fund', 0))
-    property_value = sum([float(p.get('estimated_value', 0)) for p in questionnaire.get('properties', [])])
-    gold_value = float(questionnaire.get('gold', 0))
-    vehicle_value = sum([float(v.get('estimated_value', 0)) for v in questionnaire.get('vehicles', [])])
+    # Calculate total assets
+    bank_balance = float(questionnaire.get('bank_balance', 0))
+    cash_in_hand = float(questionnaire.get('cash_in_hand', 0))
+    emergency_fund = bank_balance  # Assuming bank balance is the emergency fund
     
-    total_assets = emergency_fund + property_value + gold_value + vehicle_value + total_investments
+    total_assets = bank_balance + cash_in_hand + property_value + gold_value + vehicles_value + total_investments
     
     # Calculate liabilities
-    total_liabilities = sum([float(loan.get('outstanding_amount', 0)) for loan in questionnaire.get('loans', [])])
+    home_loan = float(questionnaire.get('home_loan', 0))
+    personal_loan = float(questionnaire.get('personal_loan', 0))
+    vehicle_loan = float(questionnaire.get('vehicle_loan', 0))
+    credit_card_outstanding = float(questionnaire.get('credit_card_outstanding', 0))
+    
+    total_liabilities = home_loan + personal_loan + vehicle_loan + credit_card_outstanding
+    
+    # Also add loans from loans array
+    for loan in questionnaire.get('loans', []):
+        total_liabilities += float(loan.get('outstanding_amount', 0))
     
     net_worth = total_assets - total_liabilities
     
