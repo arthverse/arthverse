@@ -2016,7 +2016,11 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             {step < 4 ? (
               <Button
                 type="button"
-                onClick={() => setStep(step + 1)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setStep(step + 1);
+                }}
                 className="bg-brand-blue hover:bg-brand-blue/90 rounded-full ml-auto"
               >
                 Next <ChevronRight className="ml-2 h-4 w-4" />
