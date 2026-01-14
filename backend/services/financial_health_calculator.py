@@ -221,13 +221,14 @@ def calculate_financial_health_score(questionnaire: Dict[str, Any], user_age: in
         allocation_score = 2
     
     # FINANCIAL STABILITY CHECKPOINTS (10 points)
+    # These are the 6 key financial habits that indicate good financial health
     checkpoints = {
-        'has_health_insurance': questionnaire.get('has_health_insurance', 'no') == 'yes',
-        'has_term_insurance': questionnaire.get('has_term_insurance', 'no') == 'yes',
+        'has_health_insurance': questionnaire.get('has_health_insurance', False) == True,
+        'has_term_insurance': questionnaire.get('has_term_insurance', False) == True,
         'has_emergency_fund': emergency_fund >= (monthly_expenses * 3),
-        'files_itr': questionnaire.get('files_itr', 'no') == 'yes',
+        'files_itr': questionnaire.get('files_itr_yearly', False) == True,
         'invests_regularly': total_investments > 0,
-        'has_credit_card': len(questionnaire.get('credit_cards', [])) > 0
+        'has_credit_card': len(questionnaire.get('credit_cards', [])) > 0 or questionnaire.get('credit_card_outstanding', 0) > 0
     }
     
     checkpoint_score = sum(1 for v in checkpoints.values() if v)
