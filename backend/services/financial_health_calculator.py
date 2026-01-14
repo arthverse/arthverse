@@ -87,17 +87,18 @@ def calculate_financial_health_score(questionnaire: Dict[str, Any], user_age: in
         Dictionary containing score, rating, breakdown, insights, and recommendations
     """
     
-    # Extract and parse financial data
+    # Extract and parse financial data - using correct field names from questionnaire
     monthly_income = sum([
-        float(questionnaire.get('rental_income', 0)),
-        float(questionnaire.get('salary', 0)),
+        float(questionnaire.get('rental_property1', 0)),
+        float(questionnaire.get('rental_property2', 0)),
+        float(questionnaire.get('salary_income', 0)),
         float(questionnaire.get('business_income', 0)),
         float(questionnaire.get('interest_income', 0)),
         float(questionnaire.get('dividend_income', 0)),
         float(questionnaire.get('capital_gains', 0)),
-        float(questionnaire.get('pension', 0)),
+        float(questionnaire.get('freelance_income', 0)),
         float(questionnaire.get('other_income', 0))
-    ]) / 12  # Convert annual to monthly
+    ])
     
     # Add custom income entries
     for entry in questionnaire.get('income_entries', []):
