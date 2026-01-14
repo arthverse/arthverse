@@ -194,7 +194,7 @@ export default function Dashboard({ token, user, onLogout }) {
                     </div>
                     <div>
                       <p className="text-sm text-slate-600 font-body">Total Income</p>
-                      <p className="text-xl font-bold font-mono text-green-600" data-testid="total-income-value">₹{healthScore?.total_income?.toLocaleString() || 0}</p>
+                      <p className="text-xl font-bold font-mono text-green-600" data-testid="total-income-value">₹{(healthScore?.financials?.monthly_income || 0).toLocaleString()}</p>
                     </div>
                   </div>
                 </Card>
@@ -206,7 +206,7 @@ export default function Dashboard({ token, user, onLogout }) {
                     </div>
                     <div>
                       <p className="text-sm text-slate-600 font-body">Total Expenses</p>
-                      <p className="text-xl font-bold font-mono text-red-600" data-testid="total-expenses-value">₹{healthScore?.total_expenses?.toLocaleString() || 0}</p>
+                      <p className="text-xl font-bold font-mono text-red-600" data-testid="total-expenses-value">₹{(healthScore?.financials?.monthly_expenses || 0).toLocaleString()}</p>
                     </div>
                   </div>
                 </Card>
@@ -218,7 +218,7 @@ export default function Dashboard({ token, user, onLogout }) {
                     </div>
                     <div>
                       <p className="text-sm text-slate-600 font-body">Net Savings</p>
-                      <p className="text-xl font-bold font-mono text-brand-blue" data-testid="net-savings-value">₹{healthScore?.net_savings?.toLocaleString() || 0}</p>
+                      <p className="text-xl font-bold font-mono text-brand-blue" data-testid="net-savings-value">₹{(healthScore?.financials?.monthly_savings || 0).toLocaleString()}</p>
                     </div>
                   </div>
                 </Card>
