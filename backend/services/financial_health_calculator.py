@@ -107,19 +107,22 @@ def calculate_financial_health_score(questionnaire: Dict[str, Any], user_age: in
     annual_income = monthly_income * 12
     age = user_age or int(questionnaire.get('age', 30))
     
-    # Calculate monthly expenses
+    # Calculate monthly expenses - using correct field names from questionnaire
     monthly_expenses = sum([
         float(questionnaire.get('rent_expense', 0)),
         float(questionnaire.get('emis', 0)),
         float(questionnaire.get('household_maid', 0)),
         float(questionnaire.get('groceries', 0)),
-        float(questionnaire.get('fuel_expense', 0)),
+        float(questionnaire.get('food_dining', 0)),
+        float(questionnaire.get('fuel', 0)),
         float(questionnaire.get('entertainment', 0)),
-        float(questionnaire.get('dining_out', 0)),
-        float(questionnaire.get('shopping', 0)),
         float(questionnaire.get('travel', 0)),
+        float(questionnaire.get('shopping', 0)),
+        float(questionnaire.get('online_shopping', 0)),
         float(questionnaire.get('healthcare', 0)),
-        float(questionnaire.get('other_variable_expense', 0))
+        float(questionnaire.get('education', 0)),
+        float(questionnaire.get('telecom_utilities', 0)),
+        float(questionnaire.get('monthly_investment', 0))
     ])
     
     # Add custom expense entries
