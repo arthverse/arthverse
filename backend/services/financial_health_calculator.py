@@ -167,25 +167,37 @@ def calculate_financial_health_score(questionnaire: Dict[str, Any], user_age: in
     
     net_worth = total_assets - total_liabilities
     
-    # Insurance coverage
-    life_insurance = sum([float(p.get('insurance_amount', 0)) * 12 for p in questionnaire.get('insurance_policies', []) if p.get('type') == 'life'])
-    health_insurance = sum([float(p.get('insurance_amount', 0)) * 12 for p in questionnaire.get('insurance_policies', []) if p.get('type') == 'health'])
+    # Insurance coverage - using correct field names
+    life_insurance = float(questionnaire.get('term_insurance', 0))
+    health_insurance = float(questionnaire.get('health_insurance', 0))
+    has_term_insurance = questionnaire.get('has_term_insurance', False)
+    has_health_insurance = questionnaire.get('has_health_insurance', False)
     
-    # Dependents
-    dependents = int(questionnaire.get('no_of_dependents', 0))
+    # Also check insurance_policies array
+    for policy in questionnaire.get('insurance_policies', []):
+        if policy.get('type') == 'life':
+            life_insurance += float(policy.get('insurance_amount', 0))
+        elif policy.get('type') == 'health':
+            health_insurance += float(policy.get('insurance_amount', 0))
+    
+    # Dependents - use major_members and minor_members
+    major_members = int(questionnaire.get('major_members', 0))
+    minor_members = int(questionnaire.get('minor_members', 0))
+    dependents = major_members + minor_members
     
     # Get age-based benchmarks
     age_category = get_age_category(age)
     benchmarks = get_age_benchmarks(age_category)
     
     # ASSET ALLOCATION ANALYSIS
-    total_equity = equity_mf + stocks
-    total_debt = debt_mf + ppf_nps + fixed_deposits
-    total_alternative = real_estate_investment + gold_investment
+    total_equity = stocks_value + (mutual_funds_value * 0.6)  # Assume 60% of MF is equity
+    total_debt = (mutual_funds_value * 0.4) + ppf_nps_value + fixed_deposits  # Assume 40% of MF is debt
+    total_alternative = property_value + gold_value
     
-    equity_percent = (total_equity / total_investments * 100) if total_investments > 0 else 0
-    debt_percent = (total_debt / total_investments * 100) if total_investments > 0 else 0
-    alternative_percent = (total_alternative / total_investments * 100) if total_investments > 0 else 0
+    total_investable = total_equity + total_debt + total_alternative
+    equity_percent = (total_equity / total_investable * 100) if total_investable > 0 else 0
+    debt_percent = (total_debt / total_investable * 100) if total_investable > 0 else 0
+    alternative_percent = (total_alternative / total_investable * 100) if total_investable > 0 else 0
     
     ideal_allocation = get_ideal_allocation(age)
     
