@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="20" failures="1" skipped="0" tests="25" time="2.311" timestamp="2026-01-15T13:02:25.839123+00:00" hostname="agent-env-7b376f43-4de1-4875-be10-c4d20dddabde"><testcase classname="tests.test_arthrakshak.TestArthRakshakAuth" name="test_login_success" time="0.301"><failure message="AssertionError: assert 'access_token' in {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjFlOWMwZTItOWE1ZS00ZTFmLTlhNmYtMjhjMWJlYjI5Zjg5IiwiZXhwIjoxNzY5MDg2OTQ2fQ.ifaZwzOw-b8V3ulvfEIUl1xFEGrK9XpZum2W5IEXyEc', 'user': {'age': 30, 'city': 'Mumbai', 'client_id': 'AV271676A7', 'created_at': '2026-01-11T08:07:18.137191+00:00', ...}}">tests/test_arthrakshak.py:50: in test_login_success
+    assert "access_token" in data
+E   AssertionError: assert 'access_token' in {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjFlOWMwZTItOWE1ZS00ZTFmLTlhNmYtMjhjMWJlYjI5Zjg5IiwiZXhwIjoxNzY5MDg2OTQ2fQ.ifaZwzOw-b8V3ulvfEIUl1xFEGrK9XpZum2W5IEXyEc', 'user': {'age': 30, 'city': 'Mumbai', 'client_id': 'AV271676A7', 'created_at': '2026-01-11T08:07:18.137191+00:00', ...}}</failure></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakSummary" name="test_get_summary" time="0.265"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:64: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCRUD" name="test_create_life_policy" time="0.262"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:97: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCRUD" name="test_create_health_policy" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:97: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCRUD" name="test_get_policies" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:97: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCRUD" name="test_update_policy" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:97: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCRUD" name="test_delete_policy" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:97: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCRUD" name="test_delete_health_policy_cleanup" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:97: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakRiskProfile" name="test_get_risk_profile" time="0.269"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:253: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakRiskProfile" name="test_save_risk_profile" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:253: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakRiskProfile" name="test_verify_risk_profile_persistence" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:253: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakProtectionGap" name="test_get_protection_gap" time="0.266"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:336: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakCoverageChecklist" name="test_get_life_checklist" time="0.265"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:380: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakCoverageChecklist" name="test_get_health_checklist" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:380: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakCoverageChecklist" name="test_get_vehicle_checklist" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:380: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakCoverageChecklist" name="test_get_cards_checklist" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:380: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakCoverageChecklist" name="test_invalid_category_checklist" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:380: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCoverage" name="test_get_policy_coverage" time="0.261"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:460: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCoverage" name="test_update_policy_coverage" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:460: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCoverage" name="test_verify_coverage_persistence" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:460: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakPolicyCoverage" name="test_cleanup_test_policy" time="0.000"><error message="failed on setup with &quot;KeyError: 'access_token'&quot;">tests/test_arthrakshak.py:460: in auth_headers
+    token = response.json()["access_token"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'access_token'</error></testcase><testcase classname="tests.test_arthrakshak.TestArthRakshakUnauthorized" name="test_summary_without_auth" time="0.039" /><testcase classname="tests.test_arthrakshak.TestArthRakshakUnauthorized" name="test_policies_without_auth" time="0.037" /><testcase classname="tests.test_arthrakshak.TestArthRakshakUnauthorized" name="test_risk_profile_without_auth" time="0.074" /><testcase classname="tests.test_arthrakshak.TestArthRakshakUnauthorized" name="test_protection_gap_without_auth" time="0.038" /></testsuite></testsuites>
