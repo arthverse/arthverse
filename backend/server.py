@@ -20,6 +20,11 @@ from services.financial_health_calculator import calculate_financial_health_scor
 from services.user_id_generator import generate_user_login_id_async, validate_date_of_birth
 from services.payment_service import payment_service, PLANS
 from services.report_generator import create_report
+from services.arthrakshak_service import (
+    InsurancePolicy, PolicyCategory, PolicyType, PremiumFrequency,
+    PolicyCoverage, RiskProfile, ProtectionGap, RiskStatus,
+    get_coverage_checklist, calculate_protection_gap
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
