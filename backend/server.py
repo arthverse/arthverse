@@ -1181,6 +1181,503 @@ async def download_report(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ==================== ARTHRAKSHAK ENDPOINTS ====================
+
+class InsurancePolicyCreate(BaseModel):
+    category: str
+    policy_type: str
+    insurer_name: str
+    policy_number: str
+    start_date: str
+    end_date: str
+    premium_amount: float
+    premium_frequency: str
+    sum_assured: float
+    nominee_added: bool = False
+    nominees: List[dict] = []
+    document_url: Optional[str] = None
+
+class InsurancePolicyResponse(BaseModel):
+    id: str
+    user_id: str
+    category: str
+    policy_type: str
+    insurer_name: str
+    policy_number: str
+    start_date: str
+    end_date: str
+    premium_amount: float
+    premium_frequency: str
+    sum_assured: float
+    nominee_added: bool
+    nominees: List[dict]
+    document_url: Optional[str]
+    created_at: str
+    updated_at: str
+
+class PolicyCoverageUpdate(BaseModel):
+    inclusions: dict = {}
+    exclusions: dict = {}
+    custom_notes: str = ""
+
+class RiskProfileCreate(BaseModel):
+    age: int = 0
+    marital_status: str = ""
+    dependents: int = 0
+    earning_members: int = 1
+    city_tier: str = "tier1"
+    annual_income: float = 0
+    outstanding_loans: float = 0
+    existing_investments: float = 0
+    emergency_fund_months: int = 0
+    has_pure_term: bool = False
+    total_life_cover: float = 0
+    health_cover_type: str = ""
+    health_sum_insured: float = 0
+    employer_insurance_only: bool = False
+    vehicle_cover_type: str = ""
+    has_zero_depreciation: bool = False
+    has_own_damage: bool = False
+    knows_card_benefits: bool = False
+    card_accidental_cover: float = 0
+
+@api_router.get("/arthrakshak/policies")
+async def get_insurance_policies(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get all insurance policies for the current user"""
+    user_id = await verify_token(credentials)
+    
+    policies = await db.insurance_policies.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {"policies": policies}
+
+@api_router.post("/arthrakshak/policies", response_model=InsurancePolicyResponse)
+async def create_insurance_policy(
+    policy_data: InsurancePolicyCreate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Create a new insurance policy"""
+    user_id = await verify_token(credentials)
+    
+    policy_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    policy_doc = {
+        "id": policy_id,
+        "user_id": user_id,
+        "category": policy_data.category,
+        "policy_type": policy_data.policy_type,
+        "insurer_name": policy_data.insurer_name,
+        "policy_number": policy_data.policy_number,
+        "start_date": policy_data.start_date,
+        "end_date": policy_data.end_date,
+        "premium_amount": policy_data.premium_amount,
+        "premium_frequency": policy_data.premium_frequency,
+        "sum_assured": policy_data.sum_assured,
+        "nominee_added": policy_data.nominee_added,
+        "nominees": policy_data.nominees,
+        "document_url": policy_data.document_url,
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    await db.insurance_policies.insert_one(policy_doc)
+    
+    return InsurancePolicyResponse(**policy_doc)
+
+@api_router.put("/arthrakshak/policies/{policy_id}", response_model=InsurancePolicyResponse)
+async def update_insurance_policy(
+    policy_id: str,
+    policy_data: InsurancePolicyCreate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Update an existing insurance policy"""
+    user_id = await verify_token(credentials)
+    
+    # Check policy exists and belongs to user
+    existing = await db.insurance_policies.find_one(
+        {"id": policy_id, "user_id": user_id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    update_data = {
+        "category": policy_data.category,
+        "policy_type": policy_data.policy_type,
+        "insurer_name": policy_data.insurer_name,
+        "policy_number": policy_data.policy_number,
+        "start_date": policy_data.start_date,
+        "end_date": policy_data.end_date,
+        "premium_amount": policy_data.premium_amount,
+        "premium_frequency": policy_data.premium_frequency,
+        "sum_assured": policy_data.sum_assured,
+        "nominee_added": policy_data.nominee_added,
+        "nominees": policy_data.nominees,
+        "document_url": policy_data.document_url,
+        "updated_at": now
+    }
+    
+    await db.insurance_policies.update_one(
+        {"id": policy_id},
+        {"$set": update_data}
+    )
+    
+    updated = await db.insurance_policies.find_one({"id": policy_id}, {"_id": 0})
+    return InsurancePolicyResponse(**updated)
+
+@api_router.delete("/arthrakshak/policies/{policy_id}")
+async def delete_insurance_policy(
+    policy_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Delete an insurance policy"""
+    user_id = await verify_token(credentials)
+    
+    result = await db.insurance_policies.delete_one(
+        {"id": policy_id, "user_id": user_id}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    
+    return {"message": "Policy deleted successfully"}
+
+@api_router.get("/arthrakshak/coverage-checklist/{category}")
+async def get_coverage_checklist_endpoint(
+    category: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get standard inclusions/exclusions checklist for a policy category"""
+    await verify_token(credentials)
+    
+    try:
+        policy_category = PolicyCategory(category)
+        checklist = get_coverage_checklist(policy_category)
+        return checklist
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid policy category")
+
+@api_router.get("/arthrakshak/policies/{policy_id}/coverage")
+async def get_policy_coverage(
+    policy_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get inclusions/exclusions for a specific policy"""
+    user_id = await verify_token(credentials)
+    
+    coverage = await db.policy_coverages.find_one(
+        {"policy_id": policy_id, "user_id": user_id},
+        {"_id": 0}
+    )
+    
+    if not coverage:
+        # Return default coverage based on policy category
+        policy = await db.insurance_policies.find_one({"id": policy_id, "user_id": user_id})
+        if not policy:
+            raise HTTPException(status_code=404, detail="Policy not found")
+        
+        try:
+            category = PolicyCategory(policy["category"])
+            checklist = get_coverage_checklist(category)
+            return {
+                "policy_id": policy_id,
+                "inclusions": {item["key"]: item["default"] for item in checklist["inclusions"]},
+                "exclusions": {item["key"]: item["default"] for item in checklist["exclusions"]},
+                "custom_notes": ""
+            }
+        except ValueError:
+            return {"policy_id": policy_id, "inclusions": {}, "exclusions": {}, "custom_notes": ""}
+    
+    return coverage
+
+@api_router.put("/arthrakshak/policies/{policy_id}/coverage")
+async def update_policy_coverage(
+    policy_id: str,
+    coverage_data: PolicyCoverageUpdate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Update inclusions/exclusions for a policy"""
+    user_id = await verify_token(credentials)
+    
+    # Verify policy exists
+    policy = await db.insurance_policies.find_one({"id": policy_id, "user_id": user_id})
+    if not policy:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    
+    coverage_doc = {
+        "policy_id": policy_id,
+        "user_id": user_id,
+        "inclusions": coverage_data.inclusions,
+        "exclusions": coverage_data.exclusions,
+        "custom_notes": coverage_data.custom_notes,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.policy_coverages.update_one(
+        {"policy_id": policy_id, "user_id": user_id},
+        {"$set": coverage_doc},
+        upsert=True
+    )
+    
+    return {"message": "Coverage updated successfully", "coverage": coverage_doc}
+
+@api_router.get("/arthrakshak/risk-profile")
+async def get_risk_profile(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get user's risk profile"""
+    user_id = await verify_token(credentials)
+    
+    # Try to get existing profile
+    profile = await db.risk_profiles.find_one({"user_id": user_id}, {"_id": 0})
+    
+    if not profile:
+        # Try to pre-fill from user data and questionnaire
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+        
+        # Build pre-filled profile
+        profile = {
+            "user_id": user_id,
+            "age": user.get("age", 0) if user else 0,
+            "marital_status": user.get("marital_status", "") if user else "",
+            "dependents": (user.get("major_members", 0) + user.get("minor_members", 0)) if user else 0,
+            "earning_members": 1,
+            "city_tier": "tier1",
+            "annual_income": 0,
+            "outstanding_loans": 0,
+            "existing_investments": 0,
+            "emergency_fund_months": 0,
+            "has_pure_term": False,
+            "total_life_cover": 0,
+            "health_cover_type": "",
+            "health_sum_insured": 0,
+            "employer_insurance_only": False,
+            "vehicle_cover_type": "",
+            "has_zero_depreciation": False,
+            "has_own_damage": False,
+            "knows_card_benefits": False,
+            "card_accidental_cover": 0
+        }
+        
+        if questionnaire:
+            # Pre-fill from questionnaire
+            monthly_income = sum([
+                questionnaire.get("salary_income", 0),
+                questionnaire.get("business_income", 0),
+                questionnaire.get("rental_property1", 0),
+                questionnaire.get("rental_property2", 0),
+                questionnaire.get("freelance_income", 0),
+                questionnaire.get("other_income", 0)
+            ])
+            profile["annual_income"] = monthly_income * 12
+            
+            profile["outstanding_loans"] = sum([
+                questionnaire.get("home_loan", 0),
+                questionnaire.get("personal_loan", 0),
+                questionnaire.get("vehicle_loan", 0)
+            ])
+            
+            profile["existing_investments"] = sum([
+                questionnaire.get("stocks_value", 0),
+                questionnaire.get("mutual_funds_value", 0),
+                questionnaire.get("pf_nps_value", 0)
+            ])
+            
+            profile["has_pure_term"] = questionnaire.get("has_term_insurance", False)
+            profile["health_cover_type"] = "individual" if questionnaire.get("has_health_insurance", False) else ""
+    
+    return profile
+
+@api_router.post("/arthrakshak/risk-profile")
+async def save_risk_profile(
+    profile_data: RiskProfileCreate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Save or update user's risk profile"""
+    user_id = await verify_token(credentials)
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    profile_doc = {
+        "user_id": user_id,
+        **profile_data.dict(),
+        "updated_at": now
+    }
+    
+    await db.risk_profiles.update_one(
+        {"user_id": user_id},
+        {"$set": profile_doc},
+        upsert=True
+    )
+    
+    return {"message": "Risk profile saved successfully", "profile": profile_doc}
+
+@api_router.get("/arthrakshak/protection-gap")
+async def get_protection_gap(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Calculate and return protection gap analysis"""
+    user_id = await verify_token(credentials)
+    
+    # Get risk profile
+    profile_data = await db.risk_profiles.find_one({"user_id": user_id}, {"_id": 0})
+    
+    if not profile_data:
+        # Return default analysis prompting user to fill profile
+        return {
+            "user_id": user_id,
+            "protection_score": 0,
+            "life_insurance": {
+                "category": "Life Insurance",
+                "status": "unknown",
+                "message": "Complete your risk profile to evaluate",
+                "recommendations": ["Please fill your risk profile questionnaire first"]
+            },
+            "health_insurance": {
+                "category": "Health Insurance",
+                "status": "unknown",
+                "message": "Complete your risk profile to evaluate",
+                "recommendations": ["Please fill your risk profile questionnaire first"]
+            },
+            "vehicle_insurance": {
+                "category": "Vehicle Insurance",
+                "status": "unknown",
+                "message": "No vehicle insurance added",
+                "recommendations": ["Add your vehicle insurance details"]
+            },
+            "cards_insurance": {
+                "category": "Cards Insurance",
+                "status": "unknown",
+                "message": "Card benefits not reviewed",
+                "recommendations": ["Add your credit/debit cards to review benefits"]
+            },
+            "unprotected_areas": ["Risk profile not completed"],
+            "action_items": ["Complete your risk profile to get personalized recommendations"],
+            "calculated_at": datetime.now(timezone.utc).isoformat()
+        }
+    
+    # Get policies
+    policies_cursor = db.insurance_policies.find({"user_id": user_id}, {"_id": 0})
+    policies_data = await policies_cursor.to_list(100)
+    
+    # Convert to model objects for calculation
+    profile = RiskProfile(user_id=user_id, **{k: v for k, v in profile_data.items() if k != "user_id"})
+    
+    policies = []
+    for p in policies_data:
+        try:
+            policy = InsurancePolicy(
+                id=p.get("id"),
+                user_id=p.get("user_id"),
+                category=PolicyCategory(p.get("category")),
+                policy_type=PolicyType(p.get("policy_type")),
+                insurer_name=p.get("insurer_name"),
+                policy_number=p.get("policy_number"),
+                start_date=p.get("start_date"),
+                end_date=p.get("end_date"),
+                premium_amount=p.get("premium_amount"),
+                premium_frequency=PremiumFrequency(p.get("premium_frequency")),
+                sum_assured=p.get("sum_assured"),
+                nominee_added=p.get("nominee_added", False),
+                nominees=p.get("nominees", []),
+                document_url=p.get("document_url")
+            )
+            policies.append(policy)
+        except Exception as e:
+            logger.warning(f"Skipping policy due to error: {e}")
+            continue
+    
+    # Calculate protection gap
+    gap = calculate_protection_gap(profile, policies)
+    
+    # Convert to dict for response
+    return {
+        "user_id": gap.user_id,
+        "protection_score": gap.protection_score,
+        "life_insurance": {
+            "category": gap.life_insurance.category,
+            "status": gap.life_insurance.status.value,
+            "message": gap.life_insurance.message,
+            "gap_amount": gap.life_insurance.gap_amount,
+            "recommendations": gap.life_insurance.recommendations
+        },
+        "health_insurance": {
+            "category": gap.health_insurance.category,
+            "status": gap.health_insurance.status.value,
+            "message": gap.health_insurance.message,
+            "gap_amount": gap.health_insurance.gap_amount,
+            "recommendations": gap.health_insurance.recommendations
+        },
+        "vehicle_insurance": {
+            "category": gap.vehicle_insurance.category,
+            "status": gap.vehicle_insurance.status.value,
+            "message": gap.vehicle_insurance.message,
+            "recommendations": gap.vehicle_insurance.recommendations
+        },
+        "cards_insurance": {
+            "category": gap.cards_insurance.category,
+            "status": gap.cards_insurance.status.value,
+            "message": gap.cards_insurance.message,
+            "recommendations": gap.cards_insurance.recommendations
+        },
+        "unprotected_areas": gap.unprotected_areas,
+        "action_items": gap.action_items,
+        "calculated_at": gap.calculated_at
+    }
+
+@api_router.get("/arthrakshak/summary")
+async def get_arthrakshak_summary(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get summary of all insurance data for dashboard"""
+    user_id = await verify_token(credentials)
+    
+    # Get all policies
+    policies = await db.insurance_policies.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Calculate totals by category
+    life_policies = [p for p in policies if p.get("category") == "life"]
+    health_policies = [p for p in policies if p.get("category") == "health"]
+    vehicle_policies = [p for p in policies if p.get("category") == "vehicle"]
+    card_policies = [p for p in policies if p.get("category") == "cards"]
+    
+    total_life_cover = sum(p.get("sum_assured", 0) for p in life_policies)
+    total_health_cover = sum(p.get("sum_assured", 0) for p in health_policies)
+    total_premium = sum(p.get("premium_amount", 0) for p in policies)
+    
+    return {
+        "total_policies": len(policies),
+        "by_category": {
+            "life": {
+                "count": len(life_policies),
+                "total_cover": total_life_cover
+            },
+            "health": {
+                "count": len(health_policies),
+                "total_cover": total_health_cover
+            },
+            "vehicle": {
+                "count": len(vehicle_policies)
+            },
+            "cards": {
+                "count": len(card_policies)
+            }
+        },
+        "total_annual_premium": total_premium,
+        "policies": policies
+    }
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
