@@ -2043,7 +2043,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
               </Button>
             )}
             
-            {step < 4 ? (
+            {step < 5 ? (
               <Button
                 type="button"
                 onClick={(e) => {
