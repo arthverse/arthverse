@@ -28,8 +28,8 @@ class TestArthRakshakAuth:
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         data = response.json()
-        assert "access_token" in data, "No access_token in response"
-        return data["access_token"]
+        assert "token" in data, "No token in response"
+        return data["token"]
     
     @pytest.fixture(scope="class")
     def auth_headers(self, auth_token):
@@ -47,7 +47,7 @@ class TestArthRakshakAuth:
         })
         assert response.status_code == 200
         data = response.json()
-        assert "access_token" in data
+        assert "token" in data
         print(f"✓ Login successful, token received")
 
 
@@ -61,7 +61,7 @@ class TestArthRakshakSummary:
             "client_id": TEST_CLIENT_ID,
             "password": TEST_PASSWORD
         })
-        token = response.json()["access_token"]
+        token = response.json()["token"]
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     def test_get_summary(self, auth_headers):
@@ -94,7 +94,7 @@ class TestArthRakshakPolicyCRUD:
             "client_id": TEST_CLIENT_ID,
             "password": TEST_PASSWORD
         })
-        token = response.json()["access_token"]
+        token = response.json()["token"]
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     @pytest.fixture(scope="class")
@@ -250,7 +250,7 @@ class TestArthRakshakRiskProfile:
             "client_id": TEST_CLIENT_ID,
             "password": TEST_PASSWORD
         })
-        token = response.json()["access_token"]
+        token = response.json()["token"]
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     def test_get_risk_profile(self, auth_headers):
@@ -333,7 +333,7 @@ class TestArthRakshakProtectionGap:
             "client_id": TEST_CLIENT_ID,
             "password": TEST_PASSWORD
         })
-        token = response.json()["access_token"]
+        token = response.json()["token"]
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     def test_get_protection_gap(self, auth_headers):
@@ -377,7 +377,7 @@ class TestArthRakshakCoverageChecklist:
             "client_id": TEST_CLIENT_ID,
             "password": TEST_PASSWORD
         })
-        token = response.json()["access_token"]
+        token = response.json()["token"]
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     def test_get_life_checklist(self, auth_headers):
@@ -457,7 +457,7 @@ class TestArthRakshakPolicyCoverage:
             "client_id": TEST_CLIENT_ID,
             "password": TEST_PASSWORD
         })
-        token = response.json()["access_token"]
+        token = response.json()["token"]
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     @pytest.fixture(scope="class")
