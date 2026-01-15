@@ -380,7 +380,34 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         has_emergency_fund: formData.has_emergency_fund,
         files_itr_yearly: formData.files_itr_yearly,
         credit_cards: formData.credit_cards,
-        monthly_investment: parseFloat(formData.monthly_investment) || 0
+        monthly_investment: parseFloat(formData.monthly_investment) || 0,
+        
+        // Credit Card Recommendation - Step 5
+        redeem_free_flights: formData.redeem_free_flights,
+        redeem_hotel_stays: formData.redeem_hotel_stays,
+        redeem_direct_cashback: formData.redeem_direct_cashback,
+        redeem_vouchers: formData.redeem_vouchers,
+        
+        domestic_lounge_visits: parseInt(formData.domestic_lounge_visits) || 0,
+        international_lounge_visits: parseInt(formData.international_lounge_visits) || 0,
+        golf_sessions: parseInt(formData.golf_sessions) || 0,
+        movies_events_monthly: parseInt(formData.movies_events_monthly) || 0,
+        ideal_card_count: parseInt(formData.ideal_card_count) || 2,
+        
+        spend_bills_utilities: formData.spend_bills_utilities,
+        spend_groceries: formData.spend_groceries,
+        spend_online_shopping: formData.spend_online_shopping,
+        spend_dining_food: formData.spend_dining_food,
+        spend_upi_merchants: formData.spend_upi_merchants,
+        spend_instore_shopping: formData.spend_instore_shopping,
+        spend_flights_hotels: formData.spend_flights_hotels,
+        spend_rent_payments: formData.spend_rent_payments,
+        spend_insurance: formData.spend_insurance,
+        spend_forex: formData.spend_forex,
+        spend_fuel: formData.spend_fuel,
+        spend_jewellery_gold: formData.spend_jewellery_gold,
+        spend_government_tax: formData.spend_government_tax,
+        spend_education: formData.spend_education
       };
 
       await axios.post(`${API}/questionnaire`, payload, {
