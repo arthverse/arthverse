@@ -114,7 +114,37 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     selected_credit_card: '',
     
     // Investment
-    monthly_investment: 0
+    monthly_investment: 0,
+    
+    // Credit Card Recommendation - Step 5
+    // Redemption Preferences
+    redeem_free_flights: false,
+    redeem_hotel_stays: false,
+    redeem_direct_cashback: false,
+    redeem_vouchers: false,
+    
+    // Lifestyle Perks (frequency)
+    domestic_lounge_visits: 0,
+    international_lounge_visits: 0,
+    golf_sessions: 0,
+    movies_events_monthly: 0,
+    ideal_card_count: 2,
+    
+    // Monthly Spend Categories (low/mid/high)
+    spend_bills_utilities: 'low',
+    spend_groceries: 'low',
+    spend_online_shopping: 'low',
+    spend_dining_food: 'low',
+    spend_upi_merchants: 'low',
+    spend_instore_shopping: 'low',
+    spend_flights_hotels: 'low',
+    spend_rent_payments: 'low',
+    spend_insurance: 'low',
+    spend_forex: 'low',
+    spend_fuel: 'low',
+    spend_jewellery_gold: 'low',
+    spend_government_tax: 'low',
+    spend_education: 'low'
   };
 
   const [formData, setFormData] = useState(defaultFormData);
