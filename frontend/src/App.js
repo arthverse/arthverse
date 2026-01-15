@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import FinancialQuestionnaire from './pages/FinancialQuestionnaire';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
+import ArthRakshakDashboard from './pages/ArthRakshakDashboard';
 import { Toaster } from './components/ui/sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -84,6 +85,12 @@ function App() {
           <Route 
             path="/arthvyay/reports" 
             element={token ? <Reports token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+          />
+
+          {/* ArthRakshak App Routes */}
+          <Route 
+            path="/arthrakshak/dashboard" 
+            element={token ? <ArthRakshakDashboard token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
           />
         </Routes>
       </BrowserRouter>

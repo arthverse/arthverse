@@ -45,11 +45,11 @@ export default function ArthVersePortal({ token, user, onLogout }) {
     {
       name: 'Arthrakshak',
       tagline: '"Your financial shield."',
-      description: 'Insurance Aggregator',
+      description: 'Insurance & Risk Coverage',
       icon: Shield,
       color: 'orange',
-      link: '#',
-      available: false,
+      link: '/arthrakshak/dashboard',
+      available: true,
       logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/b80clgwt_image.png'
     },
     {
