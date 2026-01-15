@@ -797,7 +797,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             }
           </p>
           <div className="mt-4 flex gap-2">
-            {[1, 2, 3, 4].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <div
                 key={s}
                 className={`h-2 flex-1 rounded-full ${s <= step ? 'bg-brand-blue' : 'bg-slate-200'}`}
