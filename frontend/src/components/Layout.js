@@ -24,7 +24,7 @@ export default function Layout({ children, token, onLogout }) {
                 <img 
                   src="/arth-verse-logo.png" 
                   alt="Arth-Verse Logo" 
-                  className="h-8 object-contain"
+                  className="h-10 object-contain"
                 />
               </Link>
               
