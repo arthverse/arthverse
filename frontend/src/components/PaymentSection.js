@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API } from '../App';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { 
   Target, FileText, PieChart, TrendingUp, Scale, Shield,
-  CreditCard, Lightbulb, Download, Check, Lock, Sparkles
+  CreditCard, Lightbulb, Download, Check, Lock, Sparkles,
+  Plus, Minus, Users, User, Baby
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const PRICING = {
+  base: 499,
+  majorMember: 399,
+  minorMember: 199
+};
 
 const BENEFITS = [
   {
@@ -59,17 +66,39 @@ const BENEFITS = [
 
 export default function PaymentSection({ token, user, onPaymentSuccess }) {
   const [loading, setLoading] = useState(false);
+  const [majorMembers, setMajorMembers] = useState(0);
+  const [minorMembers, setMinorMembers] = useState(0);
+
+  // Pre-fill from user's registered data
+  useEffect(() => {
+    if (user) {
+      setMajorMembers(user.major_members || 0);
+      setMinorMembers(user.minor_members || 0);
+    }
+  }, [user]);
+
+  const totalAmount = PRICING.base + (majorMembers * PRICING.majorMember) + (minorMembers * PRICING.minorMember);
+  const totalMembers = 1 + majorMembers + minorMembers;
+
+  const handleMajorChange = (delta) => {
+    const newValue = Math.max(0, majorMembers + delta);
+    setMajorMembers(newValue);
+  };
+
+  const handleMinorChange = (delta) => {
+    const newValue = Math.max(0, minorMembers + delta);
+    setMinorMembers(newValue);
+  };
 
   const handleCheckout = async () => {
     setLoading(true);
     
     try {
-      // Create order with base pricing (₹499)
       const orderResponse = await axios.post(
         `${API}/payment/create-order`,
         {
-          major_members: 0,
-          minor_members: 0
+          major_members: majorMembers,
+          minor_members: minorMembers
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -93,7 +122,7 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
         amount: amount,
         currency: 'INR',
         name: 'ArthVyay',
-        description: 'Individual Plan - Financial Diagnosis',
+        description: `Individual Plan${majorMembers + minorMembers > 0 ? ` + ${majorMembers + minorMembers} Family Members` : ''}`,
         order_id: order_id,
         handler: async function (response) {
           try {
@@ -103,8 +132,8 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                major_members: 0,
-                minor_members: 0
+                major_members: majorMembers,
+                minor_members: minorMembers
               },
               { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -163,20 +192,129 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
             Data-driven insights, not generic advice.
           </p>
 
-          {/* Pricing */}
-          <div className="flex items-baseline gap-3 mb-8">
-            <span className="text-5xl md:text-6xl font-bold text-white font-mono">₹499</span>
-            <div className="text-slate-400">
-              <p className="text-sm">one-time payment</p>
-              <p className="text-xs">inclusive of all applicable taxes</p>
+          {/* Pricing Section */}
+          <div className="bg-white/5 rounded-2xl p-6 mb-8 backdrop-blur-sm border border-white/10">
+            {/* Base Plan */}
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-brand-blue/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Base Plan</p>
+                  <p className="text-sm text-slate-400">Includes primary user (you)</p>
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-white font-mono">₹{PRICING.base}</p>
+            </div>
+
+            {/* Additional Major Members */}
+            <div className="flex items-center justify-between py-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Additional Major Members <span className="text-slate-400 text-sm font-normal">(18+)</span></p>
+                  <p className="text-sm text-slate-400">₹{PRICING.majorMember} per member</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleMajorChange(-1)}
+                  disabled={majorMembers === 0}
+                  className="w-9 h-9 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  data-testid="decrease-major-btn"
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <span className="w-8 text-center text-xl font-bold text-white font-mono" data-testid="major-members-count">
+                  {majorMembers}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleMajorChange(1)}
+                  className="w-9 h-9 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  data-testid="increase-major-btn"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+                <span className="w-20 text-right font-semibold text-green-400 font-mono">
+                  ₹{majorMembers * PRICING.majorMember}
+                </span>
+              </div>
+            </div>
+
+            {/* Minor Members */}
+            <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                  <Baby className="w-5 h-5 text-orange-400" />
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Minor Members <span className="text-slate-400 text-sm font-normal">(&lt;18)</span></p>
+                  <p className="text-sm text-slate-400">₹{PRICING.minorMember} per member</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleMinorChange(-1)}
+                  disabled={minorMembers === 0}
+                  className="w-9 h-9 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  data-testid="decrease-minor-btn"
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <span className="w-8 text-center text-xl font-bold text-white font-mono" data-testid="minor-members-count">
+                  {minorMembers}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleMinorChange(1)}
+                  className="w-9 h-9 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  data-testid="increase-minor-btn"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+                <span className="w-20 text-right font-semibold text-orange-400 font-mono">
+                  ₹{minorMembers * PRICING.minorMember}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Primary User Badge */}
-          <div className="flex items-center gap-2 p-3 bg-white/5 rounded-xl w-fit mb-8">
-            <Check className="w-5 h-5 text-green-400" />
-            <span className="text-white text-sm">Includes 1 primary user by default</span>
+          {/* Total Members & Price Summary */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-green-400" />
+              <span className="text-white">
+                <span className="font-bold" data-testid="total-members">{totalMembers}</span> {totalMembers === 1 ? 'member' : 'members'} covered
+              </span>
+            </div>
+            <div className="text-right">
+              <p className="text-slate-400 text-sm">Total Amount</p>
+              <p className="text-4xl font-bold text-white font-mono" data-testid="total-price">₹{totalAmount}</p>
+              <p className="text-xs text-slate-500">one-time, inclusive of taxes</p>
+            </div>
           </div>
+
+          {/* Pricing Breakdown (if family members added) */}
+          {(majorMembers > 0 || minorMembers > 0) && (
+            <div className="text-sm text-slate-400 mb-6 p-3 bg-white/5 rounded-lg">
+              <p className="font-medium text-slate-300 mb-1">Price breakdown:</p>
+              <p>₹{PRICING.base} (base) {majorMembers > 0 && `+ ₹${majorMembers * PRICING.majorMember} (${majorMembers} major)`} {minorMembers > 0 && `+ ₹${minorMembers * PRICING.minorMember} (${minorMembers} minor)`}</p>
+            </div>
+          )}
 
           {/* CTA Button */}
           <Button
@@ -193,7 +331,7 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
             ) : (
               <span className="flex items-center gap-2">
                 <Lock className="w-5 h-5" />
-                Unlock My Financial Score – ₹499
+                Unlock My Financial Score – ₹{totalAmount}
               </span>
             )}
           </Button>
