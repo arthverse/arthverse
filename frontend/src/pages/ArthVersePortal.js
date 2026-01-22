@@ -166,22 +166,14 @@ export default function ArthVersePortal({ token, user, onLogout }) {
             <div>
               <p className="text-white/80 text-lg font-body mb-2">Your Net Worth</p>
               <div className="flex items-baseline gap-3">
-                <span className="text-5xl font-bold font-mono" data-testid="networth-value">₹{userData?.networth?.toLocaleString() || 0}</span>
+                <span className="text-5xl font-bold font-mono" data-testid="networth-value">₹{netWorth.toLocaleString()}</span>
               </div>
               <p className="text-white/70 text-sm mt-2">Updated in real-time across all apps</p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <div className="text-center">
                 <p className="text-white/80 text-sm">Age</p>
-                <p className="text-2xl font-bold">{userData?.age}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-white/80 text-sm">Dependents</p>
-                <p className="text-2xl font-bold">{userData?.no_of_dependents}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-white/80 text-sm">City</p>
-                <p className="text-lg font-semibold">{userData?.city}</p>
+                <p className="text-2xl font-bold">{userData?.age || '-'}</p>
               </div>
             </div>
           </div>
