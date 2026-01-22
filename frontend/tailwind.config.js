@@ -47,14 +47,21 @@ module.exports = {
                         input: 'hsl(var(--input))',
                         ring: 'hsl(var(--ring))',
                         brand: {
-                                blue: '#0066FF',
-                                orange: '#FF9500'
-                        }
+                                blue: '#1e3a8a',
+                                orange: '#ea580c'
+                        },
+                        alabaster: '#fdfbf7'
                 },
                 fontFamily: {
-                        heading: ['Plus Jakarta Sans', 'sans-serif'],
-                        body: ['DM Sans', 'sans-serif'],
+                        heading: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'DM Sans', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace']
+                },
+                boxShadow: {
+                        'card': '0 2px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.04)',
+                        'floating': '0 20px 40px rgba(0,0,0,0.08)',
+                        'glow-orange': '0 0 20px rgba(234,88,12,0.3)',
+                        'glow-blue': '0 0 20px rgba(30,58,138,0.3)'
                 },
                 keyframes: {
                         'accordion-down': {
@@ -76,12 +83,17 @@ module.exports = {
                         shimmer: {
                                 '0%': { transform: 'translateX(-100%)' },
                                 '100%': { transform: 'translateX(100%)' }
+                        },
+                        'fade-in': {
+                                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                                '100%': { opacity: '1', transform: 'translateY(0)' }
                         }
                 },
                 animation: {
                         'accordion-down': 'accordion-down 0.2s ease-out',
                         'accordion-up': 'accordion-up 0.2s ease-out',
-                        'shimmer': 'shimmer 2s infinite'
+                        'shimmer': 'shimmer 2s infinite',
+                        'fade-in': 'fade-in 0.5s ease-out forwards'
                 }
         }
   },
