@@ -12,7 +12,7 @@ export default function ArthVerseLanding() {
       icon: TrendingUp,
       color: 'blue',
       audience: 'Young professionals, Shop owners',
-      features: ['Expense Tracking', 'P&L Reports', 'Health Score']
+      features: ['Expense Tracking', 'P&L Reports', 'ArthSthithi']
     },
     {
       name: 'RAKSHAK',
