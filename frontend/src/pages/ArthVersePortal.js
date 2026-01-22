@@ -33,64 +33,64 @@ export default function ArthVersePortal({ token, user, onLogout }) {
 
   const apps = [
     {
-      name: 'Arthvyay',
+      name: 'VYAY',
       tagline: '"Your balance sheet. Your life."',
       description: 'Personal Finance Management',
       icon: TrendingUp,
       color: 'blue',
       link: '/arthvyay/dashboard',
       available: true,
-      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/xkf0jjlw_image.png'
+      useArthPrefix: true
     },
     {
-      name: 'Arthrakshak',
+      name: 'RAKSHAK',
       tagline: '"Your financial shield."',
       description: 'Insurance & Risk Coverage',
       icon: Shield,
       color: 'orange',
       link: '/arthrakshak/dashboard',
       available: true,
-      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/b80clgwt_image.png'
+      useArthPrefix: true
     },
     {
-      name: 'ArthYojna',
+      name: 'YOJNA',
       tagline: '"Plan with purpose."',
       description: 'Financial Planning',
       icon: Landmark,
       color: 'blue',
       link: '#',
       available: false,
-      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/oy6psxie_image.png'
+      useArthPrefix: true
     },
     {
-      name: 'ArthNivesh',
+      name: 'NIVESH',
       tagline: '"Invest with intent."',
       description: 'Investment Platform',
       icon: PiggyBank,
       color: 'orange',
       link: '#',
       available: false,
-      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/j5ar06cr_image.png'
+      useArthPrefix: true
     },
     {
-      name: 'ArthDhan',
+      name: 'DHAN',
       tagline: '"Right debt, right time."',
       description: 'Loan Services',
       icon: Banknote,
       color: 'blue',
       link: '#',
       available: false,
-      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/ubdv403d_image.png'
+      useArthPrefix: true
     },
     {
-      name: 'ArthUnnati',
+      name: 'UNNATI',
       tagline: '"Restoring wealth."',
       description: 'IEPF Services',
       icon: CircleDollarSign,
       color: 'orange',
       link: '#',
       available: false,
-      logoUrl: 'https://customer-assets.emergentagent.com/job_8d545a45-b9a1-43e1-a407-4b746a401ef7/artifacts/w9yhnupf_image.png'
+      useArthPrefix: true
     }
   ];
 
