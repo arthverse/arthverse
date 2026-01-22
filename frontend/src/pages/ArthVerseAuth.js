@@ -135,7 +135,7 @@ export default function ArthVerseAuth({ onAuth }) {
             <img 
               src="/arth-verse-logo.png" 
               alt="Arth-Verse Logo" 
-              className="h-16 object-contain mx-auto mb-3"
+              className="h-20 object-contain mx-auto mb-3"
             />
             <p className="text-slate-600 font-body">Universe for every rupee</p>
           </div>
