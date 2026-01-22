@@ -143,7 +143,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
               <h1 className="text-3xl font-bold font-heading text-slate-900" data-testid="welcome-message">
                 Welcome, {userData?.name}!
               </h1>
-              <p className="text-slate-600 font-body">Your financial universe awaits</p>
+              <p className="text-slate-600 font-body">Universe for every rupee</p>
             </div>
           </div>
         </div>
