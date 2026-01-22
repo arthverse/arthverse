@@ -99,10 +99,10 @@ PLANS = {
     "individual": {
         "name": "ArthVyay Individual Plan",
         "base_amount": PRICING["base_plan"],
-        "description": "Comprehensive Financial Health Report",
+        "description": "ArthSthithi Diagnostic Report",
         "includes_primary": True,
         "features": [
-            "Detailed Financial Health Score",
+            "Detailed ArthSthithi Score",
             "9-Component Score Breakdown",
             "Income & Expense Analysis",
             "Net Worth Analysis",
