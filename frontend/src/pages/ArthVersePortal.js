@@ -111,7 +111,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
             <img 
               src="/arth-verse-logo.png" 
               alt="Arth-Verse Logo" 
-              className="h-10 object-contain"
+              className="h-12 object-contain"
             />
             
             <div className="flex items-center gap-4">
