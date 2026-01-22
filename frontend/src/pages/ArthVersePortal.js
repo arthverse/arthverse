@@ -189,10 +189,13 @@ export default function ArthVersePortal({ token, user, onLogout }) {
         </Card>
 
         {/* Apps Grid */}
-        <div>
-          <h2 className="text-3xl font-bold font-heading text-slate-900 mb-6" data-testid="apps-section-title">
-            Your Financial Apps
-          </h2>
+        <div className="animate-fade-in stagger-2">
+          <div className="mb-8">
+            <span className="text-xs uppercase tracking-widest text-brand-orange font-semibold">Your Products</span>
+            <h2 className="text-2xl font-semibold font-heading text-slate-900 mt-1" data-testid="apps-section-title">
+              Financial Apps
+            </h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {apps.map((app, idx) => {
               const Icon = app.icon;
@@ -201,50 +204,52 @@ export default function ArthVersePortal({ token, user, onLogout }) {
               return (
                 <Card 
                   key={idx}
-                  className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
+                  className={`p-6 rounded-2xl border transition-all duration-300 card-hover ${
                     app.available 
-                      ? `${isBlue ? 'border-brand-blue/30 hover:border-brand-blue hover:shadow-xl cursor-pointer' : 'border-brand-orange/30 hover:border-brand-orange hover:shadow-xl cursor-pointer'}`
-                      : 'border-slate-200 opacity-60 cursor-not-allowed'
+                      ? `bg-white border-slate-200 hover:border-${isBlue ? 'brand-blue' : 'brand-orange'} shadow-card hover:shadow-floating cursor-pointer group`
+                      : 'bg-slate-50 border-slate-200 cursor-not-allowed'
                   }`}
+                  style={{ animationDelay: `${idx * 0.1}s` }}
                   data-testid={`app-card-${app.name.toLowerCase()}`}
                 >
                   {app.available ? (
                     <Link to={app.link} className="block h-full">
-                      <div className={`w-14 h-14 rounded-2xl ${isBlue ? 'bg-gradient-to-br from-brand-blue to-blue-600' : 'bg-gradient-to-br from-brand-orange to-orange-600'} flex items-center justify-center mb-4`}>
-                        <Icon className="w-7 h-7 text-white" />
+                      <div className={`w-12 h-12 rounded-xl ${isBlue ? 'bg-brand-blue' : 'bg-brand-orange'} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="w-6 h-6 text-white" strokeWidth={1.5} />
                       </div>
-                      <div className="mb-2">
+                      <div className="mb-3">
                         <img 
                           src={app.logo} 
                           alt={`Arth-${app.name}`}
-                          className="h-16 object-contain"
+                          className="h-14 object-contain"
                         />
                       </div>
-                      <p className={`text-sm font-semibold mb-2 ${isBlue ? 'text-brand-orange' : 'text-brand-blue'}`}>
+                      <p className={`text-sm font-medium mb-2 ${isBlue ? 'text-brand-orange' : 'text-brand-blue'}`}>
                         {app.tagline}
                       </p>
-                      <p className="text-slate-600 font-body text-sm">{app.description}</p>
-                      <div className="mt-4 inline-flex items-center text-sm font-semibold text-brand-blue">
-                        Open App →
+                      <p className="text-slate-600 font-body text-sm leading-relaxed">{app.description}</p>
+                      <div className="mt-5 inline-flex items-center text-sm font-semibold text-brand-blue group-hover:translate-x-1 transition-transform">
+                        Open App 
+                        <ArrowRight className="ml-1 w-4 h-4" />
                       </div>
                     </Link>
                   ) : (
-                    <div className="h-full">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
-                        <Icon className="w-7 h-7 text-slate-400" />
+                    <div className="h-full opacity-50">
+                      <div className="w-12 h-12 rounded-xl bg-slate-300 flex items-center justify-center mb-5">
+                        <Icon className="w-6 h-6 text-slate-500" strokeWidth={1.5} />
                       </div>
-                      <div className="mb-2 opacity-40">
+                      <div className="mb-3">
                         <img 
                           src={app.logo} 
                           alt={`Arth-${app.name}`}
-                          className="h-16 object-contain grayscale"
+                          className="h-14 object-contain grayscale"
                         />
                       </div>
-                      <p className="text-sm font-semibold mb-2 text-slate-400">
+                      <p className="text-sm font-medium mb-2 text-slate-400">
                         {app.tagline}
                       </p>
                       <p className="text-slate-400 font-body text-sm">{app.description}</p>
-                      <div className="mt-4 inline-flex items-center text-sm font-semibold text-slate-400">
+                      <div className="mt-5 inline-flex items-center text-sm font-medium text-slate-400">
                         Coming Soon
                       </div>
                     </div>
