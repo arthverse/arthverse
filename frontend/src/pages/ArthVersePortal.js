@@ -108,27 +108,29 @@ export default function ArthVersePortal({ token, user, onLogout }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
-        <div className="text-lg text-slate-600">Loading portal...</div>
+      <div className="min-h-screen bg-alabaster flex items-center justify-center">
+        <div className="text-lg text-slate-600 font-body">Loading portal...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white" data-testid="arthverse-portal">
+    <div className="min-h-screen bg-alabaster" data-testid="arthverse-portal">
       {/* Navigation */}
-      <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <nav className="border-b border-slate-200/50 glass-effect sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-4">
           <div className="flex justify-between items-center">
-            <img 
-              src="/arth-verse-logo.png" 
-              alt="Arth-Verse Logo" 
-              className="h-12 object-contain"
-            />
+            <Link to="/">
+              <img 
+                src="/arth-verse-logo.png" 
+                alt="Arth-Verse Logo" 
+                className="h-10 object-contain"
+              />
+            </Link>
             
             <div className="flex items-center gap-4">
-              <div className="text-right mr-4">
-                <p className="text-sm text-slate-500">Client ID</p>
+              <div className="text-right mr-4 hidden sm:block">
+                <p className="text-xs text-slate-500 uppercase tracking-wider">Client ID</p>
                 <p className="font-mono font-semibold text-brand-blue">{userData?.client_id}</p>
               </div>
               <Button 
@@ -144,36 +146,43 @@ export default function ArthVersePortal({ token, user, onLogout }) {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto p-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12">
         {/* Welcome Section */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
+        <div className="mb-10 animate-fade-in">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-14 h-14 rounded-2xl bg-brand-blue flex items-center justify-center shadow-lg">
+              <User className="w-7 h-7 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold font-heading text-slate-900" data-testid="welcome-message">
-                Welcome, {userData?.name}!
+              <h1 className="text-3xl font-semibold font-heading text-slate-900 tracking-tight" data-testid="welcome-message">
+                Welcome back, {userData?.name?.split(' ')[0]}!
               </h1>
-              <p className="text-slate-600 font-body">Universe for every rupee</p>
+              <p className="text-slate-500 font-body">Universe for every rupee</p>
             </div>
           </div>
         </div>
 
         {/* Networth Card */}
-        <Card className="mb-12 bg-gradient-to-br from-brand-blue to-blue-600 text-white p-8 rounded-3xl shadow-2xl border-0" data-testid="networth-card">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+        <Card className="mb-12 bg-brand-blue text-white p-8 lg:p-10 rounded-3xl shadow-floating border-0 animate-fade-in stagger-1 relative overflow-hidden" data-testid="networth-card">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="grid-pattern"></div>
+          </div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <p className="text-white/80 text-lg font-body mb-2">Your Net Worth</p>
+              <p className="text-white/70 text-sm uppercase tracking-wider font-medium mb-2">Your Net Worth</p>
               <div className="flex items-baseline gap-3">
-                <span className="text-5xl font-bold font-mono" data-testid="networth-value">₹{netWorth.toLocaleString()}</span>
+                <span className="text-5xl lg:text-6xl font-semibold font-heading tracking-tight" data-testid="networth-value">
+                  ₹{netWorth.toLocaleString('en-IN')}
+                </span>
               </div>
-              <p className="text-white/70 text-sm mt-2">Updated in real-time across all apps</p>
+              <p className="text-white/60 text-sm mt-3">Synced across all your apps</p>
             </div>
-            <div className="flex gap-6">
+            <div className="flex gap-8">
               <div className="text-center">
-                <p className="text-white/80 text-sm">Age</p>
-                <p className="text-2xl font-bold">{userData?.age || '-'}</p>
+                <p className="text-white/70 text-xs uppercase tracking-wider mb-1">Age</p>
+                <p className="text-3xl font-semibold">{userData?.age || '-'}</p>
               </div>
             </div>
           </div>
