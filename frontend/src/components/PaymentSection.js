@@ -1,105 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { API } from '../App';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { 
-  CreditCard, Check, Plus, Minus, Users, User, 
-  Baby, FileText, Shield, TrendingUp, Download,
-  Sparkles, AlertCircle
+  Target, FileText, PieChart, TrendingUp, Scale, Shield,
+  CreditCard, Lightbulb, Download, Check, Lock, Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const PRICING = {
-  base: 499,
-  majorMember: 399,
-  minorMember: 199
-};
+const BENEFITS = [
+  {
+    icon: Target,
+    title: "Personal Financial Score (0–100)",
+    description: "Calculated using income stability, expense discipline, assets, liabilities, and risk indicators."
+  },
+  {
+    icon: FileText,
+    title: "Business-style Balance Sheet & P&L for Your Life",
+    description: "A structured snapshot of your personal finances."
+  },
+  {
+    icon: PieChart,
+    title: "9-Component Financial Health Breakdown",
+    description: "Covers savings, debt stress, investments, insurance, net worth, asset allocation, and financial habits."
+  },
+  {
+    icon: TrendingUp,
+    title: "Income & Expense Intelligence",
+    description: "Identifies cash-flow gaps and spending inefficiencies."
+  },
+  {
+    icon: Scale,
+    title: "Net Worth & Liability Stress Analysis",
+    description: "Highlights strengths and pressure points in your finances."
+  },
+  {
+    icon: Shield,
+    title: "Insurance Adequacy Check (Life & Health)",
+    description: "Flags protection gaps based on age and dependents."
+  },
+  {
+    icon: CreditCard,
+    title: "Best Credit Card Based on Your Spending Pattern",
+    description: "An unbiased recommendation using your actual spending behaviour, expected benefits, and suitability — not sponsored rankings."
+  },
+  {
+    icon: Lightbulb,
+    title: "Actionable Financial Decisions (Not Generic Tips)",
+    description: "Clear next steps such as Apply / Wait / Fix, explained with reasoning."
+  },
+  {
+    icon: Download,
+    title: "Downloadable Financial Report (PDF)",
+    description: "A consolidated record of your financial diagnosis."
+  }
+];
 
 export default function PaymentSection({ token, user, onPaymentSuccess }) {
-  const [majorMembers, setMajorMembers] = useState(0);
-  const [minorMembers, setMinorMembers] = useState(0);
-  const [pricing, setPricing] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [features, setFeatures] = useState([]);
-
-  // Pre-fill from user's registered data
-  useEffect(() => {
-    if (user) {
-      setMajorMembers(user.major_members || 0);
-      setMinorMembers(user.minor_members || 0);
-    }
-    fetchPricingInfo();
-  }, [user]);
-
-  // Update pricing whenever members change
-  useEffect(() => {
-    calculatePrice();
-  }, [majorMembers, minorMembers]);
-
-  const fetchPricingInfo = async () => {
-    try {
-      const response = await axios.get(`${API}/payment/pricing`);
-      setFeatures(response.data.features || []);
-    } catch (error) {
-      console.error('Failed to fetch pricing info:', error);
-    }
-  };
-
-  const calculatePrice = async () => {
-    try {
-      const response = await axios.post(`${API}/payment/calculate`, {
-        major_members: majorMembers,
-        minor_members: minorMembers
-      });
-      setPricing(response.data);
-    } catch (error) {
-      // Fallback to local calculation
-      const baseAmount = PRICING.base * 100;
-      const majorAmount = majorMembers * PRICING.majorMember * 100;
-      const minorAmount = minorMembers * PRICING.minorMember * 100;
-      const totalAmount = baseAmount + majorAmount + minorAmount;
-      
-      setPricing({
-        base_plan: { amount_display: PRICING.base },
-        additional_major_members: { 
-          count: majorMembers, 
-          amount_display: majorMembers * PRICING.majorMember 
-        },
-        minor_members: { 
-          count: minorMembers, 
-          amount_display: minorMembers * PRICING.minorMember 
-        },
-        total: { amount: totalAmount, amount_display: totalAmount / 100 }
-      });
-    }
-  };
-
-  const handleMajorChange = (delta) => {
-    const newValue = Math.max(0, majorMembers + delta);
-    setMajorMembers(newValue);
-  };
-
-  const handleMinorChange = (delta) => {
-    const newValue = Math.max(0, minorMembers + delta);
-    setMinorMembers(newValue);
-  };
 
   const handleCheckout = async () => {
-    if (!pricing) {
-      toast.error('Please wait for pricing to load');
-      return;
-    }
-
     setLoading(true);
     
     try {
-      // Create order
+      // Create order with base pricing (₹499)
       const orderResponse = await axios.post(
         `${API}/payment/create-order`,
         {
-          major_members: majorMembers,
-          minor_members: minorMembers
+          major_members: 0,
+          minor_members: 0
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -108,7 +78,6 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
 
       // Check if Razorpay is loaded
       if (!window.Razorpay) {
-        // Load Razorpay script
         const script = document.createElement('script');
         script.src = 'https://checkout.razorpay.com/v1/checkout.js';
         script.async = true;
@@ -124,25 +93,24 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
         amount: amount,
         currency: 'INR',
         name: 'ArthVyay',
-        description: `Individual Plan + ${majorMembers} Major + ${minorMembers} Minor Members`,
+        description: 'Individual Plan - Financial Diagnosis',
         order_id: order_id,
         handler: async function (response) {
           try {
-            // Verify payment
             const verifyResponse = await axios.post(
               `${API}/payment/verify`,
               {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                major_members: majorMembers,
-                minor_members: minorMembers
+                major_members: 0,
+                minor_members: 0
               },
               { headers: { Authorization: `Bearer ${token}` } }
             );
 
             if (verifyResponse.data.success) {
-              toast.success('Payment successful! Your report is ready.');
+              toast.success('Payment successful! Your financial diagnosis is ready.');
               onPaymentSuccess?.('individual');
             }
           } catch (error) {
@@ -154,7 +122,7 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
           contact: user?.mobile_number || ''
         },
         theme: {
-          color: '#2563eb'
+          color: '#1e40af'
         }
       };
 
@@ -169,215 +137,147 @@ export default function PaymentSection({ token, user, onPaymentSuccess }) {
     }
   };
 
-  const totalMembers = 1 + majorMembers + minorMembers; // 1 = primary member
-
   return (
-    <Card className="overflow-hidden rounded-3xl border-2 border-brand-blue/20 shadow-xl" data-testid="payment-section">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-brand-blue to-blue-600 text-white p-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="w-6 h-6" />
-          <h2 className="text-2xl font-bold font-heading">ArthVyay Individual Plan</h2>
-        </div>
-        <p className="text-blue-100">Comprehensive Financial Health Report for your family</p>
-      </div>
+    <div className="space-y-6" data-testid="payment-section">
+      {/* Hero Card */}
+      <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" data-testid="payment-hero-card">
+        <div className="p-8 md:p-12">
+          {/* Plan Badge */}
+          <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full backdrop-blur-sm">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-sm font-semibold text-white">Individual Plan</span>
+            </div>
+          </div>
 
-      <div className="p-6">
-        {/* Pricing Info */}
-        <div className="bg-slate-50 rounded-2xl p-5 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <CreditCard className="w-5 h-5 text-brand-blue" />
-            <h3 className="font-semibold text-lg">Pricing Details</h3>
-            <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-              All prices inclusive of taxes
+          {/* Value Proposition */}
+          <h2 className="text-3xl md:text-4xl font-bold text-white font-heading mb-4 leading-tight">
+            Complete Financial Diagnosis<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
+              & Decision Framework
             </span>
+          </h2>
+          
+          <p className="text-lg text-slate-300 mb-8 max-w-2xl">
+            Built on your real income, expenses, assets, and liabilities. 
+            Data-driven insights, not generic advice.
+          </p>
+
+          {/* Pricing */}
+          <div className="flex items-baseline gap-3 mb-8">
+            <span className="text-5xl md:text-6xl font-bold text-white font-mono">₹499</span>
+            <div className="text-slate-400">
+              <p className="text-sm">one-time payment</p>
+              <p className="text-xs">inclusive of all applicable taxes</p>
+            </div>
           </div>
 
-          {/* Base Plan */}
-          <div className="flex items-center justify-between py-3 border-b border-slate-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-brand-blue/10 flex items-center justify-center">
-                <User className="w-5 h-5 text-brand-blue" />
-              </div>
-              <div>
-                <p className="font-medium">Base Plan</p>
-                <p className="text-sm text-slate-500">Includes primary member (you)</p>
-              </div>
-            </div>
-            <p className="text-xl font-bold text-brand-blue">₹{PRICING.base}</p>
+          {/* Primary User Badge */}
+          <div className="flex items-center gap-2 p-3 bg-white/5 rounded-xl w-fit mb-8">
+            <Check className="w-5 h-5 text-green-400" />
+            <span className="text-white text-sm">Includes 1 primary user by default</span>
           </div>
 
-          {/* Additional Major Members */}
-          <div className="flex items-center justify-between py-4 border-b border-slate-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <Users className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <p className="font-medium">Additional Major Members <span className="text-slate-400 text-sm">(18+)</span></p>
-                <p className="text-sm text-slate-500">₹{PRICING.majorMember} per member</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => handleMajorChange(-1)}
-                disabled={majorMembers === 0}
-                className="w-9 h-9 rounded-full"
-                data-testid="decrease-major-btn"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <span className="w-8 text-center text-xl font-bold" data-testid="major-members-count">
-                {majorMembers}
+          {/* CTA Button */}
+          <Button
+            onClick={handleCheckout}
+            disabled={loading}
+            className="w-full md:w-auto h-14 px-10 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-lg shadow-orange-500/25 transition-all hover:shadow-xl hover:shadow-orange-500/30"
+            data-testid="checkout-btn"
+          >
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Processing...
               </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => handleMajorChange(1)}
-                className="w-9 h-9 rounded-full"
-                data-testid="increase-major-btn"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-              <span className="w-20 text-right font-semibold text-green-600">
-                ₹{majorMembers * PRICING.majorMember}
+            ) : (
+              <span className="flex items-center gap-2">
+                <Lock className="w-5 h-5" />
+                Unlock My Financial Score – ₹499
               </span>
-            </div>
-          </div>
+            )}
+          </Button>
 
-          {/* Minor Members */}
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                <Baby className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="font-medium">Minor Members <span className="text-slate-400 text-sm">(&lt;18)</span></p>
-                <p className="text-sm text-slate-500">₹{PRICING.minorMember} per member</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => handleMinorChange(-1)}
-                disabled={minorMembers === 0}
-                className="w-9 h-9 rounded-full"
-                data-testid="decrease-minor-btn"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <span className="w-8 text-center text-xl font-bold" data-testid="minor-members-count">
-                {minorMembers}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => handleMinorChange(1)}
-                className="w-9 h-9 rounded-full"
-                data-testid="increase-minor-btn"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-              <span className="w-20 text-right font-semibold text-orange-600">
-                ₹{minorMembers * PRICING.minorMember}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Members Summary */}
-        <div className="flex items-center justify-between mb-4 p-4 bg-blue-50 rounded-xl">
-          <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-brand-blue" />
-            <span className="font-medium">Total Family Members Covered:</span>
-          </div>
-          <span className="text-xl font-bold text-brand-blue" data-testid="total-members">
-            {totalMembers} {totalMembers === 1 ? 'member' : 'members'}
-          </span>
-        </div>
-
-        {/* Total Price */}
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-5 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-slate-400 text-sm mb-1">Total Amount</p>
-              <p className="text-4xl font-bold font-mono" data-testid="total-price">
-                ₹{pricing?.total?.amount_display || PRICING.base + (majorMembers * PRICING.majorMember) + (minorMembers * PRICING.minorMember)}
-              </p>
-            </div>
-            <div className="text-right text-sm text-slate-400">
-              <p>₹{PRICING.base} (base)</p>
-              {majorMembers > 0 && <p>+ ₹{majorMembers * PRICING.majorMember} ({majorMembers} major)</p>}
-              {minorMembers > 0 && <p>+ ₹{minorMembers * PRICING.minorMember} ({minorMembers} minor)</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="mb-6">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <Check className="w-5 h-5 text-green-600" />
-            What's Included
-          </h4>
-          <div className="grid grid-cols-2 gap-2">
-            {(features.length > 0 ? features : [
-              'Detailed Financial Health Score',
-              '9-Component Score Breakdown',
-              'Income & Expense Analysis',
-              'Net Worth Analysis',
-              'Insurance Coverage Analysis',
-              '5 Personalized Recommendations',
-              '5-Year Financial Projection',
-              'PDF Report Download'
-            ]).map((feature, idx) => (
-              <div key={idx} className="flex items-center gap-2 text-sm text-slate-600">
-                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Note */}
-        <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg mb-6 text-sm">
-          <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-          <p className="text-amber-800">
-            <strong>Note:</strong> Primary member (you) cannot be removed. 
-            If a minor member turns 18, they will be automatically reclassified as a major member.
+          {/* Disclaimer */}
+          <p className="text-xs text-slate-500 mt-6 max-w-md">
+            "This is not financial advice. It is a financial diagnosis generated using your data."
           </p>
         </div>
+      </Card>
 
-        {/* Checkout Button */}
-        <Button
-          onClick={handleCheckout}
-          disabled={loading || !pricing}
-          className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-brand-blue to-blue-600 hover:from-brand-blue/90 hover:to-blue-600/90 rounded-xl shadow-lg"
-          data-testid="checkout-btn"
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Processing...
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              Pay ₹{pricing?.total?.amount_display || PRICING.base + (majorMembers * PRICING.majorMember) + (minorMembers * PRICING.minorMember)}
-            </span>
-          )}
-        </Button>
-
-        <p className="text-center text-xs text-slate-500 mt-4">
-          Secure payment powered by Razorpay • 100% Refund if not satisfied
-        </p>
+      {/* Benefits Grid */}
+      <div>
+        <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+          <Check className="w-5 h-5 text-green-600" />
+          What's Included in Your Diagnosis
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {BENEFITS.map((benefit, idx) => {
+            const Icon = benefit.icon;
+            return (
+              <Card 
+                key={idx} 
+                className="p-5 rounded-2xl border border-slate-200 hover:border-brand-blue/30 hover:shadow-lg transition-all duration-300 bg-white"
+                data-testid={`benefit-card-${idx}`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue/10 to-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-5 h-5 text-brand-blue" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-800 text-sm mb-1 leading-tight">
+                      {benefit.title}
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       </div>
-    </Card>
+
+      {/* Trust Indicators */}
+      <Card className="p-6 rounded-2xl bg-slate-50 border border-slate-200" data-testid="trust-indicators">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="font-medium text-slate-800 text-sm">Data-Driven</p>
+              <p className="text-xs text-slate-500">Based on your actual numbers</p>
+            </div>
+          </div>
+          
+          <div className="hidden md:block w-px h-10 bg-slate-300" />
+          
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <Target className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="font-medium text-slate-800 text-sm">Unbiased Insights</p>
+              <p className="text-xs text-slate-500">No sponsored recommendations</p>
+            </div>
+          </div>
+          
+          <div className="hidden md:block w-px h-10 bg-slate-300" />
+          
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+              <Lock className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="font-medium text-slate-800 text-sm">Secure Payment</p>
+              <p className="text-xs text-slate-500">Powered by Razorpay</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }
