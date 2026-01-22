@@ -14,7 +14,12 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Financial health score (0-100) with age-based algorithm
 - Total Income, Total Expenses, Net Savings display
 - 5-step Financial Questionnaire (Income, Expenses, Assets, Liabilities, Credit Cards)
-- Paywall for premium features (Individual ₹499, Family ₹999)
+- **Dynamic Paywall** with family member pricing:
+  - Base Plan: ₹499 (includes primary member)
+  - Additional Major Member (18+): ₹399 each
+  - Additional Minor Member (<18): ₹199 each
+  - Real-time price calculation
+  - All prices inclusive of taxes
 
 ### ArthRakshak - Insurance & Risk Coverage ✅ NEW
 - **Insurance Vault**: Manual entry for Life, Health, Vehicle, and Card insurance policies
@@ -31,6 +36,13 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 ---
 
 ## What's Been Implemented (Jan 2026)
+
+### ✅ ArthVyay Paywall Complete (Jan 22, 2026)
+- Dynamic pricing based on family members
+- Real-time price calculation UI
+- Backend APIs: /pricing, /calculate, /create-order
+- All 10 backend tests passing (100%)
+- Razorpay integration ready (needs API keys)
 
 ### ✅ ArthRakshak MVP Complete (Jan 15, 2026)
 - Full backend API with CRUD for insurance policies
@@ -85,7 +97,9 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - `GET /api/arthrakshak/policies/{id}/coverage` - Get policy coverage
 - `PUT /api/arthrakshak/policies/{id}/coverage` - Update policy coverage
 
-### Payment
+### Payment (NEW)
+- `GET /api/payment/pricing` - Get pricing details
+- `POST /api/payment/calculate` - Calculate price for members
 - `GET /api/payment/plans` - Get available plans
 - `POST /api/payment/create-order` - Create Razorpay order
 - `POST /api/payment/verify` - Verify payment
