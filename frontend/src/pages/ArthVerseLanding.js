@@ -157,13 +157,12 @@ export default function ArthVerseLanding() {
 
       <footer className="bg-slate-900 text-white py-12 px-6" data-testid="footer">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="font-heading text-2xl font-bold mb-4">
-            <span className="text-brand-blue">a</span>
-            <span className="text-brand-orange">₹</span>
-            <span className="text-white">th-verse</span>
-            <span className="text-brand-orange">.in</span>
-          </div>
-          <p className="text-slate-400 font-body">Universe Where Every Rupee Finds Its Place.</p>
+          <img 
+            src="/arth-verse-logo.png" 
+            alt="Arth-Verse Logo" 
+            className="h-12 object-contain mx-auto mb-4 brightness-0 invert"
+          />
+          <p className="text-slate-400 font-body">Universe for every rupee</p>
           <p className="text-slate-500 text-sm mt-6">© 2025 arth-verse. All rights reserved.</p>
         </div>
       </footer>
