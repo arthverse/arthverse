@@ -144,9 +144,9 @@ export default function ArthRakshakDashboard({ token, onLogout }) {
               Back to Portal
             </Button>
             <div>
-              <h1 className="text-4xl font-bold font-heading text-slate-900 mb-2" data-testid="arthrakshak-title">
-                <span className="text-brand-orange">Arth</span>
-                <span className="text-brand-blue">Rakshak</span>
+              <h1 className="text-4xl font-bold font-heading text-slate-900 mb-2 flex items-center gap-2" data-testid="arthrakshak-title">
+                <img src="/arth-prefix.png" alt="Arth" className="h-10 object-contain" />
+                <span className="text-brand-orange">RAKSHAK</span>
               </h1>
               <p className="text-slate-600 font-body">"Your financial shield." - Insurance & Risk Coverage</p>
             </div>
