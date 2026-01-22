@@ -37,6 +37,13 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## What's Been Implemented (Jan 2026)
 
+### ✅ Branding Update with New Logos (Jan 22, 2026)
+- Extracted 6 sub-product logos from user-provided PPTX file
+- Updated all logos across Landing Page, Portal, and ArthRakshak Dashboard
+- Logos: ARTH-VYAY, ARTH-RAKSHAK, ARTH-YOJNA, ARTH-NIVESH, ARTH-DHAN, ARTH-UNNATI
+- Logo files stored in /app/frontend/public/ as PNG images
+- Replaced old prefix+text approach with complete logo images
+
 ### ✅ Reports Page Enhancement Complete (Jan 22, 2026)
 - Graphical breakdowns with Recharts (pie charts, bar charts)
 - Income/Expense distribution with donut charts
