@@ -86,13 +86,13 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="col-span-full md:col-span-4 bg-white rounded-2xl p-8 border border-slate-100 hover:-translate-y-1 transition-transform duration-300" data-testid="feature-health-score">
+            <div className="col-span-full md:col-span-4 bg-white rounded-2xl p-8 border border-slate-100 hover:-translate-y-1 transition-transform duration-300" data-testid="feature-arthsthithi">
               <div className="w-12 h-12 rounded-full bg-brand-blue/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-brand-blue" />
               </div>
-              <h3 className="text-2xl font-medium font-heading mb-3">Financial Health Score</h3>
+              <h3 className="text-2xl font-medium font-heading mb-3">ArthSthithi Score</h3>
               <p className="text-base leading-relaxed text-slate-600 font-body">
-                Know your financial health at a glance with personalized insights and actionable recommendations.
+                Know your ArthSthithi at a glance with personalized insights. Aapki financial position, simplified.
               </p>
             </div>
           </div>
