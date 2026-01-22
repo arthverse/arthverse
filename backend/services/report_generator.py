@@ -171,7 +171,7 @@ def create_report(filename, data, plan_type="individual"):
     
     # ===== HEADER =====
     elements.append(Paragraph("arth-verse", styles['MainTitle']))
-    elements.append(Paragraph("Comprehensive Financial Health Report", styles['Subtitle']))
+    elements.append(Paragraph("ArthSthithi Diagnostic Report", styles['Subtitle']))
     elements.append(HRFlowable(width="100%", thickness=2, color=BRAND_BLUE, spaceAfter=20))
     
     # Report metadata
@@ -198,8 +198,8 @@ def create_report(filename, data, plan_type="individual"):
     elements.append(meta_table)
     elements.append(Spacer(1, 20))
     
-    # ===== FINANCIAL HEALTH SCORE =====
-    elements.append(Paragraph("📊 Financial Health Score", styles['SectionTitle']))
+    # ===== ARTHSTHITHI SCORE =====
+    elements.append(Paragraph("📊 ArthSthithi Score", styles['SectionTitle']))
     
     score = data['health_score']['overall']
     score_color = get_score_color(score)
