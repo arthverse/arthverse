@@ -108,12 +108,11 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <div className="font-heading text-2xl font-bold">
-              <span className="text-brand-blue">a</span>
-              <span className="text-brand-orange">₹</span>
-              <span className="text-brand-blue">th-verse</span>
-              <span className="text-brand-orange">.in</span>
-            </div>
+            <img 
+              src="/arth-verse-logo.png" 
+              alt="Arth-Verse Logo" 
+              className="h-10 object-contain"
+            />
             
             <div className="flex items-center gap-4">
               <div className="text-right mr-4">
