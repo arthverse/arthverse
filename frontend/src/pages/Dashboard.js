@@ -230,7 +230,8 @@ export default function Dashboard({ token, user, onLogout }) {
           {!hasPremiumAccess && (
             <div className="col-span-1 md:col-span-4">
               <PaymentSection 
-                token={token} 
+                token={token}
+                user={user}
                 onPaymentSuccess={handlePaymentSuccess} 
               />
             </div>
