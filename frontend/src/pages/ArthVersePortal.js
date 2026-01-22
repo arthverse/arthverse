@@ -204,7 +204,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
                         <img 
                           src={app.logo} 
                           alt={`Arth-${app.name}`}
-                          className="h-12 object-contain"
+                          className="h-16 object-contain"
                         />
                       </div>
                       <p className={`text-sm font-semibold mb-2 ${isBlue ? 'text-brand-orange' : 'text-brand-blue'}`}>
@@ -224,7 +224,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
                         <img 
                           src={app.logo} 
                           alt={`Arth-${app.name}`}
-                          className="h-12 object-contain grayscale"
+                          className="h-16 object-contain grayscale"
                         />
                       </div>
                       <p className="text-sm font-semibold mb-2 text-slate-400">
