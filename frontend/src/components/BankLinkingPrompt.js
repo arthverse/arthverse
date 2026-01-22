@@ -122,7 +122,7 @@ export default function BankLinkingPrompt({ token, onComplete, onSkip }) {
               <li>• Auto-fill income from salary credits</li>
               <li>• Auto-categorize your expenses</li>
               <li>• Track your investments automatically</li>
-              <li>• Get more accurate financial health score</li>
+              <li>• Get more accurate ArthSthithi score</li>
             </ul>
           </div>
 
