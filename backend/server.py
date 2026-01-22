@@ -592,23 +592,53 @@ async def get_health_score(credentials: HTTPAuthorizationCredentials = Depends(s
 async def get_pl_statement(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
-    transactions = await db.transactions.find({"user_id": user_id}, {"_id": 0}).to_list(1000)
+    # Get questionnaire data for income and expense breakdown
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
     
-    total_income = 0
-    total_expenses = 0
+    # Income breakdown from questionnaire
     income_by_category = {}
+    if questionnaire:
+        income_fields = [
+            ("Salary", questionnaire.get("salary_income", 0)),
+            ("Business", questionnaire.get("business_income", 0)),
+            ("Rental Property 1", questionnaire.get("rental_property1", 0)),
+            ("Rental Property 2", questionnaire.get("rental_property2", 0)),
+            ("Interest", questionnaire.get("interest_income", 0)),
+            ("Dividends", questionnaire.get("dividend_income", 0)),
+            ("Capital Gains", questionnaire.get("capital_gains", 0)),
+            ("Freelance", questionnaire.get("freelance_income", 0)),
+            ("Other Income", questionnaire.get("other_income", 0))
+        ]
+        income_by_category = {k: v for k, v in income_fields if v and v > 0}
+    
+    # Expense breakdown from questionnaire
     expenses_by_category = {}
+    if questionnaire:
+        expense_fields = [
+            ("Rent", questionnaire.get("rent_expense", 0)),
+            ("EMIs", questionnaire.get("emis", 0)),
+            ("Term Insurance", questionnaire.get("term_insurance", 0)),
+            ("Health Insurance", questionnaire.get("health_insurance", 0)),
+            ("Groceries", questionnaire.get("groceries", 0)),
+            ("Food & Dining", questionnaire.get("food_dining", 0)),
+            ("Fuel", questionnaire.get("fuel", 0)),
+            ("Travel", questionnaire.get("travel", 0)),
+            ("Shopping", questionnaire.get("shopping", 0)),
+            ("Online Shopping", questionnaire.get("online_shopping", 0)),
+            ("Electronics", questionnaire.get("electronics", 0)),
+            ("Entertainment", questionnaire.get("entertainment", 0)),
+            ("Telecom & Utilities", questionnaire.get("telecom_utilities", 0)),
+            ("Healthcare", questionnaire.get("healthcare", 0)),
+            ("Education", questionnaire.get("education", 0)),
+            ("Vehicle 2W", questionnaire.get("vehicle_2w_1", 0) + questionnaire.get("vehicle_2w_2", 0)),
+            ("Vehicle 4W", questionnaire.get("vehicle_4w_1", 0) + questionnaire.get("vehicle_4w_2", 0) + questionnaire.get("vehicle_4w_3", 0)),
+            ("Household Help", questionnaire.get("household_maid", 0)),
+            ("Cash Withdrawals", questionnaire.get("cash_withdrawals", 0))
+        ]
+        expenses_by_category = {k: v for k, v in expense_fields if v and v > 0}
     
-    for t in transactions:
-        if t['type'] == 'income':
-            total_income += t['amount']
-            category = t.get('category', 'Other')
-            income_by_category[category] = income_by_category.get(category, 0) + t['amount']
-        else:
-            total_expenses += t['amount']
-            category = t.get('category', 'Other')
-            expenses_by_category[category] = expenses_by_category.get(category, 0) + t['amount']
-    
+    total_income = sum(income_by_category.values())
+    total_expenses = sum(expenses_by_category.values())
     net_profit_loss = total_income - total_expenses
     
     return PLStatement(
@@ -624,14 +654,39 @@ async def get_pl_statement(credentials: HTTPAuthorizationCredentials = Depends(s
 async def get_balance_sheet(credentials: HTTPAuthorizationCredentials = Depends(security)):
     user_id = await verify_token(credentials)
     
-    transactions = await db.transactions.find({"user_id": user_id}, {"_id": 0}).to_list(1000)
+    # Get questionnaire data for assets and liabilities
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
     
-    total_assets = sum(t['amount'] for t in transactions if t['type'] == 'income')
-    total_liabilities = sum(t['amount'] for t in transactions if t['type'] == 'expense')
+    # Assets breakdown from questionnaire
+    assets_breakdown = {}
+    if questionnaire:
+        asset_fields = [
+            ("Real Estate", questionnaire.get("property_value", 0)),
+            ("Vehicles", questionnaire.get("vehicles_value", 0)),
+            ("Gold", questionnaire.get("gold_value", 0)),
+            ("Silver", questionnaire.get("silver_value", 0)),
+            ("Stocks", questionnaire.get("stocks_value", 0)),
+            ("Mutual Funds", questionnaire.get("mutual_funds_value", 0)),
+            ("PF/NPS", questionnaire.get("pf_nps_value", 0)),
+            ("Bank Balance", questionnaire.get("bank_balance", 0)),
+            ("Cash in Hand", questionnaire.get("cash_in_hand", 0))
+        ]
+        assets_breakdown = {k: v for k, v in asset_fields if v and v > 0}
+    
+    # Liabilities breakdown from questionnaire
+    liabilities_breakdown = {}
+    if questionnaire:
+        liability_fields = [
+            ("Home Loan", questionnaire.get("home_loan", 0)),
+            ("Personal Loan", questionnaire.get("personal_loan", 0)),
+            ("Vehicle Loan", questionnaire.get("vehicle_loan", 0)),
+            ("Credit Card", questionnaire.get("credit_card_outstanding", 0))
+        ]
+        liabilities_breakdown = {k: v for k, v in liability_fields if v and v > 0}
+    
+    total_assets = sum(assets_breakdown.values())
+    total_liabilities = sum(liabilities_breakdown.values())
     net_worth = total_assets - total_liabilities
-    
-    assets_breakdown = {'Cash': total_assets}
-    liabilities_breakdown = {'Expenses': total_liabilities}
     
     return BalanceSheet(
         total_assets=total_assets,
