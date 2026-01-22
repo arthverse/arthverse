@@ -159,17 +159,23 @@ export default function Dashboard({ token, user, onLogout }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Health Score Card */}
-          <div className="col-span-1 md:col-span-4 bg-white rounded-2xl p-8 border border-slate-200 shadow-card" data-testid="health-score-card">
+          {/* ArthSthithi Card */}
+          <div className="col-span-1 md:col-span-4 bg-white rounded-2xl p-8 border border-slate-200 shadow-card" data-testid="arthsthithi-card">
             <div className="flex flex-col md:flex-row items-start justify-between gap-8">
               <div className="flex-1">
-                <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">Overview</span>
-                <h2 className="text-2xl font-semibold font-heading mt-1 mb-4">Financial Health Score</h2>
-                <div className={`text-6xl font-semibold font-heading tracking-tight mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="health-score-value">
-                  {healthScore?.score || 0}<span className="text-3xl text-slate-400">/100</span>
+                <span className="text-xs uppercase tracking-widest text-brand-orange font-semibold">Aapki Financial Position</span>
+                <h2 className="text-3xl font-semibold font-heading mt-2 mb-1">ArthSthithi</h2>
+                <p className="text-sm text-slate-500 mb-4">Aapki ArthSthithi reflects your personal balance sheet strength.</p>
+                <div className={`text-6xl font-semibold font-heading tracking-tight mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="arthsthithi-value">
+                  {healthScore?.score || 0}<span className="text-3xl text-slate-400"> / 100</span>
                 </div>
-                <p className="text-lg font-medium text-slate-700 mb-6">
+                <p className="text-lg font-medium text-slate-700 mb-4">
                   {healthScore?.rating || 'Not Available'} - {healthScore?.message || 'Complete questionnaire to see score'}
+                </p>
+                
+                {/* Disclaimer */}
+                <p className="text-xs text-slate-400 bg-slate-50 p-3 rounded-lg mb-6 border border-slate-100">
+                  ArthSthithi is a financial diagnostic indicator generated using user-provided and consented data. It is not financial advice.
                 </p>
 
                 {/* Show insights for premium users only */}
