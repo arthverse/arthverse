@@ -29,7 +29,7 @@ const BENEFITS = [
   },
   {
     icon: PieChart,
-    title: "9-Component Financial Health Breakdown",
+    title: "9-Component ArthSthithi Breakdown",
     description: "Covers savings, debt stress, investments, insurance, net worth, asset allocation, and financial habits."
   },
   {
