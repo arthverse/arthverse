@@ -65,7 +65,10 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center mb-4">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-brand-blue">Arthvyay</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
+                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
+                <span className="text-brand-blue">VYAY</span>
+              </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Your balance sheet. Your life."</p>
               <p className="text-slate-600 font-body mb-4">
                 Personal Finance Management - Track expenses, auto-generate P&L, get financial health scores
@@ -77,7 +80,10 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-orange-600 flex items-center justify-center mb-4">
                 <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-brand-orange">Arthrakshak</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
+                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
+                <span className="text-brand-orange">RAKSHAK</span>
+              </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Your financial shield."</p>
               <p className="text-slate-600 font-body mb-4">
                 Insurance Aggregator - Unified platform for all insurance needs with AI assistance
@@ -89,7 +95,10 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center mb-4">
                 <Landmark className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-brand-blue">ArthYojna</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
+                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
+                <span className="text-brand-blue">YOJNA</span>
+              </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Plan with purpose."</p>
               <p className="text-slate-600 font-body mb-4">
                 Financial Planning - Forecasting, goal-based planning, tax advisory, ITR filing
@@ -101,7 +110,10 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-orange-600 flex items-center justify-center mb-4">
                 <PiggyBank className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-brand-orange">ArthNivesh</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
+                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
+                <span className="text-brand-orange">NIVESH</span>
+              </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Invest with intent."</p>
               <p className="text-slate-600 font-body mb-4">
                 Investment Platform - Mutual funds, stocks, PMS, IPOs, and fixed income instruments
@@ -113,7 +125,10 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center mb-4">
                 <Banknote className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-brand-blue">ArthDhan</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
+                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
+                <span className="text-brand-blue">DHAN</span>
+              </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Right debt, right time, right purpose."</p>
               <p className="text-slate-600 font-body mb-4">
                 Loan Services - Business, personal loans, P2P lending, gold loans
@@ -125,7 +140,10 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-orange-600 flex items-center justify-center mb-4">
                 <CircleDollarSign className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-brand-orange">ArthUnnati</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
+                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
+                <span className="text-brand-orange">UNNATI</span>
+              </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Restoring wealth. Renewing trust."</p>
               <p className="text-slate-600 font-body mb-4">
                 IEPF Services - Investment recovery, debt recovery, fraud support
