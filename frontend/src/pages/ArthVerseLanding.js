@@ -8,12 +8,11 @@ export default function ArthVerseLanding() {
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-xl fixed top-0 w-full z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="font-heading text-2xl font-bold">
-              <span className="text-brand-blue">a</span>
-              <span className="text-brand-orange">₹</span>
-              <span className="text-brand-blue">th-verse</span>
-              <span className="text-brand-orange">.in</span>
-            </div>
+            <img 
+              src="/arth-verse-logo.png" 
+              alt="Arth-Verse Logo" 
+              className="h-10 object-contain"
+            />
           </div>
           <div className="flex gap-3">
             <Link to="/arthverse/auth?mode=login" data-testid="nav-login-btn">
@@ -32,11 +31,13 @@ export default function ArthVerseLanding() {
 
       <div className="pt-32 pb-16 px-6" data-testid="arthverse-hero-section">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-none font-heading text-slate-900 mb-6">
-            <span className="text-brand-blue">arth-verse</span>
-          </h1>
+          <img 
+            src="/arth-verse-logo.png" 
+            alt="Arth-Verse" 
+            className="h-24 md:h-32 object-contain mx-auto mb-6"
+          />
           <p className="text-2xl md:text-3xl text-brand-orange font-heading mb-8">
-            "Universe Where Every Rupee Finds Its Place."
+            "Universe for every rupee"
           </p>
           <p className="text-lg md:text-xl leading-relaxed text-slate-600 font-body mb-12 max-w-3xl mx-auto">
             Your complete financial ecosystem - from expense tracking to investments, insurance to loans. All in one place.
