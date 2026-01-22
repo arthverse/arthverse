@@ -132,13 +132,12 @@ export default function ArthVerseAuth({ onAuth }) {
       ) : (
         <Card className="w-full max-w-2xl p-8 bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl" data-testid="arthverse-auth-card">
           <div className="mb-8 text-center">
-            <div className="font-heading text-3xl font-bold mb-2">
-              <span className="text-brand-blue">a</span>
-              <span className="text-brand-orange">₹</span>
-              <span className="text-brand-blue">th-verse</span>
-              <span className="text-brand-orange">.in</span>
-            </div>
-            <p className="text-slate-600 font-body">Universe Where Every Rupee Finds Its Place.</p>
+            <img 
+              src="/arth-verse-logo.png" 
+              alt="Arth-Verse Logo" 
+              className="h-16 object-contain mx-auto mb-3"
+            />
+            <p className="text-slate-600 font-body">Universe for every rupee</p>
           </div>
 
           <div className="flex gap-2 mb-6" data-testid="auth-toggle">
