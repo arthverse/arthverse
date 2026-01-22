@@ -20,6 +20,7 @@ export default function Dashboard({ token, user, onLogout }) {
   const [showBankData, setShowBankData] = useState(false);
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [userData, setUserData] = useState(user);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +34,18 @@ export default function Dashboard({ token, user, onLogout }) {
 
   const fetchData = async () => {
     try {
+      // Fetch user data if not provided
+      if (!userData) {
+        try {
+          const userRes = await axios.get(`${API}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUserData(userRes.data);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+
       // Check if questionnaire is completed
       let questionnaireData = null;
       try {
