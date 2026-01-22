@@ -65,9 +65,8 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center mb-4">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
-                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
-                <span className="text-brand-blue">VYAY</span>
+              <h3 className="mb-2">
+                <img src="/logo-vyay.png" alt="Arth-Vyay" className="h-10 object-contain" />
               </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Your balance sheet. Your life."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -80,9 +79,8 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-orange-600 flex items-center justify-center mb-4">
                 <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
-                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
-                <span className="text-brand-orange">RAKSHAK</span>
+              <h3 className="mb-2">
+                <img src="/logo-rakshak.png" alt="Arth-Rakshak" className="h-10 object-contain" />
               </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Your financial shield."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -95,9 +93,8 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center mb-4">
                 <Landmark className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
-                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
-                <span className="text-brand-blue">YOJNA</span>
+              <h3 className="mb-2">
+                <img src="/logo-yojna.png" alt="Arth-Yojna" className="h-10 object-contain" />
               </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Plan with purpose."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -110,9 +107,8 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-orange-600 flex items-center justify-center mb-4">
                 <PiggyBank className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
-                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
-                <span className="text-brand-orange">NIVESH</span>
+              <h3 className="mb-2">
+                <img src="/logo-nivesh.png" alt="Arth-Nivesh" className="h-10 object-contain" />
               </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Invest with intent."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -125,9 +121,8 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-blue-600 flex items-center justify-center mb-4">
                 <Banknote className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
-                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
-                <span className="text-brand-blue">DHAN</span>
+              <h3 className="mb-2">
+                <img src="/logo-dhan.png" alt="Arth-Dhan" className="h-10 object-contain" />
               </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Right debt, right time, right purpose."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -140,9 +135,8 @@ export default function ArthVerseLanding() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-orange-600 flex items-center justify-center mb-4">
                 <CircleDollarSign className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 flex items-center gap-1">
-                <img src="/arth-prefix.png" alt="Arth" className="h-7 object-contain" />
-                <span className="text-brand-orange">UNNATI</span>
+              <h3 className="mb-2">
+                <img src="/logo-unnati.png" alt="Arth-Unnati" className="h-10 object-contain" />
               </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Restoring wealth. Renewing trust."</p>
               <p className="text-slate-600 font-body mb-4">
