@@ -66,7 +66,7 @@ export default function ArthVerseLanding() {
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <h3 className="mb-2">
-                <img src="/logo-vyay.png" alt="Arth-Vyay" className="h-14 object-contain" />
+                <img src="/logo-vyay.png" alt="Arth-Vyay" className="h-20 object-contain" />
               </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Your balance sheet. Your life."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -80,7 +80,7 @@ export default function ArthVerseLanding() {
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <h3 className="mb-2">
-                <img src="/logo-rakshak.png" alt="Arth-Rakshak" className="h-14 object-contain" />
+                <img src="/logo-rakshak.png" alt="Arth-Rakshak" className="h-20 object-contain" />
               </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Your financial shield."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -94,7 +94,7 @@ export default function ArthVerseLanding() {
                 <Landmark className="w-8 h-8 text-white" />
               </div>
               <h3 className="mb-2">
-                <img src="/logo-yojna.png" alt="Arth-Yojna" className="h-14 object-contain" />
+                <img src="/logo-yojna.png" alt="Arth-Yojna" className="h-20 object-contain" />
               </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Plan with purpose."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -108,7 +108,7 @@ export default function ArthVerseLanding() {
                 <PiggyBank className="w-8 h-8 text-white" />
               </div>
               <h3 className="mb-2">
-                <img src="/logo-nivesh.png" alt="Arth-Nivesh" className="h-14 object-contain" />
+                <img src="/logo-nivesh.png" alt="Arth-Nivesh" className="h-20 object-contain" />
               </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Invest with intent."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -122,7 +122,7 @@ export default function ArthVerseLanding() {
                 <Banknote className="w-8 h-8 text-white" />
               </div>
               <h3 className="mb-2">
-                <img src="/logo-dhan.png" alt="Arth-Dhan" className="h-14 object-contain" />
+                <img src="/logo-dhan.png" alt="Arth-Dhan" className="h-20 object-contain" />
               </h3>
               <p className="text-sm text-brand-orange font-semibold mb-3">"Right debt, right time, right purpose."</p>
               <p className="text-slate-600 font-body mb-4">
@@ -136,7 +136,7 @@ export default function ArthVerseLanding() {
                 <CircleDollarSign className="w-8 h-8 text-white" />
               </div>
               <h3 className="mb-2">
-                <img src="/logo-unnati.png" alt="Arth-Unnati" className="h-14 object-contain" />
+                <img src="/logo-unnati.png" alt="Arth-Unnati" className="h-20 object-contain" />
               </h3>
               <p className="text-sm text-brand-blue font-semibold mb-3">"Restoring wealth. Renewing trust."</p>
               <p className="text-slate-600 font-body mb-4">
