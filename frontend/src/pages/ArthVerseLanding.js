@@ -11,7 +11,7 @@ export default function ArthVerseLanding() {
             <img 
               src="/arth-verse-logo.png" 
               alt="Arth-Verse Logo" 
-              className="h-10 object-contain"
+              className="h-14 object-contain"
             />
           </div>
           <div className="flex gap-3">
@@ -34,7 +34,7 @@ export default function ArthVerseLanding() {
           <img 
             src="/arth-verse-logo.png" 
             alt="Arth-Verse" 
-            className="h-24 md:h-32 object-contain mx-auto mb-6"
+            className="h-28 md:h-40 object-contain mx-auto mb-6"
           />
           <p className="text-2xl md:text-3xl text-brand-orange font-heading mb-8">
             "Universe for every rupee"
