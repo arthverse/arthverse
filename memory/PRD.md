@@ -37,6 +37,14 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## What's Been Implemented (Jan 2026)
 
+### ✅ UI/UX Design Overhaul (Jan 22, 2026)
+- New color palette: Royal Indigo + Marigold Orange
+- Typography: Outfit (headings) + Plus Jakarta Sans (body)
+- Warm alabaster background across all pages
+- Glass-morphism navigation, card hover effects
+- Feature pills on product cards
+- Trust badges, modern CTA sections, clean footer
+
 ### ✅ Branding Update with New Logos (Jan 22, 2026)
 - Extracted 6 sub-product logos from user-provided PPTX file
 - Updated all logos across Landing Page, Portal, and ArthRakshak Dashboard
