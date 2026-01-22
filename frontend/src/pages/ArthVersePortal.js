@@ -34,63 +34,63 @@ export default function ArthVersePortal({ token, user, onLogout }) {
   const apps = [
     {
       name: 'VYAY',
+      logo: '/logo-vyay.png',
       tagline: '"Your balance sheet. Your life."',
       description: 'Personal Finance Management',
       icon: TrendingUp,
       color: 'blue',
       link: '/arthvyay/dashboard',
-      available: true,
-      useArthPrefix: true
+      available: true
     },
     {
       name: 'RAKSHAK',
+      logo: '/logo-rakshak.png',
       tagline: '"Your financial shield."',
       description: 'Insurance & Risk Coverage',
       icon: Shield,
       color: 'orange',
       link: '/arthrakshak/dashboard',
-      available: true,
-      useArthPrefix: true
+      available: true
     },
     {
       name: 'YOJNA',
+      logo: '/logo-yojna.png',
       tagline: '"Plan with purpose."',
       description: 'Financial Planning',
       icon: Landmark,
       color: 'blue',
       link: '#',
-      available: false,
-      useArthPrefix: true
+      available: false
     },
     {
       name: 'NIVESH',
+      logo: '/logo-nivesh.png',
       tagline: '"Invest with intent."',
       description: 'Investment Platform',
       icon: PiggyBank,
       color: 'orange',
       link: '#',
-      available: false,
-      useArthPrefix: true
+      available: false
     },
     {
       name: 'DHAN',
+      logo: '/logo-dhan.png',
       tagline: '"Right debt, right time."',
       description: 'Loan Services',
       icon: Banknote,
       color: 'blue',
       link: '#',
-      available: false,
-      useArthPrefix: true
+      available: false
     },
     {
       name: 'UNNATI',
+      logo: '/logo-unnati.png',
       tagline: '"Restoring wealth."',
       description: 'IEPF Services',
       icon: CircleDollarSign,
       color: 'orange',
       link: '#',
-      available: false,
-      useArthPrefix: true
+      available: false
     }
   ];
 
