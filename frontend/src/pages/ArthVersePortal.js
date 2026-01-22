@@ -200,13 +200,15 @@ export default function ArthVersePortal({ token, user, onLogout }) {
                       <div className={`w-14 h-14 rounded-2xl ${isBlue ? 'bg-gradient-to-br from-brand-blue to-blue-600' : 'bg-gradient-to-br from-brand-orange to-orange-600'} flex items-center justify-center mb-4`}>
                         <Icon className="w-7 h-7 text-white" />
                       </div>
-                      <div className="mb-1">
+                      <div className="mb-2 flex items-center gap-1">
                         <img 
-                          src={app.logoUrl} 
-                          alt={app.name}
-                          className="h-12 object-contain"
-                          style={{ maxWidth: '200px' }}
+                          src="/arth-prefix.png" 
+                          alt="Arth"
+                          className="h-8 object-contain"
                         />
+                        <span className={`text-2xl font-bold font-heading ${isBlue ? 'text-brand-blue' : 'text-brand-orange'}`}>
+                          {app.name}
+                        </span>
                       </div>
                       <p className={`text-sm font-semibold mb-2 ${isBlue ? 'text-brand-orange' : 'text-brand-blue'}`}>
                         {app.tagline}
@@ -221,13 +223,15 @@ export default function ArthVersePortal({ token, user, onLogout }) {
                       <div className="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
                         <Icon className="w-7 h-7 text-slate-400" />
                       </div>
-                      <div className="mb-1">
+                      <div className="mb-2 flex items-center gap-1 opacity-40">
                         <img 
-                          src={app.logoUrl} 
-                          alt={app.name}
-                          className="h-12 object-contain opacity-40"
-                          style={{ maxWidth: '200px' }}
+                          src="/arth-prefix.png" 
+                          alt="Arth"
+                          className="h-8 object-contain"
                         />
+                        <span className="text-2xl font-bold font-heading text-slate-500">
+                          {app.name}
+                        </span>
                       </div>
                       <p className="text-sm font-semibold mb-2 text-slate-400">
                         {app.tagline}
