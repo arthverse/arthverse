@@ -121,7 +121,7 @@ export default function Dashboard({ token, user, onLogout }) {
     return (
       <Layout token={token} onLogout={onLogout}>
         <div className="flex items-center justify-center h-96" data-testid="dashboard-loading">
-          <div className="text-lg text-slate-600">Loading dashboard...</div>
+          <div className="text-lg text-slate-600 font-body">Loading dashboard...</div>
         </div>
       </Layout>
     );
@@ -129,16 +129,20 @@ export default function Dashboard({ token, user, onLogout }) {
 
   return (
     <Layout token={token} onLogout={onLogout}>
-      <div className="max-w-7xl mx-auto p-6" data-testid="dashboard-page">
-        <div className="mb-8 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8" data-testid="dashboard-page">
+        {/* Header */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold font-heading text-slate-900 mb-2" data-testid="dashboard-title">Dashboard</h1>
-            <p className="text-slate-600 font-body">Welcome back! Here's your financial overview.</p>
+            <span className="text-xs uppercase tracking-widest text-brand-orange font-semibold">ArthVyay</span>
+            <h1 className="text-3xl font-semibold font-heading text-slate-900 tracking-tight mt-1" data-testid="dashboard-title">
+              Financial Dashboard
+            </h1>
+            <p className="text-slate-500 font-body mt-1">Your complete financial overview</p>
           </div>
           <div className="flex gap-3">
             <Button
               onClick={() => navigate('/arthvyay/questionnaire')}
-              className="bg-brand-blue hover:bg-brand-blue/90 rounded-full"
+              className="bg-brand-blue hover:bg-blue-800 text-white rounded-full px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit Financials
@@ -146,21 +150,23 @@ export default function Dashboard({ token, user, onLogout }) {
             <Button
               variant="outline"
               onClick={handleResetData}
-              className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700 rounded-full"
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 rounded-full px-6 transition-all"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Reset Data
+              Reset
             </Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="col-span-1 md:col-span-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl p-8 border border-slate-200 shadow-sm" data-testid="health-score-card">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          {/* Health Score Card */}
+          <div className="col-span-1 md:col-span-4 bg-white rounded-2xl p-8 border border-slate-200 shadow-card" data-testid="health-score-card">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-8">
               <div className="flex-1">
-                <h2 className="text-2xl font-semibold font-heading mb-2">Financial Health Score</h2>
-                <div className={`text-6xl font-bold font-mono mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="health-score-value">
-                  {healthScore?.score || 0}/100
+                <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">Overview</span>
+                <h2 className="text-2xl font-semibold font-heading mt-1 mb-4">Financial Health Score</h2>
+                <div className={`text-6xl font-semibold font-heading tracking-tight mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="health-score-value">
+                  {healthScore?.score || 0}<span className="text-3xl text-slate-400">/100</span>
                 </div>
                 <p className="text-lg font-medium text-slate-700 mb-6">
                   {healthScore?.rating || 'Not Available'} - {healthScore?.message || 'Complete questionnaire to see score'}
@@ -170,9 +176,9 @@ export default function Dashboard({ token, user, onLogout }) {
                 {hasPremiumAccess && (
                   <div className="space-y-3">
                     {healthScore?.insights?.slice(0, 5).map((insight, idx) => (
-                      <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200" data-testid={`insight-${idx}`}>
-                        <div className="flex items-start gap-2 mb-1">
-                          <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
+                      <div key={idx} className="p-4 bg-slate-50 rounded-xl border border-slate-100" data-testid={`insight-${idx}`}>
+                        <div className="flex items-start gap-2 mb-2">
+                          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
                             insight.priority === 'HIGH' ? 'bg-red-100 text-red-700' : 
                             insight.priority === 'MEDIUM' ? 'bg-orange-100 text-orange-700' : 
                             'bg-blue-100 text-blue-700'
@@ -182,13 +188,13 @@ export default function Dashboard({ token, user, onLogout }) {
                           <p className="text-sm font-semibold text-slate-900">{insight.category}</p>
                         </div>
                         <p className="text-sm text-slate-700 mb-2">{insight.issue}</p>
-                        <div className="text-xs text-slate-600 mb-1">
+                        <div className="text-xs text-slate-600 mb-2">
                           <span className="text-red-600">Current: {insight.current}</span>
                           <span className="mx-2">→</span>
                           <span className="text-green-600">Target: {insight.target}</span>
                         </div>
-                        <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded">
-                          💡 {insight.action}
+                        <p className="text-xs text-brand-blue bg-blue-50 p-2 rounded-lg">
+                          {insight.action}
                         </p>
                       </div>
                     ))}
