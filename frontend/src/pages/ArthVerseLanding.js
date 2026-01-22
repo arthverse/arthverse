@@ -8,7 +8,7 @@ export default function ArthVerseLanding() {
       name: 'VYAY',
       logo: '/logo-vyay.png',
       tagline: '"Your balance sheet. Your life."',
-      description: 'Track expenses, auto-generate P&L, get financial health scores',
+      description: 'Track expenses, auto-generate P&L, get your ArthSthithi score',
       icon: TrendingUp,
       color: 'blue',
       audience: 'Young professionals, Shop owners',
