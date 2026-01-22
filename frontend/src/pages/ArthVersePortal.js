@@ -10,11 +10,11 @@ import { toast } from 'sonner';
 export default function ArthVersePortal({ token, user, onLogout }) {
   const [userData, setUserData] = useState(user);
   const [loading, setLoading] = useState(false);
+  const [netWorth, setNetWorth] = useState(0);
 
   useEffect(() => {
-    if (!user) {
-      fetchUserData();
-    }
+    fetchUserData();
+    fetchNetWorth();
   }, []);
 
   const fetchUserData = async () => {
@@ -28,6 +28,18 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       toast.error('Failed to load user data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchNetWorth = async () => {
+    try {
+      const response = await axios.get(`${API}/reports/balance-sheet`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNetWorth(response.data.net_worth || 0);
+    } catch (error) {
+      // User might not have completed questionnaire yet
+      console.log('Balance sheet not available');
     }
   };
 
