@@ -18,7 +18,7 @@ import asyncio
 from services.setu_service import setu_service
 from services.financial_health_calculator import calculate_financial_health_score
 from services.user_id_generator import generate_user_login_id_async, validate_date_of_birth
-from services.payment_service import payment_service, PLANS
+from services.payment_service import payment_service, PLANS, PRICING, calculate_plan_price
 from services.report_generator import create_report
 from services.arthrakshak_service import (
     InsurancePolicy, PolicyCategory, PolicyType, PremiumFrequency,
@@ -815,8 +815,13 @@ async def get_user_financial_data(
 
 # ==================== PAYMENT ENDPOINTS ====================
 
+class CalculatePriceRequest(BaseModel):
+    major_members: int = Field(0, ge=0, description="Additional major members (18+)")
+    minor_members: int = Field(0, ge=0, description="Minor members (<18)")
+
 class CreateOrderRequest(BaseModel):
-    plan_type: str = Field(..., description="Plan type: 'individual' or 'family'")
+    major_members: int = Field(0, ge=0, description="Additional major members (18+)")
+    minor_members: int = Field(0, ge=0, description="Minor members (<18)")
 
 class CreateOrderResponse(BaseModel):
     order_id: str
@@ -825,25 +830,59 @@ class CreateOrderResponse(BaseModel):
     key_id: str
     plan_name: str
     plan_description: str
+    pricing_breakdown: dict
 
 class VerifyPaymentRequest(BaseModel):
     razorpay_order_id: str
     razorpay_payment_id: str
     razorpay_signature: str
-    plan_type: str
+    major_members: int = 0
+    minor_members: int = 0
+
+@api_router.get("/payment/pricing")
+async def get_pricing_info():
+    """Get pricing information for the plan"""
+    return {
+        "base_plan": {
+            "name": "ArthVyay Individual Plan",
+            "price": PRICING["base_plan"] / 100,
+            "description": "Includes primary member (account owner)",
+            "currency": "INR"
+        },
+        "additional_major_member": {
+            "price": PRICING["additional_major"] / 100,
+            "description": "Per additional major member (18+)",
+            "currency": "INR"
+        },
+        "minor_member": {
+            "price": PRICING["additional_minor"] / 100,
+            "description": "Per minor member (<18)",
+            "currency": "INR"
+        },
+        "tax_inclusive": True,
+        "features": PLANS["individual"]["features"]
+    }
+
+@api_router.post("/payment/calculate")
+async def calculate_price(request: CalculatePriceRequest):
+    """Calculate total price based on family members"""
+    pricing = calculate_plan_price(request.major_members, request.minor_members)
+    return pricing
 
 @api_router.get("/payment/plans")
 async def get_payment_plans():
     """Get available payment plans"""
     return {
         "plans": {
-            plan_id: {
-                "name": plan["name"],
-                "amount": plan["amount"] / 100,  # Convert paise to rupees
-                "description": plan["description"],
-                "features": plan["features"]
+            "individual": {
+                "name": PLANS["individual"]["name"],
+                "base_amount": PLANS["individual"]["base_amount"] / 100,
+                "description": PLANS["individual"]["description"],
+                "features": PLANS["individual"]["features"],
+                "additional_major_price": PRICING["additional_major"] / 100,
+                "minor_price": PRICING["additional_minor"] / 100,
+                "tax_inclusive": True
             }
-            for plan_id, plan in PLANS.items()
         }
     }
 
@@ -852,33 +891,32 @@ async def create_payment_order(
     request: CreateOrderRequest,
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    """Create a Razorpay order for payment"""
+    """Create a Razorpay order for payment with family members"""
     try:
         user_id = await verify_token(credentials)
         
-        if request.plan_type not in PLANS:
-            raise HTTPException(status_code=400, detail="Invalid plan type")
-        
-        plan = PLANS[request.plan_type]
+        # Calculate total price
+        pricing = calculate_plan_price(request.major_members, request.minor_members)
+        total_amount = pricing["total"]["amount"]
         
         # Check if user already has an active premium subscription
         existing_payment = await db.payments.find_one({
             "user_id": user_id,
-            "status": "completed",
-            "plan_type": request.plan_type
+            "status": "completed"
         })
         
         if existing_payment:
-            raise HTTPException(status_code=400, detail="You already have this plan. You can download your report from the dashboard.")
+            raise HTTPException(status_code=400, detail="You already have an active plan. You can download your report from the dashboard.")
         
         # Create Razorpay order
         order = payment_service.create_order(
-            amount=plan["amount"],
+            amount=total_amount,
             currency="INR",
             receipt=f"rcpt_{user_id[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}",
             notes={
                 "user_id": user_id,
-                "plan_type": request.plan_type
+                "major_members": request.major_members,
+                "minor_members": request.minor_members
             }
         )
         
@@ -886,19 +924,23 @@ async def create_payment_order(
         await db.orders.insert_one({
             "order_id": order["id"],
             "user_id": user_id,
-            "plan_type": request.plan_type,
-            "amount": plan["amount"],
+            "plan_type": "individual",
+            "major_members": request.major_members,
+            "minor_members": request.minor_members,
+            "amount": total_amount,
+            "pricing_breakdown": pricing,
             "status": "created",
             "created_at": datetime.now(timezone.utc).isoformat()
         })
         
         return CreateOrderResponse(
             order_id=order["id"],
-            amount=plan["amount"],
+            amount=total_amount,
             currency="INR",
             key_id=payment_service.key_id,
-            plan_name=plan["name"],
-            plan_description=plan["description"]
+            plan_name=PLANS["individual"]["name"],
+            plan_description=PLANS["individual"]["description"],
+            pricing_breakdown=pricing
         )
         
     except HTTPException:
