@@ -222,16 +222,21 @@ def create_report(filename, data, plan_type="individual"):
     
     # Score interpretation
     if score >= 75:
-        interpretation = "🌟 Excellent! Your financial health is strong. Keep up the great work!"
+        interpretation = "Aapki ArthSthithi abhi excellent hai! Your financial position is strong."
         interp_color = SUCCESS_GREEN
     elif score >= 50:
-        interpretation = "👍 Good. Your finances are stable with room for improvement."
+        interpretation = "Aapki ArthSthithi stable hai. Your finances are balanced with room for improvement."
         interp_color = BRAND_BLUE
     else:
-        interpretation = "⚠️ Needs Attention. Focus on building savings and reducing debt."
+        interpretation = "Aapki ArthSthithi needs attention. Focus on building savings and reducing debt."
         interp_color = DANGER_RED
     
     elements.append(Paragraph(f"<font color='{interp_color.hexval()}'>{interpretation}</font>", styles['CustomBody']))
+    elements.append(Spacer(1, 10))
+    
+    # Disclaimer
+    disclaimer = "ArthSthithi is a financial diagnostic indicator generated using user-provided and consented data. It is not financial advice."
+    elements.append(Paragraph(f"<font size='8' color='#94a3b8'>{disclaimer}</font>", styles['CustomBody']))
     elements.append(Spacer(1, 15))
     
     # Component scores table
