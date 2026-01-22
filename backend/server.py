@@ -968,6 +968,10 @@ async def verify_payment(
         if not is_valid:
             raise HTTPException(status_code=400, detail="Payment verification failed")
         
+        # Get order details to retrieve pricing
+        order = await db.orders.find_one({"order_id": request.razorpay_order_id})
+        order_amount = order.get("amount") if order else calculate_plan_price(request.major_members, request.minor_members)["total"]["amount"]
+        
         # Update order status
         await db.orders.update_one(
             {"order_id": request.razorpay_order_id},
@@ -983,30 +987,34 @@ async def verify_payment(
             "user_id": user_id,
             "order_id": request.razorpay_order_id,
             "payment_id": request.razorpay_payment_id,
-            "plan_type": request.plan_type,
-            "amount": PLANS[request.plan_type]["amount"],
+            "plan_type": "individual",
+            "major_members": request.major_members,
+            "minor_members": request.minor_members,
+            "amount": order_amount,
             "status": "completed",
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.payments.insert_one(payment_record)
         
         # Generate the report
-        report_path = await generate_user_report(user_id, request.plan_type)
+        report_path = await generate_user_report(user_id, "individual")
         
         # Update user's premium status
         await db.users.update_one(
-            {"_id": user_id},
+            {"id": user_id},
             {"$set": {
-                "premium_plan": request.plan_type,
+                "premium_plan": "individual",
                 "premium_activated_at": datetime.now(timezone.utc).isoformat(),
-                "report_path": report_path
+                "report_path": report_path,
+                "covered_major_members": request.major_members,
+                "covered_minor_members": request.minor_members
             }}
         )
         
         return {
             "success": True,
             "message": "Payment successful! Your report is ready.",
-            "plan_type": request.plan_type,
+            "plan_type": "individual",
             "report_available": True
         }
         
