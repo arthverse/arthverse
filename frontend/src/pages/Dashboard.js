@@ -244,7 +244,7 @@ export default function Dashboard({ token, user, onLogout }) {
             <div className="col-span-1 md:col-span-4">
               <PaymentSection 
                 token={token}
-                user={user}
+                user={userData}
                 onPaymentSuccess={handlePaymentSuccess} 
               />
             </div>
