@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
-import { TrendingUp, Shield, Landmark, PiggyBank, Banknote, CircleDollarSign, LogOut, User } from 'lucide-react';
+import { TrendingUp, Shield, Landmark, PiggyBank, Banknote, CircleDollarSign, LogOut, User, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ArthVersePortal({ token, user, onLogout }) {
