@@ -357,12 +357,18 @@ export default function Reports({ token, onLogout }) {
                     <TrendingUp className="w-4 h-4" /> Income Sources
                   </h4>
                   <div className="space-y-2">
-                    {incomeChartData.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span className="text-slate-700">{item.name}</span>
-                        <span className="font-mono font-semibold text-green-600">₹{item.value.toLocaleString()}</span>
-                      </div>
-                    ))}
+                    {incomeChartData.map((item, idx) => {
+                      const color = INCOME_COLORS[idx % INCOME_COLORS.length];
+                      return (
+                        <div key={idx} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: `${color}15` }}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
+                            <span className="text-slate-700">{item.name}</span>
+                          </div>
+                          <span className="font-mono font-semibold" style={{ color }}>₹{item.value.toLocaleString()}</span>
+                        </div>
+                      );
+                    })}
                     {incomeChartData.length === 0 && (
                       <p className="text-slate-500 text-center py-4">No income recorded</p>
                     )}
@@ -375,12 +381,18 @@ export default function Reports({ token, onLogout }) {
                     <TrendingDown className="w-4 h-4" /> Expense Categories
                   </h4>
                   <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                    {expenseChartData.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                        <span className="text-slate-700">{item.name}</span>
-                        <span className="font-mono font-semibold text-red-600">₹{item.value.toLocaleString()}</span>
-                      </div>
-                    ))}
+                    {expenseChartData.map((item, idx) => {
+                      const color = EXPENSE_COLORS[idx % EXPENSE_COLORS.length];
+                      return (
+                        <div key={idx} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: `${color}15` }}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
+                            <span className="text-slate-700">{item.name}</span>
+                          </div>
+                          <span className="font-mono font-semibold" style={{ color }}>₹{item.value.toLocaleString()}</span>
+                        </div>
+                      );
+                    })}
                     {expenseChartData.length === 0 && (
                       <p className="text-slate-500 text-center py-4">No expenses recorded</p>
                     )}
