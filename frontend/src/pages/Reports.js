@@ -257,12 +257,16 @@ export default function Reports({ token, onLogout }) {
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={incomeBarData} layout="vertical">
+                    <BarChart data={incomeBarData.map((item, idx) => ({ ...item, fill: INCOME_COLORS[idx % INCOME_COLORS.length] }))} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={true} vertical={false} />
                       <XAxis type="number" tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`} />
                       <YAxis type="category" dataKey="category" width={100} tick={{ fontSize: 12 }} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Bar dataKey="amount" fill="#10B981" radius={[0, 8, 8, 0]} />
+                      <Bar dataKey="amount" radius={[0, 8, 8, 0]}>
+                        {incomeBarData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={INCOME_COLORS[index % INCOME_COLORS.length]} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 )}
