@@ -1287,6 +1287,39 @@ async def download_report(
         logger.error(f"Error downloading report: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/reports/download-pdf")
+async def download_reports_pdf(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Download/Generate the user's financial report PDF (for authorized users)"""
+    try:
+        user_id = await verify_token(credentials)
+        
+        # Get user data
+        user = await db.users.find_one({"_id": user_id}, {"_id": 0, "hashed_password": 0})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get questionnaire data
+        questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+        if not questionnaire:
+            raise HTTPException(status_code=404, detail="Please complete the financial questionnaire first")
+        
+        # Generate the report
+        report_path = await generate_user_report(user_id, "individual")
+        
+        return FileResponse(
+            report_path,
+            media_type="application/pdf",
+            filename=f"ArthSthithi_Report_{user.get('client_id', 'User')}.pdf"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating report PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # ==================== ARTHRAKSHAK ENDPOINTS ====================
 
