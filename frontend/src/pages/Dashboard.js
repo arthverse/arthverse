@@ -257,7 +257,7 @@ export default function Dashboard({ token, user, onLogout }) {
           </div>
 
           {/* Payment Section OR Analysis Results based on premium access */}
-          {!hasPremiumAccess ? (
+          {(!hasPremiumAccess && !isDemo) ? (
             <div className="col-span-1 md:col-span-4">
               <PaymentSection 
                 token={token}
