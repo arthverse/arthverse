@@ -14,11 +14,11 @@ import {
   CreditCard, PiggyBank, Landmark, Car, Gem, Banknote
 } from 'lucide-react';
 
-// Color palettes for charts
-const INCOME_COLORS = ['#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#22C55E', '#16A34A', '#15803D', '#166534'];
-const EXPENSE_COLORS = ['#EF4444', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#F87171', '#F97316', '#EA580C', '#C2410C'];
-const ASSET_COLORS = ['#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF', '#1E3A8A', '#60A5FA', '#0EA5E9', '#0284C7', '#0369A1'];
-const LIABILITY_COLORS = ['#F97316', '#EA580C', '#C2410C', '#9A3412', '#7C2D12', '#FB923C', '#FDBA74', '#FED7AA', '#FFEDD5'];
+// Color palettes for charts - Vibrant multi-color scheme
+const INCOME_COLORS = ['#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#22C55E'];
+const EXPENSE_COLORS = ['#EF4444', '#F97316', '#F59E0B', '#EC4899', '#D946EF', '#8B5CF6', '#6366F1', '#F43F5E', '#E11D48'];
+const ASSET_COLORS = ['#3B82F6', '#06B6D4', '#14B8A6', '#10B981', '#22C55E', '#84CC16', '#EAB308', '#F59E0B', '#0EA5E9'];
+const LIABILITY_COLORS = ['#F97316', '#EF4444', '#EC4899', '#D946EF', '#8B5CF6', '#F59E0B', '#F43F5E', '#E11D48', '#FB923C'];
 
 // Custom tooltip component
 const CustomTooltip = ({ active, payload, label, prefix = '₹' }) => {
