@@ -252,13 +252,22 @@ export default function Dashboard({ token, user, onLogout }) {
             </div>
           </div>
 
-          {/* Payment Section - Replace old paywall */}
-          {!hasPremiumAccess && (
+          {/* Payment Section OR Analysis Results based on premium access */}
+          {!hasPremiumAccess ? (
             <div className="col-span-1 md:col-span-4">
               <PaymentSection 
                 token={token}
                 user={userData}
                 onPaymentSuccess={handlePaymentSuccess} 
+              />
+            </div>
+          ) : (
+            <div className="col-span-1 md:col-span-4">
+              <AnalysisResults
+                token={token}
+                user={userData}
+                healthScore={healthScore}
+                questionnaire={questionnaire}
               />
             </div>
           )}
