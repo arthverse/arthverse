@@ -578,16 +578,17 @@ export default function Reports({ token, onLogout }) {
                     const percentage = balanceSheet?.total_liabilities > 0 
                       ? ((item.value / balanceSheet.total_liabilities) * 100).toFixed(1) 
                       : 0;
+                    const color = LIABILITY_COLORS[idx % LIABILITY_COLORS.length];
                     return (
-                      <div key={idx} className="p-3 bg-orange-50 rounded-lg" data-testid={`liability-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div key={idx} className="p-3 rounded-lg" style={{ backgroundColor: `${color}15` }} data-testid={`liability-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-slate-700">{item.name}</span>
-                          <span className="font-mono font-bold text-orange-600">₹{item.value.toLocaleString()}</span>
+                          <span className="font-mono font-bold" style={{ color }}>₹{item.value.toLocaleString()}</span>
                         </div>
-                        <div className="w-full bg-orange-200 rounded-full h-2">
+                        <div className="w-full rounded-full h-2" style={{ backgroundColor: `${color}30` }}>
                           <div 
-                            className="bg-orange-600 h-2 rounded-full transition-all duration-500"
-                            style={{ width: `${percentage}%` }}
+                            className="h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%`, backgroundColor: color }}
                           />
                         </div>
                         <p className="text-xs text-slate-500 mt-1">{percentage}% of total liabilities</p>
