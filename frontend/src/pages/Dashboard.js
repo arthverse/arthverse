@@ -24,6 +24,10 @@ export default function Dashboard({ token, user, onLogout }) {
   const [userData, setUserData] = useState(user);
   const navigate = useNavigate();
 
+  // Check for demo mode via URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const isDemo = urlParams.get('demo') === 'true';
+
   useEffect(() => {
     fetchData();
   }, []);
