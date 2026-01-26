@@ -497,16 +497,17 @@ export default function Reports({ token, onLogout }) {
                     const percentage = balanceSheet?.total_assets > 0 
                       ? ((item.value / balanceSheet.total_assets) * 100).toFixed(1) 
                       : 0;
+                    const color = ASSET_COLORS[idx % ASSET_COLORS.length];
                     return (
-                      <div key={idx} className="p-3 bg-blue-50 rounded-lg" data-testid={`asset-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div key={idx} className="p-3 rounded-lg" style={{ backgroundColor: `${color}15` }} data-testid={`asset-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-slate-700">{item.name}</span>
-                          <span className="font-mono font-bold text-blue-600">₹{item.value.toLocaleString()}</span>
+                          <span className="font-mono font-bold" style={{ color }}>₹{item.value.toLocaleString()}</span>
                         </div>
-                        <div className="w-full bg-blue-200 rounded-full h-2">
+                        <div className="w-full rounded-full h-2" style={{ backgroundColor: `${color}30` }}>
                           <div 
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                            style={{ width: `${percentage}%` }}
+                            className="h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%`, backgroundColor: color }}
                           />
                         </div>
                         <p className="text-xs text-slate-500 mt-1">{percentage}% of total assets</p>
