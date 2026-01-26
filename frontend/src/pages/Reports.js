@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 // Color palettes for charts - Vibrant multi-color scheme
-const INCOME_COLORS = ['#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#22C55E'];
+const INCOME_COLORS = ['#10B981', '#06B6D4', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#14B8A6', '#6366F1', '#22C55E'];
 const EXPENSE_COLORS = ['#EF4444', '#F97316', '#F59E0B', '#EC4899', '#D946EF', '#8B5CF6', '#6366F1', '#F43F5E', '#E11D48'];
 const ASSET_COLORS = ['#3B82F6', '#06B6D4', '#14B8A6', '#10B981', '#22C55E', '#84CC16', '#EAB308', '#F59E0B', '#0EA5E9'];
 const LIABILITY_COLORS = ['#F97316', '#EF4444', '#EC4899', '#D946EF', '#8B5CF6', '#F59E0B', '#F43F5E', '#E11D48', '#FB923C'];
