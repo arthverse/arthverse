@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
-import { TrendingUp, Shield, Landmark, PiggyBank, Banknote, CircleDollarSign, LogOut, User, ArrowRight } from 'lucide-react';
+import { TrendingUp, Shield, Landmark, PiggyBank, Banknote, IndianRupee, LogOut, User, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ArthVersePortal({ token, user, onLogout }) {
@@ -99,7 +99,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       logo: '/logo-unnati.png',
       tagline: '"Restoring wealth."',
       description: 'IEPF Services',
-      icon: CircleDollarSign,
+      icon: IndianRupee,
       color: 'orange',
       link: '#',
       available: false

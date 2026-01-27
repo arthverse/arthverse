@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Shield, TrendingUp, PiggyBank, Banknote, Landmark, CircleDollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Shield, TrendingUp, PiggyBank, Banknote, Landmark, IndianRupee, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function ArthVerseLanding() {
   const apps = [
@@ -59,7 +59,7 @@ export default function ArthVerseLanding() {
       logo: '/logo-unnati.png',
       tagline: '"Restoring wealth."',
       description: 'Investment recovery, debt recovery, fraud support',
-      icon: CircleDollarSign,
+      icon: IndianRupee,
       color: 'orange',
       audience: 'Professionals, Business owners',
       features: ['IEPF Claims', 'Debt Recovery', 'Fraud Support']
