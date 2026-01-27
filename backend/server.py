@@ -1084,8 +1084,10 @@ async def verify_payment(
 async def generate_user_report(user_id: str, plan_type: str) -> str:
     """Generate financial report for user"""
     try:
-        # Get user data
-        user = await db.users.find_one({"_id": user_id}, {"_id": 0, "hashed_password": 0})
+        # Get user data - try both id formats for compatibility
+        user = await db.users.find_one({"id": user_id}, {"_id": 0, "hashed_password": 0})
+        if not user:
+            user = await db.users.find_one({"_id": user_id}, {"_id": 0, "hashed_password": 0})
         if not user:
             raise Exception("User not found")
         
