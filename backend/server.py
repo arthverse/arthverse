@@ -1295,8 +1295,10 @@ async def download_reports_pdf(
     try:
         user_id = await verify_token(credentials)
         
-        # Get user data
-        user = await db.users.find_one({"_id": user_id}, {"_id": 0, "hashed_password": 0})
+        # Get user data - try both id formats for compatibility
+        user = await db.users.find_one({"id": user_id}, {"_id": 0, "hashed_password": 0})
+        if not user:
+            user = await db.users.find_one({"_id": user_id}, {"_id": 0, "hashed_password": 0})
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
