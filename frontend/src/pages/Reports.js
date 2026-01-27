@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { toast } from 'sonner';
 import { 
-  TrendingUp, TrendingDown, DollarSign, Wallet, Building2, 
+  TrendingUp, TrendingDown, IndianRupee, Wallet, Building2, 
   CreditCard, PiggyBank, Landmark, Car, Gem, Banknote
 } from 'lucide-react';
 
@@ -439,7 +439,7 @@ export default function Reports({ token, onLogout }) {
               <Card className="p-6 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl shadow-lg" data-testid="bs-networth-card">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <DollarSign className="w-6 h-6" />
+                    <IndianRupee className="w-6 h-6" />
                   </div>
                   <p className="text-sm font-medium text-emerald-100">Net Worth</p>
                 </div>
