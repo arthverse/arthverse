@@ -12,17 +12,21 @@ The key features and requests implemented throughout the project include:
 - **ArthSthithi Rebranding and Recalculation**: The core Financial Health Score was renamed to ArthSthithi and its calculation formula was completely replaced based on a detailed user specification.
 - **PDF Report Generation**: An API to generate a detailed financial report, with a corresponding Analysis Results preview screen available post-payment (or via a demo mode).
 - **Localization**: Replaced all dollar symbols ($) with the Indian Rupee symbol (₹).
+- **ROI Teaser**: Implemented a Money Leakage report on the payment screen to increase conversion.
+- **Language Updates**: Converted UI text from Hinglish to Easy English per user request.
+- **WhatsApp Sharing**: Added functionality for users to share their financial score.
+- **Premium Report Screen**: The current task is to build a new, detailed premium report screen for paying users and update the backend PDF generation logic to match.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The Arth-Verse application is a full-stack platform with a significantly enhanced UI/UX. It features user authentication, a financial questionnaire, and several modules. Key functionalities include the ArthVyay dashboard (displaying the new ArthSthithi score), the ArthRakshak insurance module, and a graphical Reports page. A Razorpay-integrated dynamic paywall is in place using test credentials, which gates access to a detailed Analysis Results screen and a downloadable PDF report. The entire application reflects the latest branding and a consistent, modern design language.
+The Arth-Verse application is a full-stack platform with a significantly enhanced UI/UX. It features user authentication, a financial questionnaire, and several modules. Key functionalities include the ArthVyay dashboard (displaying the ArthSthithi score), the ArthRakshak insurance module, and a graphical Reports page. A Razorpay-integrated dynamic paywall is in place using test credentials, which gates access to premium features. This paywall now includes an ROI Teaser to show users their potential monthly savings. The agent was in the process of replacing the basic analysis screen with a much more detailed premium report screen.
 
 **Last working item**:
--   Last item agent was working: The agent finished implementing a new, user-provided formula for calculating the ArthSthithi score. This involved replacing the logic in . The agent tested the corresponding API endpoint and verified via a screenshot that the dashboard correctly displayed the new score (80/100) and updated financial recommendations.
--   Status: **USER VERIFICATION PENDING**
--   Agent Testing Done: Y
--   Which testing method agent to use? NA
+-   Last item agent was working: Implementing a new, detailed premium report screen for paying users. The agent created a new placeholder component  and updated  to render this new component for users with premium access, replacing the older . The task is to populate this new component with content and logic based on files provided by the user.
+-   Status: **IN PROGRESS**
+-   Agent Testing Done: N
+-   Which testing method agent to use? Frontend testing agent should be used after building the new  component to verify its complex UI and data rendering.
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
@@ -30,31 +34,31 @@ The Arth-Verse application is a full-stack platform with a significantly enhance
 
 Issues Detail:
 -   **Issue 1: Setu Account Aggregator integration is blocked.**
-    -   **Attempted fixes**: Debugging confirmed the issue is an external  error from the Setu sandbox environment. This is not an application code issue.
-    -   **Next debug checklist**: Do not attempt to debug the code. The task is blocked until the user confirms their Setu sandbox account is active and the application's IP has been whitelisted on their end.
-    -   **Why fix this issue and what will be achieved with the fix?** Enables automatic linking of bank accounts, which is a core feature for simplifying the financial questionnaire process for users.
+    -   **Attempted fixes**: The issue is an external  error from the Setu sandbox environment. This is not an application code issue.
+    -   **Next debug checklist**: Do not attempt to debug the code. The task is blocked until the user confirms their Setu sandbox account is active and the application's IP has been whitelisted.
+    -   **Why fix this issue and what will be achieved with the fix?** Enables automatic linking of bank accounts, a core feature for simplifying the user's data entry process.
     -   **Status**: BLOCKED
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** backend
-    -   **Blocked on other issue**: User action required to configure their Setu account.
+    -   **Blocked on other issue**: User action required (Setu account configuration).
 
 **In progress Task List**:
--   Task 1: (P0) Finalize and Productionalize Razorpay Integration
--   Task 2: (P1) Enhance PDF Report with Graphics
+-   Task 1: (P0) Implement the new Premium Report Screen & Backend Logic.
+-   Task 2: (P1) Finalize and Productionalize Razorpay Integration.
 
 Task Detail:
--   **Task 1: Finalize and Productionalize Razorpay Integration**
-    -   **Where to resume**: The integration is functional with test keys. The next steps are to perform a full end-to-end payment flow test, and then remove the temporary  query parameter from  to ensure the analysis screen is only accessible after a real payment.
-    -   **What will be achieved with this?** A fully operational and secure payment gateway, enabling monetization of the application's premium features.
+-   **Task 1: Implement the new Premium Report Screen & Backend Logic**
+    -   **Where to resume**: The file  is an empty shell. The immediate next step is to build out its UI to match the structure and layout shown in the user-provided . This will involve creating sections for a cover page, financial summary, net worth, cash flow analysis, goals, and recommendations. The data and text for these sections should be derived from the logic in .
+    -   **What will be achieved with this?** A new, detailed, multi-section premium report screen for paying users and an updated PDF download that matches the new on-screen report.
     -   **Status**: IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something**: None.
 
--   **Task 2: Enhance PDF Report with Graphics**
-    -   **Where to resume**: The backend API  successfully generates a text-based PDF using . The next step is to modify  to include the same graphical charts (e.g., from ) that are displayed on the web-based Reports page. This may require a library that can render charts into the PDF.
-    -   **What will be achieved with this?** A more professional, visually appealing, and easier-to-understand downloadable report for paying customers.
-    -   **Status**: NOT STARTED
-    -   **Should Test frontend/backend/both after fix?** backend
+-   **Task 2: Finalize and Productionalize Razorpay Integration**
+    -   **Where to resume**: The integration works with test keys. A full end-to-end payment flow test is needed. The temporary  query parameter logic in  should be removed to ensure the analysis screen is only accessible after a real payment.
+    -   **What will be achieved with this?** A fully operational and secure payment gateway, enabling monetization.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
@@ -68,15 +72,11 @@ Task Detail:
     -   (P2) **Refactor **: Break down the monolithic  file into smaller, feature-specific router files (e.g., in ) to improve code maintainability and scalability.
 
 **Completed work in this session**
--   **Branding Update (Logos)**: Updated all 6 sub-product logos with new, high-quality, transparent PNGs provided by the user. This involved multiple iterations, starting from extracting assets from a PPTX file.
--   **Networth Card Refactor**: Modified the portal dashboard to remove Dependents and City from the net worth display and replaced the static value with a live calculation fetched from the backend.
--   **Major Design Overhaul**: Implemented a comprehensive UI/UX revamp based on  specifications, introducing a new color palette, typography, and redesigned layouts for the landing page, auth page, and user portal for a more modern and uniform look.
--   **ArthSthithi Rebranding**: Replaced all user-facing instances of Financial Health Score with the new term ArthSthithi, including adding required explanations and disclaimers.
--   **Multi-color Charts**: Enhanced the Reports page by updating the  pie and bar charts to use vibrant, multi-color palettes for better data visualization.
--   **Razorpay Integration**: Successfully integrated Razorpay by adding user-provided test API keys to the backend, installing necessary dependencies, and fixing environment variable loading issues.
--   **PDF Report API & Preview Screen**: Created a new  component to display a detailed report preview post-payment. Implemented a temporary  flag for viewing. Created and debugged the backend API () to generate and serve the PDF.
--   **Rupee Symbol Update**: Globally replaced all dollar sign icons () with the  icon from .
--   **ArthSthithi Formula Update**: Replaced the entire backend logic for the financial score with a new, detailed formula provided by the user, and verified the updated score on the dashboard.
+-   **ROI Teaser Implementation**: Created and integrated  into the payment section, which shows users a Money Leakage report to incentivize payment.
+-   **Language Conversion**: Converted all UI text from Hinglish to Easy English across the , , and  components, per a user request.
+-   **WhatsApp Share Feature**: Added Share on WhatsApp buttons to the dashboard and analysis results page to increase virality.
+-   **Premium Report Scaffolding**: Began the current main task by creating the  component and updating  to render it for paid users.
+-   **Testing Flow Improvement**: Successfully debugged why the ROI Teaser wasn't showing by creating a new test user without premium access.
 
 **Known issue recurrence from previous fork**
 -   The Setu Account Aggregator integration remains blocked due to the same external  error.
@@ -85,62 +85,47 @@ Task Detail:
 
 
 **Key Technical Concepts**
--   **Frontend**: React, , Tailwind CSS, Shadcn/UI, , .
--   **Backend**: FastAPI, Pydantic, Motor (async MongoDB), ,  SDK.
--   **Design**: A new design system was implemented with specific fonts (Outfit, Plus Jakarta Sans), colors (Royal Indigo, Marigold Orange), and a warm Alabaster background.
--   **APIs**: Leveraged  for non-blocking I/O in FastAPI endpoints.
+-   **Frontend**: React, Conditional Rendering, Prop Drilling, State Management (, ), Event Handling.
+-   **Backend**: FastAPI, ReportLab for PDF generation. The core task involves translating Python business logic into a React frontend component.
 
 **key DB schema**
--   No new collections were created in this session. The work revolved around the existing  and  collections.
+-   No changes to DB schema. Continues to use  and  collections.
 
 **changes in tech stack**
--   **Backend**: Added  Python package.
--   **Frontend**: Added  yarn package.
+-   No new libraries or packages were installed in this session.
 
 **All files of reference**
--   **/app/backend/services/financial_health_calculator.py**: Overwritten with the new ArthSthithi calculation logic.
--   **/app/frontend/src/pages/ArthVerseLanding.js**: Completely rewritten to match the new design system.
--   **/app/frontend/src/pages/Dashboard.js**: Heavily modified to show the  component and implement the  logic.
--   **/app/frontend/src/pages/Reports.js**: Modified to add multi-color palettes to all charts.
--   **/app/frontend/src/components/AnalysisResults.js**: New component created to display the post-payment analysis screen.
--   **/app/backend/server.py**: Modified to add a demo PDF download endpoint, fix bugs in the production PDF endpoint, and correct the order of .
--   **/app/design_guidelines.json**: New file from  that dictated the UI/UX overhaul.
+-   **/app/frontend/src/components/PremiumReport.js**: The new component to be built.
+-   **/app/frontend/src/pages/Dashboard.js**: Contains the logic for rendering the new premium report.
+-   **/app/frontend/src/components/ROITeaser.js**: Contains the Money Leakage logic.
+-   **/app/backend/services/report_generator.py**: The existing PDF generator that needs to be updated with the new v6 logic.
+-   **User-provided files for current task**:  (contains the logic) and  (the visual target).
 
 **Areas that need refactoring**:
--   The  file remains a large monolith and is a candidate for being split into smaller router files.
--    has become complex due to handling loading states, premium access checks, and the demo mode logic. It could be broken down into smaller, more focused components.
+-    is becoming increasingly complex with logic for loading states, premium access checks, demo mode, and rendering different components (, ). It could be simplified into smaller, more focused components.
 
 **key api endpoints**
--   : Creates a new Razorpay order.
--   : Serves the generated PDF report to authenticated, paying users.
--   : A temporary endpoint to generate a PDF report without a payment check.
--   : Returns the user's ArthSthithi score, now calculated using the new formula.
+-   : The backend for this endpoint needs to be completely replaced with the logic from .
 
 **Critical Info for New Agent**
--   **Demo Mode**: The post-payment Analysis Results screen can be viewed without payment by adding  to the  URL. This is a temporary feature for the user's review and must be removed before production.
--   **Razorpay**: The integration is using **test keys**. The flow is functional but needs a complete end-to-end test.
--   **PDF Generation**: The current PDF is text-only. An upcoming task is to enhance it with graphical charts.
--   **Blocked Task**: Do not work on the Setu integration. It is blocked pending action from the user regarding their sandbox account.
+-   **Primary Task**: Your main goal is to build out the  component. Use the user-provided  as a visual guide and  for the detailed section logic, data points, and text.
+-   **Backend Update**: After the frontend screen is complete, you must replace the logic in  with the contents of  to ensure the Download PDF button generates the correct new report.
+-   **Blocked Task**: Do not work on the Setu integration. It is blocked pending user action.
+-   **Testing**: When testing the premium report, ensure you are logged in as a user who has premium access (e.g., the original test user ) and that the  flag is not present in the URL.
 
 **documents and test reports created in this job**
--   /app/design_guidelines.json
 -   /app/memory/PRD.md (Updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Update this logo also (Arth Vyay). (Status: **Completed**)
-2.  **User**: Use Multi colours in Asset, liabilities, income and expense distribution. (Status: **Completed**)
-3.  **User**: Create Multi color in income distribution also. (Status: **Completed**)
-4.  **User**: Provided Razorpay API Keys. (Status: **Completed**)
-5.  **User**: Show the analysis screen after payment, and show it to me now without payment. (Status: **Completed**)
-6.  **User**: How can I see the screen which is shown after payment is made? (Status: **Answered**)
-7.  **User**: Lets start pdf api. (Status: **Completed**)
-8.  **User**: Change this dollar symbol to rupee symbol every where in arthverse. (Status: **Completed**)
-9.  **User**: This is the revised formula to calculate ArthSthithi. (Status: **Completed**)
-10. **User**: [No new message, agent just finished the previous task] (Status: No pending messages)
+1.  **User**: Implement this to attract users to pay more for the report (provided ROI teaser files). (Status: **Completed**)
+2.  **User**: make everything in easy English instead of Hinglish. (Status: **Completed**)
+3.  **User**: create a screen for premium version and provide an option to download the same screen in pdf report at the bottom of the premium screen. (Status: **In Progress**)
+4.  **User**: I will provide you the report with logic in some time convert that report into a screen for premium users. (Status: **Acknowledged**)
+5.  **User**: Report and its logic (provided  and ). (Status: **In Progress**)
 
 **Project Health Check:**
 -   **Broken**: Setu Account Aggregator integration ( external error).
--   **Mocked**: Razorpay is in **test mode**. The  screen has a  bypass that should be removed for production.
+-   **Mocked**: Razorpay is in **test mode**. The  screen still has a  bypass that should be removed for production.
 
 **3rd Party Integrations**
 -   **Setu Account Aggregator**: Configured but blocked by an external issue.
@@ -149,18 +134,18 @@ Task Detail:
 -   **Recharts**: Used on the frontend for graphical reports.
 
 **Testing status**
--   Testing agent used after significant changes: NO (Agent self-tested with  and screenshots).
+-   Testing agent used after significant changes: NO
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None
 -   Known regressions: None
 
 **Credentials to test flow:**
--   **Client ID**: 
--   **Password**: 
--   **Razorpay Test Card**:
-    -   Number: 
-    -   Expiry: Any future date (e.g., )
-    -   CVV: Any 3 digits (e.g., )
+-   **Premium User**:
+    -   Client ID: 
+    -   Password: 
+-   **Non-Premium User (for testing paywall/ROI teaser)**:
+    -   Client ID: 
+    -   Password: 
 
 **What agent forgot to execute**
--   The agent has been thorough and did not forget to execute any requested tasks. All work follows a logical progression based on user requests.</analysis>
+-   The agent did not forget to execute any tasks. The current task of implementing the premium report screen was started but is incomplete as the session ended.</analysis>
