@@ -12,6 +12,7 @@ import AggregatedFinancialData from '../components/AggregatedFinancialData';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import PaymentSection from '../components/PaymentSection';
 import AnalysisResults from '../components/AnalysisResults';
+import PremiumReport from '../components/PremiumReport';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
