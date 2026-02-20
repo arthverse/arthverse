@@ -313,7 +313,7 @@ Check your score too! 👇
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <TrendingUp className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-emerald-100">Monthly Income (Aay)</p>
+            <p className="text-sm font-medium text-emerald-100">Monthly Income</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.income?.total || healthScore?.financials?.monthly_income || 0).toLocaleString('en-IN')}
@@ -326,7 +326,7 @@ Check your score too! 👇
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <TrendingDown className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-red-100">Monthly Expenses (Kharcha)</p>
+            <p className="text-sm font-medium text-red-100">Monthly Expenses</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.expenses?.total || healthScore?.financials?.monthly_expenses || 0).toLocaleString('en-IN')}
@@ -339,7 +339,7 @@ Check your score too! 👇
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <Gem className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-blue-100">Total Assets (Sampatti)</p>
+            <p className="text-sm font-medium text-blue-100">Total Assets</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.assets?.total || healthScore?.financials?.total_assets || 0).toLocaleString('en-IN')}
@@ -352,7 +352,7 @@ Check your score too! 👇
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <Scale className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-violet-100">Net Worth (Shuddh Sampatti)</p>
+            <p className="text-sm font-medium text-violet-100">Net Worth</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.netWorth || (healthScore?.financials?.total_assets - healthScore?.financials?.total_liabilities) || 0).toLocaleString('en-IN')}
@@ -360,14 +360,14 @@ Check your score too! 👇
         </Card>
       </div>
 
-      {/* Key Insights & Recommendations - Hinglish */}
+      {/* Key Insights & Recommendations */}
       <Card className="p-8 bg-white border border-slate-200 rounded-2xl shadow-card" data-testid="insights-section">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-brand-orange flex items-center justify-center">
             <Lightbulb className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold font-heading">Aage Kya Karo? (Action Items)</h3>
+            <h3 className="text-xl font-semibold font-heading">What Should You Do Next?</h3>
             <p className="text-slate-500 text-sm">Actionable steps to improve your ArthSthithi</p>
           </div>
         </div>
