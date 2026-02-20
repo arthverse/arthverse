@@ -65,7 +65,7 @@ const BENEFITS = [
   }
 ];
 
-export default function PaymentSection({ token, user, onPaymentSuccess }) {
+export default function PaymentSection({ token, user, questionnaire, onPaymentSuccess }) {
   const [loading, setLoading] = useState(false);
   const [majorMembers, setMajorMembers] = useState(0);
   const [minorMembers, setMinorMembers] = useState(0);
