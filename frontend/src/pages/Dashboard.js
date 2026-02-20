@@ -5,7 +5,7 @@ import { API } from '../App';
 import Layout from '../components/Layout';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import BankLinking from '../components/BankLinking';
 import AggregatedFinancialData from '../components/AggregatedFinancialData';
