@@ -114,6 +114,39 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
     }
   };
 
+  // WhatsApp Share functionality
+  const handleWhatsAppShare = () => {
+    const userName = user?.name || 'User';
+    const userScore = healthScore?.score || 0;
+    const scoreEmoji = getScoreEmoji(userScore);
+    const tagline = getOverallTagline(userScore);
+    
+    // Create share message in Hinglish
+    const shareMessage = `🎯 *Mera ArthSthithi Score: ${userScore}/100* ${scoreEmoji}
+
+${tagline}
+
+Maine apni financial health check ki ArthVerse pe! 💰
+
+📊 *ArthSthithi* = Financial Health Indicator
+✅ 5-Point Analysis: Bachat, Karz, Suraksha, Nivesh, Lakshya
+📈 Personalized tips aur 30-day action plan
+
+Aap bhi apna score check karo! 👇
+🔗 https://arth-verse.in
+
+#ArthVerse #FinancialHealth #ArthSthithi`;
+
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(shareMessage);
+    
+    // Open WhatsApp with the message
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+    
+    toast.success('Opening WhatsApp...');
+  };
+
   const score = healthScore?.score || 0;
   const components = healthScore?.component_scores || {
     'Savings Rate': 75,
