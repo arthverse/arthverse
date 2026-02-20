@@ -176,11 +176,11 @@ Check your score too! 👇
           ArthMitra Financial Report
         </h2>
         <p className="text-slate-600 max-w-2xl mx-auto">
-          Aapki complete financial position ka analysis. Download karein aur apne financial goals achieve karein.
+          Your complete financial position analysis. Download and achieve your financial goals.
         </p>
       </div>
 
-      {/* Main Score Card - Hinglish Style */}
+      {/* Main Score Card */}
       <Card className="p-8 bg-gradient-to-br from-brand-blue to-blue-700 text-white rounded-3xl shadow-floating relative overflow-hidden" data-testid="main-score-card">
         <div className="absolute inset-0 opacity-10">
           <div className="grid-pattern"></div>
@@ -200,7 +200,7 @@ Check your score too! 👇
                 {getOverallTagline(score)}
               </p>
               <p className="text-white/60 text-sm mt-4 max-w-md">
-                ArthSthithi is a financial diagnostic indicator. Yeh report educational purpose ke liye hai.
+                ArthSthithi is a financial diagnostic indicator. This report is for educational purposes.
               </p>
             </div>
             
