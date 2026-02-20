@@ -169,6 +169,9 @@ export default function PaymentSection({ token, user, questionnaire, onPaymentSu
 
   return (
     <div className="space-y-6" data-testid="payment-section">
+      {/* ROI Teaser - Money Leakage Shock + Savings Reveal */}
+      <ROITeaser userData={user} questionnaire={questionnaire} />
+
       {/* Hero Card */}
       <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" data-testid="payment-hero-card">
         <div className="p-8 md:p-12">
