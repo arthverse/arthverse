@@ -5,9 +5,9 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { 
   Download, FileText, TrendingUp, TrendingDown, PiggyBank, 
-  Shield, CreditCard, Target, Lightbulb, CheckCircle2, 
-  AlertTriangle, ArrowRight, Wallet, Building2, Car, 
-  Home, Gem, Scale, PieChart, BarChart3
+  Shield, Target, Lightbulb, CheckCircle2, 
+  AlertTriangle, ArrowRight, Wallet, 
+  Gem, Scale, PieChart, BarChart3, Calendar, Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
 
