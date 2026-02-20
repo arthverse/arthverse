@@ -9,6 +9,7 @@ import {
   Plus, Minus, Users, User, Baby
 } from 'lucide-react';
 import { toast } from 'sonner';
+import ROITeaser from './ROITeaser';
 
 const PRICING = {
   base: 499,
