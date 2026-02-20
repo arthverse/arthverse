@@ -32,19 +32,21 @@ const getScoreEmoji = (score) => {
 
 const getOverallTagline = (score) => {
   if (score >= 80) return 'Waah! Aap financial champion ho! 🏆';
-  if (score >= 70) return 'Bahut accha! Aapki financial health strong hai! 💪';
-  if (score >= 50) return 'Sahi raaste pe ho! Thoda aur mehnat karo! 🎯';
-  if (score >= 30) return 'Chinta mat karo, improvement ke scope hain! 📈';
-  return 'Abhi se shuru karo, sab theek ho jayega! 🚀';
+const getOverallTagline = (score) => {
+  if (score >= 80) return 'Excellent! You are a financial champion! 🏆';
+  if (score >= 70) return 'Great job! Your financial health is strong! 💪';
+  if (score >= 50) return 'You are on the right track! Keep improving! 🎯';
+  if (score >= 30) return 'Don\'t worry, there\'s room for improvement! 📈';
+  return 'Start now, everything will be fine! 🚀';
 };
 
 // Section definitions for the 5-point breakdown
 const SECTIONS = [
-  { id: 'savings', icon: '💰', title: 'Bachat (Savings)', hindi: 'Savings habit aur emergency fund' },
-  { id: 'debt', icon: '📉', title: 'Karz (Debt)', hindi: 'Loans aur debt management' },
-  { id: 'insurance', icon: '🛡️', title: 'Suraksha (Insurance)', hindi: 'Life aur health coverage' },
-  { id: 'investment', icon: '📈', title: 'Nivesh (Investment)', hindi: 'Stocks, MF aur diversification' },
-  { id: 'goals', icon: '🎯', title: 'Lakshya (Goals)', hindi: 'Financial goals planning' }
+  { id: 'savings', icon: '💰', title: 'Savings', subtitle: 'Savings habit and emergency fund' },
+  { id: 'debt', icon: '📉', title: 'Debt', subtitle: 'Loans and debt management' },
+  { id: 'insurance', icon: '🛡️', title: 'Insurance', subtitle: 'Life and health coverage' },
+  { id: 'investment', icon: '📈', title: 'Investment', subtitle: 'Stocks, MF and diversification' },
+  { id: 'goals', icon: '🎯', title: 'Goals', subtitle: 'Financial goals planning' }
 ];
 
 export default function AnalysisResults({ token, user, healthScore, questionnaire }) {
