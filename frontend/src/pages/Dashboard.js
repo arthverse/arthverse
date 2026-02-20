@@ -309,6 +309,7 @@ Aap bhi apna score check karo! 👇
               <PaymentSection 
                 token={token}
                 user={userData}
+                questionnaire={questionnaire}
                 onPaymentSuccess={handlePaymentSuccess} 
               />
             </div>
