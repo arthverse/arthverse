@@ -50,6 +50,20 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Backend: `/app/backend/services/hinglish_report_generator.py`
 - PDF generation working and tested (15KB+ reports)
 
+### ✅ ROI Teaser Implementation (Feb 20, 2026)
+- Created ROITeaser.js component with animated money leakage visualization
+- Calculates personalized leakages from user questionnaire data:
+  - Savings Gap (20% rule)
+  - Loan Interest Drain
+  - Medical Risk Exposure
+  - Investment Opportunity Loss
+  - No Life Cover risk
+- Animated reveal sequence with IntersectionObserver
+- Shows Year 1 Savings Potential and 5-Year Wealth Build projections
+- "₹499 KA SIMPLE MATH" section with ROI comparison
+- Social proof strip (2,400+ users, ₹28K avg saving, 4.8⭐ rating)
+- Integrated into PaymentSection.js before payment card
+
 ### ✅ WhatsApp Share Feature (Feb 20, 2026)
 - Added WhatsApp share buttons in Dashboard and AnalysisResults
 - Share includes: ArthSthithi score, Hinglish tagline, and ArthVerse link
