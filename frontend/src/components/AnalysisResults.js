@@ -247,7 +247,7 @@ Check your score too! 👇
           </div>
           <div>
             <h3 className="text-xl font-semibold font-heading">5-Point ArthSthithi Breakdown</h3>
-            <p className="text-slate-500 text-sm">Har category ka detailed score</p>
+            <p className="text-slate-500 text-sm">Detailed score for each category</p>
           </div>
         </div>
         
@@ -305,7 +305,7 @@ Check your score too! 👇
         </div>
       </Card>
 
-      {/* Financial Summary - Hinglish Labels */}
+      {/* Financial Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Income */}
         <Card className="p-6 bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-2xl">
