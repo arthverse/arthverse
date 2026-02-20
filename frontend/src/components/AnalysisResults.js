@@ -13,18 +13,39 @@ import { toast } from 'sonner';
 
 // Component score colors
 const getScoreColor = (score) => {
-  if (score >= 80) return '#10B981';
-  if (score >= 60) return '#3B82F6';
-  if (score >= 40) return '#F59E0B';
-  return '#EF4444';
+  if (score >= 70) return '#10B981';  // Strong - Green
+  if (score >= 40) return '#F59E0B';  // Improving - Yellow
+  return '#EF4444';                    // Action Needed - Red
 };
 
 const getScoreLabel = (score) => {
-  if (score >= 80) return 'Excellent';
-  if (score >= 60) return 'Good';
-  if (score >= 40) return 'Fair';
-  return 'Needs Attention';
+  if (score >= 70) return 'Strong';
+  if (score >= 40) return 'Improving';
+  return 'Action Needed';
 };
+
+const getScoreEmoji = (score) => {
+  if (score >= 70) return '✅';
+  if (score >= 40) return '🟡';
+  return '🔴';
+};
+
+const getOverallTagline = (score) => {
+  if (score >= 80) return 'Waah! Aap financial champion ho! 🏆';
+  if (score >= 70) return 'Bahut accha! Aapki financial health strong hai! 💪';
+  if (score >= 50) return 'Sahi raaste pe ho! Thoda aur mehnat karo! 🎯';
+  if (score >= 30) return 'Chinta mat karo, improvement ke scope hain! 📈';
+  return 'Abhi se shuru karo, sab theek ho jayega! 🚀';
+};
+
+// Section definitions for the 5-point breakdown
+const SECTIONS = [
+  { id: 'savings', icon: '💰', title: 'Bachat (Savings)', hindi: 'Savings habit aur emergency fund' },
+  { id: 'debt', icon: '📉', title: 'Karz (Debt)', hindi: 'Loans aur debt management' },
+  { id: 'insurance', icon: '🛡️', title: 'Suraksha (Insurance)', hindi: 'Life aur health coverage' },
+  { id: 'investment', icon: '📈', title: 'Nivesh (Investment)', hindi: 'Stocks, MF aur diversification' },
+  { id: 'goals', icon: '🎯', title: 'Lakshya (Goals)', hindi: 'Financial goals planning' }
+];
 
 export default function AnalysisResults({ token, user, healthScore, questionnaire }) {
   const [downloading, setDownloading] = useState(false);
