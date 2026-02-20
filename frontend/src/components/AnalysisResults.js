@@ -419,8 +419,8 @@ Check your score too! 👇
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">💰</span>
                   <div className="text-left">
-                    <p className="font-medium text-emerald-800">Emergency Fund Banao</p>
-                    <p className="text-sm text-emerald-600">6 months ka kharcha bachake rakho</p>
+                    <p className="font-medium text-emerald-800">Build Emergency Fund</p>
+                    <p className="text-sm text-emerald-600">Save 6 months of expenses as backup</p>
                   </div>
                 </div>
               </div>
@@ -428,8 +428,8 @@ Check your score too! 👇
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">🛡️</span>
                   <div className="text-left">
-                    <p className="font-medium text-blue-800">Term Insurance Lo</p>
-                    <p className="text-sm text-blue-600">Annual income ka 15-20x coverage lo</p>
+                    <p className="font-medium text-blue-800">Get Term Insurance</p>
+                    <p className="text-sm text-blue-600">Get 15-20x annual income as coverage</p>
                   </div>
                 </div>
               </div>
@@ -437,8 +437,8 @@ Check your score too! 👇
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">📈</span>
                   <div className="text-left">
-                    <p className="font-medium text-orange-800">SIP Shuru Karo</p>
-                    <p className="text-sm text-orange-600">Monthly ₹5,000 se start karo, wealth create karo</p>
+                    <p className="font-medium text-orange-800">Start SIP Investing</p>
+                    <p className="text-sm text-orange-600">Start with ₹5,000/month to build wealth</p>
                   </div>
                 </div>
               </div>
@@ -447,26 +447,26 @@ Check your score too! 👇
         </div>
       </Card>
 
-      {/* Report Contents Preview - Hinglish */}
+      {/* Report Contents Preview */}
       <Card className="p-8 bg-slate-50 border border-slate-200 rounded-2xl" data-testid="report-contents">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold font-heading">PDF Report Mein Kya Hai?</h3>
+            <h3 className="text-xl font-semibold font-heading">What's in Your PDF Report?</h3>
             <p className="text-slate-500 text-sm">Complete 10-page ArthMitra diagnostic report</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { icon: Sparkles, title: "ArthSthithi Score", desc: "Overall score with Hinglish explanation" },
-            { icon: PieChart, title: "5-Point Breakdown", desc: "Bachat, Karz, Suraksha, Nivesh, Lakshya" },
-            { icon: BarChart3, title: "Income & Expense Analysis", desc: "Aay aur Kharcha ka breakdown" },
-            { icon: Scale, title: "Net Worth (Shuddh Sampatti)", desc: "Assets vs Liabilities comparison" },
+            { icon: Sparkles, title: "ArthSthithi Score", desc: "Overall score with detailed explanation" },
+            { icon: PieChart, title: "5-Point Breakdown", desc: "Savings, Debt, Insurance, Investment, Goals" },
+            { icon: BarChart3, title: "Income & Expense Analysis", desc: "Complete income and expense breakdown" },
+            { icon: Scale, title: "Net Worth", desc: "Assets vs Liabilities comparison" },
             { icon: Shield, title: "Insurance Adequacy", desc: "Life & Health coverage check" },
-            { icon: Wallet, title: "50-30-20 Allocation", desc: "Ideal paisa distribution guide" },
+            { icon: Wallet, title: "50-30-20 Allocation", desc: "Ideal money distribution guide" },
             { icon: Calendar, title: "30-Day Action Calendar", desc: "Week-wise financial improvement plan" },
             { icon: Lightbulb, title: "Personalized Tips", desc: "Hinglish mein actionable advice" }
           ].map((item, idx) => (
