@@ -468,7 +468,7 @@ Check your score too! 👇
             { icon: Shield, title: "Insurance Adequacy", desc: "Life & Health coverage check" },
             { icon: Wallet, title: "50-30-20 Allocation", desc: "Ideal money distribution guide" },
             { icon: Calendar, title: "30-Day Action Calendar", desc: "Week-wise financial improvement plan" },
-            { icon: Lightbulb, title: "Personalized Tips", desc: "Hinglish mein actionable advice" }
+            { icon: Lightbulb, title: "Personalized Tips", desc: "Actionable advice for you" }
           ].map((item, idx) => (
             <div key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-100">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
