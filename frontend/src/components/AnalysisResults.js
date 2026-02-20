@@ -138,14 +138,14 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
           Analysis Complete
         </div>
         <h2 className="text-3xl font-semibold font-heading text-slate-900 mb-2">
-          Your ArthSthithi Diagnostic Report
+          ArthMitra Financial Report
         </h2>
         <p className="text-slate-600 max-w-2xl mx-auto">
           Aapki complete financial position ka analysis. Download karein aur apne financial goals achieve karein.
         </p>
       </div>
 
-      {/* Main Score Card */}
+      {/* Main Score Card - Hinglish Style */}
       <Card className="p-8 bg-gradient-to-br from-brand-blue to-blue-700 text-white rounded-3xl shadow-floating relative overflow-hidden" data-testid="main-score-card">
         <div className="absolute inset-0 opacity-10">
           <div className="grid-pattern"></div>
@@ -153,16 +153,19 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
-              <p className="text-white/70 text-sm uppercase tracking-wider mb-2">Your ArthSthithi Score</p>
+              <p className="text-white/70 text-sm uppercase tracking-wider mb-2">ArthSthithi Score</p>
               <div className="text-8xl font-bold font-heading tracking-tight">
                 {score}
                 <span className="text-4xl text-white/60"> / 100</span>
               </div>
               <p className="text-2xl font-medium text-white/90 mt-2">
-                {getScoreLabel(score)}
+                {getScoreEmoji(score)} {getScoreLabel(score)}
+              </p>
+              <p className="text-lg text-brand-orange mt-3 font-medium">
+                {getOverallTagline(score)}
               </p>
               <p className="text-white/60 text-sm mt-4 max-w-md">
-                ArthSthithi is a financial diagnostic indicator generated using user-provided and consented data. It is not financial advice.
+                ArthSthithi is a financial diagnostic indicator. Yeh report educational purpose ke liye hai.
               </p>
             </div>
             
@@ -182,56 +185,79 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
                   </>
                 )}
               </Button>
-              <p className="text-white/60 text-xs text-center">PDF • 8-10 pages</p>
+              <p className="text-white/60 text-xs text-center">PDF • 10 pages • Hinglish</p>
             </div>
           </div>
         </div>
       </Card>
 
-      {/* 9-Component Breakdown */}
+      {/* 5-Component ArthSthithi Breakdown - Hinglish Style */}
       <Card className="p-8 bg-white border border-slate-200 rounded-2xl shadow-card" data-testid="component-breakdown">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-brand-blue flex items-center justify-center">
             <PieChart className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold font-heading">9-Component ArthSthithi Breakdown</h3>
-            <p className="text-slate-500 text-sm">Har component ka detailed analysis</p>
+            <h3 className="text-xl font-semibold font-heading">5-Point ArthSthithi Breakdown</h3>
+            <p className="text-slate-500 text-sm">Har category ka detailed score</p>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.entries(components).map(([name, value], idx) => (
-            <div 
-              key={name}
-              className="p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
-              style={{ backgroundColor: `${getScoreColor(value)}10` }}
-            >
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-sm font-medium text-slate-700">{name}</span>
-                <span 
-                  className="text-lg font-bold"
-                  style={{ color: getScoreColor(value) }}
-                >
-                  {value}
-                </span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {SECTIONS.map((section, idx) => {
+            // Map component scores to sections
+            const sectionScoreMap = {
+              'savings': components['Savings Rate'] || components['Emergency Fund'] || 60,
+              'debt': components['Debt Management'] || 70,
+              'insurance': components['Insurance Coverage'] || 50,
+              'investment': components['Investment Diversification'] || components['Investment Mix'] || 55,
+              'goals': components['Retirement Readiness'] || components['Net Worth Growth'] || 65
+            };
+            const sectionScore = sectionScoreMap[section.id] || 50;
+            
+            return (
+              <div 
+                key={section.id}
+                className="p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors text-center"
+                style={{ backgroundColor: `${getScoreColor(sectionScore)}10` }}
+              >
+                <div className="text-3xl mb-2">{section.icon}</div>
+                <p className="text-sm font-medium text-slate-700 mb-1">{section.title}</p>
                 <div 
-                  className="h-2 rounded-full transition-all duration-500"
-                  style={{ 
-                    width: `${value}%`,
-                    backgroundColor: getScoreColor(value)
-                  }}
-                />
+                  className="text-2xl font-bold mb-2"
+                  style={{ color: getScoreColor(sectionScore) }}
+                >
+                  {sectionScore}
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
+                  <div 
+                    className="h-2 rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${sectionScore}%`,
+                      backgroundColor: getScoreColor(sectionScore)
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-slate-500">
+                  {getScoreEmoji(sectionScore)} {getScoreLabel(sectionScore)}
+                </p>
               </div>
-              <p className="text-xs text-slate-500 mt-2">{getScoreLabel(value)}</p>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+
+        {/* Score Legend */}
+        <div className="mt-6 p-4 bg-slate-50 rounded-xl">
+          <p className="text-sm font-medium text-slate-700 mb-2">Score Guide:</p>
+          <div className="flex flex-wrap gap-4 text-xs">
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-emerald-500"></span> 70-100: Strong</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-500"></span> 40-69: Improving</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500"></span> 0-39: Action Needed</span>
+          </div>
         </div>
       </Card>
 
-      {/* Financial Summary */}
+      {/* Financial Summary - Hinglish Labels */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Income */}
         <Card className="p-6 bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-2xl">
@@ -239,7 +265,7 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <TrendingUp className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-emerald-100">Monthly Income</p>
+            <p className="text-sm font-medium text-emerald-100">Monthly Income (Aay)</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.income?.total || healthScore?.financials?.monthly_income || 0).toLocaleString('en-IN')}
@@ -252,7 +278,7 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <TrendingDown className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-red-100">Monthly Expenses</p>
+            <p className="text-sm font-medium text-red-100">Monthly Expenses (Kharcha)</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.expenses?.total || healthScore?.financials?.monthly_expenses || 0).toLocaleString('en-IN')}
@@ -265,7 +291,7 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <Gem className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-blue-100">Total Assets</p>
+            <p className="text-sm font-medium text-blue-100">Total Assets (Sampatti)</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.assets?.total || healthScore?.financials?.total_assets || 0).toLocaleString('en-IN')}
@@ -278,7 +304,7 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <Scale className="w-5 h-5" />
             </div>
-            <p className="text-sm font-medium text-violet-100">Net Worth</p>
+            <p className="text-sm font-medium text-violet-100">Net Worth (Shuddh Sampatti)</p>
           </div>
           <p className="text-3xl font-bold font-mono">
             ₹{(reportData?.netWorth || (healthScore?.financials?.total_assets - healthScore?.financials?.total_liabilities) || 0).toLocaleString('en-IN')}
@@ -286,14 +312,14 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
         </Card>
       </div>
 
-      {/* Key Insights & Recommendations */}
+      {/* Key Insights & Recommendations - Hinglish */}
       <Card className="p-8 bg-white border border-slate-200 rounded-2xl shadow-card" data-testid="insights-section">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-brand-orange flex items-center justify-center">
             <Lightbulb className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold font-heading">Personalized Recommendations</h3>
+            <h3 className="text-xl font-semibold font-heading">Aage Kya Karo? (Action Items)</h3>
             <p className="text-slate-500 text-sm">Actionable steps to improve your ArthSthithi</p>
           </div>
         </div>
@@ -340,33 +366,31 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
               </div>
             ))
           ) : (
-            <div className="text-center py-8">
-              <div className="space-y-4">
-                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <div className="text-left">
-                      <p className="font-medium text-emerald-800">Build Emergency Fund</p>
-                      <p className="text-sm text-emerald-600">Target 6 months of expenses (₹6,00,000)</p>
-                    </div>
+            <div className="space-y-4">
+              <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">💰</span>
+                  <div className="text-left">
+                    <p className="font-medium text-emerald-800">Emergency Fund Banao</p>
+                    <p className="text-sm text-emerald-600">6 months ka kharcha bachake rakho</p>
                   </div>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <div className="text-left">
-                      <p className="font-medium text-blue-800">Increase Life Insurance Cover</p>
-                      <p className="text-sm text-blue-600">Current gap: ₹50,00,000 additional coverage needed</p>
-                    </div>
+              </div>
+              <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🛡️</span>
+                  <div className="text-left">
+                    <p className="font-medium text-blue-800">Term Insurance Lo</p>
+                    <p className="text-sm text-blue-600">Annual income ka 15-20x coverage lo</p>
                   </div>
                 </div>
-                <div className="p-4 bg-orange-50 rounded-xl border border-orange-100">
-                  <div className="flex items-center gap-3">
-                    <PiggyBank className="w-5 h-5 text-orange-600" />
-                    <div className="text-left">
-                      <p className="font-medium text-orange-800">Increase Savings Rate</p>
-                      <p className="text-sm text-orange-600">Target: 30% of income (currently at 20%)</p>
-                    </div>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📈</span>
+                  <div className="text-left">
+                    <p className="font-medium text-orange-800">SIP Shuru Karo</p>
+                    <p className="text-sm text-orange-600">Monthly ₹5,000 se start karo, wealth create karo</p>
                   </div>
                 </div>
               </div>
@@ -375,28 +399,28 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
         </div>
       </Card>
 
-      {/* Report Contents Preview */}
+      {/* Report Contents Preview - Hinglish */}
       <Card className="p-8 bg-slate-50 border border-slate-200 rounded-2xl" data-testid="report-contents">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold font-heading">What's in Your PDF Report</h3>
-            <p className="text-slate-500 text-sm">Complete 8-10 page diagnostic report</p>
+            <h3 className="text-xl font-semibold font-heading">PDF Report Mein Kya Hai?</h3>
+            <p className="text-slate-500 text-sm">Complete 10-page ArthMitra diagnostic report</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { icon: Target, title: "ArthSthithi Score", desc: "Overall score with rating explanation" },
-            { icon: PieChart, title: "9-Component Breakdown", desc: "Detailed analysis of each component" },
-            { icon: BarChart3, title: "Income & Expense Analysis", desc: "Monthly cash flow visualization" },
-            { icon: Scale, title: "Balance Sheet", desc: "Assets vs Liabilities comparison" },
-            { icon: Shield, title: "Insurance Adequacy", desc: "Life & Health coverage analysis" },
-            { icon: CreditCard, title: "Credit Card Recommendation", desc: "Best card based on your spending" },
-            { icon: TrendingUp, title: "5-Year Projection", desc: "Financial growth forecast" },
-            { icon: Lightbulb, title: "Action Plan", desc: "Priority-wise recommendations" }
+            { icon: Sparkles, title: "ArthSthithi Score", desc: "Overall score with Hinglish explanation" },
+            { icon: PieChart, title: "5-Point Breakdown", desc: "Bachat, Karz, Suraksha, Nivesh, Lakshya" },
+            { icon: BarChart3, title: "Income & Expense Analysis", desc: "Aay aur Kharcha ka breakdown" },
+            { icon: Scale, title: "Net Worth (Shuddh Sampatti)", desc: "Assets vs Liabilities comparison" },
+            { icon: Shield, title: "Insurance Adequacy", desc: "Life & Health coverage check" },
+            { icon: Wallet, title: "50-30-20 Allocation", desc: "Ideal paisa distribution guide" },
+            { icon: Calendar, title: "30-Day Action Calendar", desc: "Week-wise financial improvement plan" },
+            { icon: Lightbulb, title: "Personalized Tips", desc: "Hinglish mein actionable advice" }
           ].map((item, idx) => (
             <div key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-100">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
@@ -422,10 +446,10 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
         </div>
       </Card>
 
-      {/* Disclaimer */}
+      {/* Disclaimer - Hinglish */}
       <p className="text-center text-xs text-slate-400 max-w-2xl mx-auto">
         ArthSthithi is a financial diagnostic indicator generated using user-provided and consented data. 
-        It is not financial advice. Please consult a certified financial planner for personalized advice.
+        Yeh report educational purpose ke liye hai. Professional financial advice ke liye certified planner se consult karein.
       </p>
     </div>
   );
