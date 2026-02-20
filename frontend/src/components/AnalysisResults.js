@@ -233,7 +233,7 @@ Check your score too! 👇
                 Share on WhatsApp
               </Button>
               
-              <p className="text-white/60 text-xs text-center">PDF • 10 pages • Hinglish</p>
+              <p className="text-white/60 text-xs text-center">PDF • 10 pages • English</p>
             </div>
           </div>
         </div>
