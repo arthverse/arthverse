@@ -123,18 +123,18 @@ export default function AnalysisResults({ token, user, healthScore, questionnair
     const scoreEmoji = getScoreEmoji(userScore);
     const tagline = getOverallTagline(userScore);
     
-    // Create share message in Hinglish
-    const shareMessage = `🎯 *Mera ArthSthithi Score: ${userScore}/100* ${scoreEmoji}
+    // Create share message in English
+    const shareMessage = `🎯 *My ArthSthithi Score: ${userScore}/100* ${scoreEmoji}
 
 ${tagline}
 
-Maine apni financial health check ki ArthVerse pe! 💰
+I checked my financial health on ArthVerse! 💰
 
 📊 *ArthSthithi* = Financial Health Indicator
-✅ 5-Point Analysis: Bachat, Karz, Suraksha, Nivesh, Lakshya
-📈 Personalized tips aur 30-day action plan
+✅ 5-Point Analysis: Savings, Debt, Insurance, Investment, Goals
+📈 Personalized tips and 30-day action plan
 
-Aap bhi apna score check karo! 👇
+Check your score too! 👇
 🔗 https://arth-verse.in
 
 #ArthVerse #FinancialHealth #ArthSthithi`;
