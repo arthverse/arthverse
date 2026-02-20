@@ -1204,16 +1204,17 @@ async def generate_user_report(user_id: str, plan_type: str) -> str:
             }
         }
         
-        # Generate report
+        # Generate report using Hinglish template
         reports_dir = Path("/app/backend/reports")
         reports_dir.mkdir(exist_ok=True)
         
-        filename = f"report_{user_id}_{plan_type}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+        filename = f"ArthMitra_Report_{user_id}_{plan_type}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
         filepath = reports_dir / filename
         
-        create_report(str(filepath), report_data, plan_type)
+        # Use the new Hinglish report generator
+        create_hinglish_report(str(filepath), report_data, plan_type)
         
-        logger.info(f"Generated report for user {user_id}: {filepath}")
+        logger.info(f"Generated Hinglish report for user {user_id}: {filepath}")
         return str(filepath)
         
     except Exception as e:
