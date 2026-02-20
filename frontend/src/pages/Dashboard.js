@@ -122,6 +122,41 @@ export default function Dashboard({ token, user, onLogout }) {
     return 'text-brand-orange';
   };
 
+  // WhatsApp Share functionality
+  const handleWhatsAppShare = () => {
+    const userScore = healthScore?.score || 0;
+    const getScoreEmoji = (s) => s >= 70 ? '✅' : s >= 40 ? '🟡' : '🔴';
+    const getTagline = (s) => {
+      if (s >= 80) return 'Waah! Aap financial champion ho! 🏆';
+      if (s >= 70) return 'Bahut accha! Aapki financial health strong hai! 💪';
+      if (s >= 50) return 'Sahi raaste pe ho! Thoda aur mehnat karo! 🎯';
+      if (s >= 30) return 'Chinta mat karo, improvement ke scope hain! 📈';
+      return 'Abhi se shuru karo, sab theek ho jayega! 🚀';
+    };
+    
+    const scoreEmoji = getScoreEmoji(userScore);
+    const tagline = getTagline(userScore);
+    
+    const shareMessage = `🎯 *Mera ArthSthithi Score: ${userScore}/100* ${scoreEmoji}
+
+${tagline}
+
+Maine apni financial health check ki ArthVerse pe! 💰
+
+📊 *ArthSthithi* = Financial Health Indicator
+✅ 5-Point Analysis: Bachat, Karz, Suraksha, Nivesh, Lakshya
+📈 Personalized tips aur 30-day action plan
+
+Aap bhi apna score check karo! 👇
+🔗 https://arth-verse.in
+
+#ArthVerse #FinancialHealth #ArthSthithi`;
+
+    const encodedMessage = encodeURIComponent(shareMessage);
+    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+    toast.success('Opening WhatsApp...');
+  };
+
   if (loading) {
     return (
       <Layout token={token} onLogout={onLogout}>
