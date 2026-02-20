@@ -7,7 +7,7 @@ import {
   Download, FileText, TrendingUp, TrendingDown, PiggyBank, 
   Shield, Target, Lightbulb, CheckCircle2, 
   AlertTriangle, ArrowRight, Wallet, 
-  Gem, Scale, PieChart, BarChart3, Calendar, Sparkles
+  Gem, Scale, PieChart, BarChart3, Calendar, Sparkles, Share2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
