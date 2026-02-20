@@ -127,27 +127,27 @@ export default function Dashboard({ token, user, onLogout }) {
     const userScore = healthScore?.score || 0;
     const getScoreEmoji = (s) => s >= 70 ? '✅' : s >= 40 ? '🟡' : '🔴';
     const getTagline = (s) => {
-      if (s >= 80) return 'Waah! Aap financial champion ho! 🏆';
-      if (s >= 70) return 'Bahut accha! Aapki financial health strong hai! 💪';
-      if (s >= 50) return 'Sahi raaste pe ho! Thoda aur mehnat karo! 🎯';
-      if (s >= 30) return 'Chinta mat karo, improvement ke scope hain! 📈';
-      return 'Abhi se shuru karo, sab theek ho jayega! 🚀';
+      if (s >= 80) return 'Excellent! You are a financial champion! 🏆';
+      if (s >= 70) return 'Great job! Your financial health is strong! 💪';
+      if (s >= 50) return 'You are on the right track! Keep improving! 🎯';
+      if (s >= 30) return 'Don\'t worry, there\'s room for improvement! 📈';
+      return 'Start now, everything will be fine! 🚀';
     };
     
     const scoreEmoji = getScoreEmoji(userScore);
     const tagline = getTagline(userScore);
     
-    const shareMessage = `🎯 *Mera ArthSthithi Score: ${userScore}/100* ${scoreEmoji}
+    const shareMessage = `🎯 *My ArthSthithi Score: ${userScore}/100* ${scoreEmoji}
 
 ${tagline}
 
-Maine apni financial health check ki ArthVerse pe! 💰
+I checked my financial health on ArthVerse! 💰
 
 📊 *ArthSthithi* = Financial Health Indicator
-✅ 5-Point Analysis: Bachat, Karz, Suraksha, Nivesh, Lakshya
-📈 Personalized tips aur 30-day action plan
+✅ 5-Point Analysis: Savings, Debt, Insurance, Investment, Goals
+📈 Personalized tips and 30-day action plan
 
-Aap bhi apna score check karo! 👇
+Check your score too! 👇
 🔗 https://arth-verse.in
 
 #ArthVerse #FinancialHealth #ArthSthithi`;
