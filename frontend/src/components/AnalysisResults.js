@@ -31,8 +31,6 @@ const getScoreEmoji = (score) => {
 };
 
 const getOverallTagline = (score) => {
-  if (score >= 80) return 'Waah! Aap financial champion ho! 🏆';
-const getOverallTagline = (score) => {
   if (score >= 80) return 'Excellent! You are a financial champion! 🏆';
   if (score >= 70) return 'Great job! Your financial health is strong! 💪';
   if (score >= 50) return 'You are on the right track! Keep improving! 🎯';
