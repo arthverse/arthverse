@@ -29,7 +29,7 @@ function computeROI(userData, questionnaire) {
     leakages.push({
       icon: "💸",
       label: "Savings Gap",
-      sublabel: "Ideal 20% rule se peeche hain",
+      sublabel: "Below the ideal 20% savings rule",
       monthly: savingsGap,
     });
 
@@ -39,7 +39,7 @@ function computeROI(userData, questionnaire) {
     leakages.push({
       icon: "📉",
       label: "Loan Interest Drain",
-      sublabel: "High-interest loans par jaa raha hai",
+      sublabel: "Going towards high-interest loans",
       monthly: interestDrain,
     });
 
@@ -48,7 +48,7 @@ function computeROI(userData, questionnaire) {
     leakages.push({
       icon: "🚨",
       label: "Medical Risk Exposure",
-      sublabel: "Ek bimari sab uda sakti hai",
+      sublabel: "One illness could wipe out savings",
       monthly: Math.round(income * 0.05), // 5% income at risk
     });
 
@@ -58,7 +58,7 @@ function computeROI(userData, questionnaire) {
     leakages.push({
       icon: "📊",
       label: "Investment Opportunity Loss",
-      sublabel: "Idle cash growth miss kar raha hai",
+      sublabel: "Missing growth on idle cash",
       monthly: Math.round(investGap * 0.10), // 10% return opportunity cost
     });
 
@@ -67,17 +67,17 @@ function computeROI(userData, questionnaire) {
     leakages.push({
       icon: "🛡️",
       label: "No Life Cover",
-      sublabel: "Family financially unprotected hai",
+      sublabel: "Family financially unprotected",
       monthly: Math.round(income * 0.03),
     });
 
   // Fallback leakages if questionnaire data is sparse
   if (leakages.length === 0) {
     leakages.push(
-      { icon: "💸", label: "Savings Gap", sublabel: "Ideal 20% rule se peeche hain", monthly: Math.round(income * 0.08) },
-      { icon: "📉", label: "Loan Interest Drain", sublabel: "High-interest loans par jaa raha hai", monthly: Math.round(income * 0.06) },
-      { icon: "🚨", label: "Medical Risk Exposure", sublabel: "Ek bimari sab uda sakti hai", monthly: Math.round(income * 0.05) },
-      { icon: "📊", label: "Investment Opportunity Loss", sublabel: "Idle cash growth miss kar raha hai", monthly: Math.round(income * 0.04) },
+      { icon: "💸", label: "Savings Gap", sublabel: "Below the ideal 20% savings rule", monthly: Math.round(income * 0.08) },
+      { icon: "📉", label: "Loan Interest Drain", sublabel: "Going towards high-interest loans", monthly: Math.round(income * 0.06) },
+      { icon: "🚨", label: "Medical Risk Exposure", sublabel: "One illness could wipe out savings", monthly: Math.round(income * 0.05) },
+      { icon: "📊", label: "Investment Opportunity Loss", sublabel: "Missing growth on idle cash", monthly: Math.round(income * 0.04) },
     );
   }
 
@@ -187,14 +187,14 @@ export default function ROITeaser({ userData, questionnaire }) {
   const fiveYearCount = useCountUp(roi.fiveYearWealth, 2200, phase === "reveal");
 
   const roiRows = [
-    { left: "Aap invest karo", right: "₹499", color: "#fb923c" },
-    { left: "Year 1 mein bachao", right: `+${inr(roi.yearlySavingsPotential)}`, color: "#4ade80" },
-    { left: "Ek CA se milega yeh advice?", right: "₹5,000+", color: "#f87171", strike: true },
-    { left: "Aapka ROI first month mein", right: `${Math.round(roi.totalMonthlyLeakage / 499)}x`, color: "#fbbf24", big: true },
+    { left: "You invest", right: "₹499", color: "#fb923c" },
+    { left: "Year 1 savings", right: `+${inr(roi.yearlySavingsPotential)}`, color: "#4ade80" },
+    { left: "Same advice from a CA?", right: "₹5,000+", color: "#f87171", strike: true },
+    { left: "Your ROI in first month", right: `${Math.round(roi.totalMonthlyLeakage / 499)}x`, color: "#fbbf24", big: true },
   ];
 
   const socialProof = [
-    { stat: "2,400+", label: "Users ne save kiya" },
+    { stat: "2,400+", label: "Users saved money" },
     { stat: "₹28K", label: "Avg. monthly saving" },
     { stat: "4.8⭐", label: "User rating" },
   ];
@@ -220,7 +220,7 @@ export default function ROITeaser({ userData, questionnaire }) {
         flexWrap: "wrap",
       }}>
         <span style={{ fontSize: "16px", animation: "pulse 1.5s infinite" }}>⚠️</span>
-        <span>AAPKA FINANCIAL X-RAY — Pehle yeh dekho, phir decide karo</span>
+        <span>YOUR FINANCIAL X-RAY — See this before you decide</span>
         <span style={{
           marginLeft: "auto", background: "rgba(255,255,255,0.2)",
           padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: "600"
@@ -235,11 +235,11 @@ export default function ROITeaser({ userData, questionnaire }) {
             MONEY LEAKAGE REPORT
           </div>
           <h2 style={{ fontSize: "26px", fontWeight: "900", color: "#fff", lineHeight: 1.3, margin: "0 0 8px" }}>
-            Har mahine aapke haath se
-            <span style={{ color: "#fbbf24" }}> kitna paisa nikal raha hai?</span>
+            How much money is
+            <span style={{ color: "#fbbf24" }}> slipping through your hands every month?</span>
           </h2>
           <p style={{ fontSize: "14px", color: "#94a3b8", margin: 0 }}>
-            Aapke questionnaire data se calculate kiya gaya — yeh rough estimate hai
+            Calculated from your questionnaire data — this is a rough estimate
           </p>
         </div>
 
@@ -268,7 +268,7 @@ export default function ROITeaser({ userData, questionnaire }) {
               TOTAL MONTHLY LEAKAGE
             </div>
             <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "2px" }}>
-              Yeh paisa aapki jeb se silently ja raha hai
+              This money is silently leaving your pocket
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -294,7 +294,7 @@ export default function ROITeaser({ userData, questionnaire }) {
           }}>
             <span style={{ fontSize: "18px" }}>✨</span>
             <span style={{ fontSize: "13px", fontWeight: "700", color: "#fbbf24" }}>
-              ArthVerse Premium se yeh hoga fix — dekho kaise:
+              ArthVerse Premium will help fix this — see how:
             </span>
             <span style={{ fontSize: "18px" }}>✨</span>
           </div>
@@ -321,7 +321,7 @@ export default function ROITeaser({ userData, questionnaire }) {
                 +{inr(yearlyCount)}
               </div>
               <div style={{ fontSize: "12px", color: "#86efac", marginTop: "6px" }}>
-                leakage fix hone par
+                after fixing leakages
               </div>
             </div>
 
@@ -339,7 +339,7 @@ export default function ROITeaser({ userData, questionnaire }) {
                 +{inr(fiveYearCount)}
               </div>
               <div style={{ fontSize: "12px", color: "#93c5fd", marginTop: "6px" }}>
-                12% CAGR assumption par
+                assuming 12% CAGR
               </div>
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function ROITeaser({ userData, questionnaire }) {
             animation: "fadeSlideUp 0.7s ease 0.3s both",
           }}>
             <div style={{ fontSize: "13px", fontWeight: "800", color: "#fbbf24", letterSpacing: "2px", marginBottom: "16px" }}>
-              ₹499 KA SIMPLE MATH 🧮
+              SIMPLE ₹499 MATH 🧮
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -384,8 +384,8 @@ export default function ROITeaser({ userData, questionnaire }) {
             }}>
               <span style={{ fontSize: "20px", flexShrink: 0 }}>💡</span>
               <p style={{ margin: 0, fontSize: "13px", color: "#fde68a", lineHeight: 1.6 }}>
-                <strong>Simple baat:</strong> Agar aap sirf <strong>1 leakage bhi fix karo</strong> is report ki wajah se,
-                toh ₹499 pehle hi mahine mein recover ho jaata hai. Baaki sab <strong>pure profit.</strong>
+                <strong>Simple truth:</strong> If you fix just <strong>1 leakage</strong> because of this report,
+                ₹499 gets recovered in the first month itself. Everything else is <strong>pure profit.</strong>
               </p>
             </div>
           </div>
