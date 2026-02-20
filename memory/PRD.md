@@ -50,6 +50,15 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Backend: `/app/backend/services/hinglish_report_generator.py`
 - PDF generation working and tested (15KB+ reports)
 
+### ✅ WhatsApp Share Feature (Feb 20, 2026)
+- Added WhatsApp share buttons in Dashboard and AnalysisResults
+- Share includes: ArthSthithi score, Hinglish tagline, and ArthVerse link
+- Privacy-focused: Only score and link shared, no user data
+- Three share button locations:
+  1. Dashboard - "Share Score" button next to Net Savings
+  2. Analysis Results - "Share on WhatsApp" button in hero section
+  3. Dedicated share section at bottom of report
+
 ### ✅ UI/UX Design Overhaul (Jan 22, 2026)
 - New color palette: Royal Indigo + Marigold Orange
 - Typography: Outfit (headings) + Plus Jakarta Sans (body)
