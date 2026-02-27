@@ -1204,17 +1204,43 @@ async def generate_user_report(user_id: str, plan_type: str) -> str:
             }
         }
         
-        # Generate report using Hinglish template
+        # Generate report using v6 premium template
         reports_dir = Path("/app/backend/reports")
         reports_dir.mkdir(exist_ok=True)
         
-        filename = f"ArthMitra_Report_{user_id}_{plan_type}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+        filename = f"ArthSthithi_Report_{user_id}_{plan_type}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
         filepath = reports_dir / filename
         
-        # Use the new Hinglish report generator
-        create_hinglish_report(str(filepath), report_data, plan_type)
+        # Prepare data for v6 report generator
+        user_data = {
+            "name": user.get("name", "User"),
+            "client_id": user.get("client_id", "N/A"),
+            "city": user.get("city", "India")
+        }
         
-        logger.info(f"Generated Hinglish report for user {user_id}: {filepath}")
+        # Prepare health score data for v6 format
+        health_score_v6 = {
+            "score": health_score.get("overall_score", 70),
+            "component_scores": health_score.get("component_scores", {}),
+            "financials": {
+                "monthly_income": report_data["income"]["total_monthly"],
+                "monthly_expenses": report_data["expenses"]["total_monthly"],
+                "total_assets": report_data["assets"]["total"],
+                "total_liabilities": report_data["liabilities"]["total"]
+            }
+        }
+        
+        # Prepare questionnaire data for v6
+        questionnaire_v6 = {
+            "monthly_income": report_data["income"]["total_monthly"],
+            "monthly_expenses": report_data["expenses"]["total_monthly"]
+        }
+        
+        # Use the new v6 premium report generator
+        from services.report_generator_v6 import create_report_v6
+        create_report_v6(str(filepath), user_data, health_score_v6, questionnaire_v6, plan_type)
+        
+        logger.info(f"Generated v6 premium report for user {user_id}: {filepath}")
         return str(filepath)
         
     except Exception as e:
