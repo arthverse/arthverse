@@ -208,8 +208,9 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - **Setu Account Aggregator**: 403 Forbidden error from external service. Requires user to configure sandbox account.
 
 ## Test Credentials
-- **Existing User**: Client ID `AV271676A7`, Password `Demo123!`
+- **Premium User**: Client ID `AV271676A7`, Password `Demo123!`
+- **Non-Premium User**: Client ID `RUS1501`, Password `Test@123`
 
 ## Mocked Features
-- ⚠️ **Payment Gateway**: Razorpay UI ready, backend stubs created - needs API keys
-- ⚠️ **Setu**: Sandbox mode blocked externally
+- ⚠️ **Razorpay**: Test mode using sandbox keys - needs production keys for live payments
+- ⚠️ **Setu**: Sandbox mode blocked externally (403 Forbidden)
