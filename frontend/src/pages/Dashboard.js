@@ -311,6 +311,7 @@ Check your score too! 👇
                 token={token}
                 user={userData}
                 questionnaire={questionnaire}
+                healthScore={healthScore}
                 onPaymentSuccess={handlePaymentSuccess} 
               />
             </div>

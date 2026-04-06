@@ -69,9 +69,24 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Backend: v6 report generator (`/app/backend/services/report_generator_v6.py`)
 - PDF download working via `/api/reports/download-pdf`
 
-### ✅ ROI Teaser Implementation (Feb 20, 2026)
-- Created ROITeaser.js component with animated money leakage visualization
-- Calculates personalized leakages from user questionnaire data
+### ✅ Premium Preview Component (Apr 6, 2026) - REPLACED ROI Teaser
+- Created PremiumPreview.js to replace ROITeaser.js for better conversion
+- Shows ArthSthithi Summary card (4-quadrant design matching user's mockup):
+  - ArthSthithi Score (gold)
+  - Band (FAIR/GOOD/etc. with color coding)
+  - Potential Savings (green)
+  - Reduction in Risk (red)
+- Lists 9 premium features users get for ₹499:
+  1. Priority Action Plan
+  2. 9-Pillar Financial Health Overview
+  3. Income & Expense Breakdown
+  4. Credit Card Recommendation
+  5. Your Score Journey — 48 to 80+ in 12 Months
+  6. Where You're Headed — Net Worth by Asset Class
+  7. Current CIBIL Score & Improvement Tips
+  8. Know Your Retirement Age
+  9. What to Track Monthly
+- Animated counters and visual styling matching existing design system
 - Integrated into PaymentSection.js before payment card
 
 ### ✅ WhatsApp Share Feature (Feb 20, 2026)

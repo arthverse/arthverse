@@ -9,7 +9,7 @@ import {
   Plus, Minus, Users, User, Baby
 } from 'lucide-react';
 import { toast } from 'sonner';
-import ROITeaser from './ROITeaser';
+import PremiumPreview from './PremiumPreview';
 
 const PRICING = {
   base: 499,
@@ -65,7 +65,7 @@ const BENEFITS = [
   }
 ];
 
-export default function PaymentSection({ token, user, questionnaire, onPaymentSuccess }) {
+export default function PaymentSection({ token, user, questionnaire, healthScore, onPaymentSuccess }) {
   const [loading, setLoading] = useState(false);
   const [majorMembers, setMajorMembers] = useState(0);
   const [minorMembers, setMinorMembers] = useState(0);
@@ -169,8 +169,8 @@ export default function PaymentSection({ token, user, questionnaire, onPaymentSu
 
   return (
     <div className="space-y-6" data-testid="payment-section">
-      {/* ROI Teaser - Money Leakage Shock + Savings Reveal */}
-      <ROITeaser userData={user} questionnaire={questionnaire} />
+      {/* Premium Preview - ArthSthithi Summary + What You Get */}
+      <PremiumPreview userData={user} questionnaire={questionnaire} healthScore={healthScore} />
 
       {/* Hero Card */}
       <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" data-testid="payment-hero-card">
