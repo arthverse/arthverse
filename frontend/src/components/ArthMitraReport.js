@@ -473,6 +473,48 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         </div>
       </div>
 
+      {/* YEARLY FINANCIAL SNAPSHOT */}
+      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',animationDelay:'.15s'}}>
+        <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
+          <span style={{fontSize:'14px'}}>📊</span>
+          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Yearly Financial Snapshot</span>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
+          {/* Row 1 */}
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Income</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR(income * 12, true)}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>Gross salary</div>
+          </div>
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Savings</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR(savings * 12, true)}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>{savingsRate}% rate</div>
+          </div>
+          <div style={{padding:'20px',borderBottom:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Total Expenses</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{formatINR(expenses * 12, true)}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>{((expenses/income)*100).toFixed(1)}% income</div>
+          </div>
+          {/* Row 2 */}
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Net Worth</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--gold)',marginBottom:'6px'}}>{formatINR(netWorth, true)}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>{(netWorth / (income * 12)).toFixed(2)}× income</div>
+          </div>
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Free Surplus</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR(savings * 12, true)}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>After all outflows</div>
+          </div>
+          <div style={{padding:'20px'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Score</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{score}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: 80+</div>
+          </div>
+        </div>
+      </div>
+
       {/* SCORE SUMMARY BANNER */}
       <div className="an in" style={{background:'var(--t0)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',border:'1px solid rgba(168,118,42,.2)',position:'relative',animationDelay:'.22s'}}>
         <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#A8762A,#C9922C,#A8762A,transparent)'}}></div>
