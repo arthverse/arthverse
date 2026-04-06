@@ -555,8 +555,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           </div>
 
           <div style={{padding:'14px 24px 18px'}}>
-            <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'5px'}}>10Y Wealth Build</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'26px',fontWeight:700,color:'#22C55E',lineHeight:1,letterSpacing:'-.02em'}}>{formatINR(Math.round(netWorth * Math.pow(1.12, 10)), true)}</div>
+            <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'5px'}}>Risk Reduction</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'26px',fontWeight:700,color:'#EF4444',lineHeight:1,letterSpacing:'-.02em'}}>{formatINR(Math.round(income * 12 * 10), true)}</div>
           </div>
         </div>
         <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#A8762A,#C9922C,#A8762A,transparent)'}}></div>
