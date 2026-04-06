@@ -251,7 +251,27 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const savings = income - expenses;
   const savingsRate = ((savings / income) * 100).toFixed(1);
   const score = healthScore?.score || healthScore?.overall_score || 80;
-  const netWorth = healthScore?.financials?.total_assets || 3750000;
+  
+  // Assets breakdown
+  const bankBalance = questionnaire?.bank_balance || healthScore?.financials?.bank_balance || 100000;
+  const mutualFunds = questionnaire?.mutual_funds_value || healthScore?.financials?.mutual_funds || 500000;
+  const pfNps = questionnaire?.pf_nps_value || healthScore?.financials?.pf_nps || 800000;
+  const stocks = questionnaire?.stocks_value || healthScore?.financials?.stocks || 200000;
+  const fd = questionnaire?.fd_value || healthScore?.financials?.fd || 300000;
+  const gold = questionnaire?.gold_value || healthScore?.financials?.gold || 150000;
+  const realEstate = questionnaire?.real_estate_value || healthScore?.financials?.real_estate || 0;
+  const emergencyFund = questionnaire?.emergency_fund || healthScore?.financials?.emergency_fund || 200000;
+  const totalAssets = bankBalance + mutualFunds + pfNps + stocks + fd + gold + realEstate + emergencyFund;
+
+  // Liabilities breakdown
+  const homeLoan = questionnaire?.home_loan || healthScore?.financials?.home_loan || 0;
+  const personalLoan = questionnaire?.personal_loan || healthScore?.financials?.personal_loan || 0;
+  const carLoan = questionnaire?.car_loan || healthScore?.financials?.car_loan || 0;
+  const creditCardDebt = questionnaire?.credit_card_debt || healthScore?.financials?.credit_card_debt || 0;
+  const otherLoans = questionnaire?.other_loans || healthScore?.financials?.other_loans || 0;
+  const totalLiabilities = homeLoan + personalLoan + carLoan + creditCardDebt + otherLoans;
+
+  const netWorth = totalAssets - totalLiabilities;
 
   // Format currency
   const formatINR = (num, lakh = false) => {
@@ -359,76 +379,96 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         </div>
       </div>
 
-      {/* SNAPSHOTS */}
+      {/* NET WORTH STATEMENT */}
       <div className="snap2 an in" style={{animationDelay:'.1s'}}>
         <div className="snap-card">
-          <div className="snap-hd">📅 Monthly Financial Snapshot</div>
+          <div className="snap-hd">📈 Assets (What You Own)</div>
           <div className="snap-grid">
             <div className="snap-cell">
-              <div className="snap-lbl">Monthly Income</div>
-              <div className="snap-val g">{formatINR(income)}</div>
-              <div className="snap-sub">Gross salary</div>
+              <div className="snap-lbl">Bank Balance</div>
+              <div className="snap-val g">{formatINR(bankBalance, true)}</div>
+              <div className="snap-sub">Savings & Current</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Monthly Savings</div>
-              <div className="snap-val g">{formatINR(savings)}</div>
-              <div className="snap-sub">{savingsRate}% rate</div>
+              <div className="snap-lbl">Mutual Funds</div>
+              <div className="snap-val g">{formatINR(mutualFunds, true)}</div>
+              <div className="snap-sub">SIP + Lumpsum</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Total Expenses</div>
-              <div className="snap-val a">{formatINR(expenses)}</div>
-              <div className="snap-sub">{((expenses/income)*100).toFixed(1)}% of income</div>
+              <div className="snap-lbl">PF / NPS</div>
+              <div className="snap-val g">{formatINR(pfNps, true)}</div>
+              <div className="snap-sub">Retirement corpus</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Net Worth</div>
-              <div className="snap-val go">{formatINR(netWorth, true)}</div>
-              <div className="snap-sub">{(netWorth / (income * 12)).toFixed(2)}× income</div>
+              <div className="snap-lbl">Stocks</div>
+              <div className="snap-val g">{formatINR(stocks, true)}</div>
+              <div className="snap-sub">Direct equity</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Free Surplus</div>
-              <div className="snap-val g">{formatINR(savings)}</div>
-              <div className="snap-sub">After all outflows</div>
+              <div className="snap-lbl">Fixed Deposits</div>
+              <div className="snap-val g">{formatINR(fd, true)}</div>
+              <div className="snap-sub">Bank FD / RD</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Score</div>
-              <div className="snap-val a">{score}</div>
-              <div className="snap-sub">Target: 80+</div>
+              <div className="snap-lbl">Gold / Jewellery</div>
+              <div className="snap-val go">{formatINR(gold, true)}</div>
+              <div className="snap-sub">Physical + Digital</div>
             </div>
+            {realEstate > 0 && (
+              <div className="snap-cell">
+                <div className="snap-lbl">Real Estate</div>
+                <div className="snap-val go">{formatINR(realEstate, true)}</div>
+                <div className="snap-sub">Property value</div>
+              </div>
+            )}
+            <div className="snap-cell">
+              <div className="snap-lbl">Emergency Fund</div>
+              <div className="snap-val g">{formatINR(emergencyFund, true)}</div>
+              <div className="snap-sub">Liquid savings</div>
+            </div>
+          </div>
+          <div style={{borderTop:'1px dashed var(--border)',margin:'12px 0',paddingTop:'12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)'}}>TOTAL ASSETS</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--grn)'}}>{formatINR(totalAssets, true)}</span>
           </div>
         </div>
         <div className="snap-card">
-          <div className="snap-hd">📆 Yearly Financial Snapshot</div>
+          <div className="snap-hd">📉 Liabilities (What You Owe)</div>
           <div className="snap-grid">
             <div className="snap-cell">
-              <div className="snap-lbl">Annual Income</div>
-              <div className="snap-val g">{formatINR(income * 12, true)}</div>
-              <div className="snap-sub">{formatINR(income)} × 12</div>
+              <div className="snap-lbl">Home Loan</div>
+              <div className="snap-val r">{formatINR(homeLoan, true)}</div>
+              <div className="snap-sub">Outstanding principal</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Annual Savings</div>
-              <div className="snap-val g">{formatINR(savings * 12)}</div>
-              <div className="snap-sub">{formatINR(savings)} × 12</div>
+              <div className="snap-lbl">Personal Loan</div>
+              <div className="snap-val r">{formatINR(personalLoan, true)}</div>
+              <div className="snap-sub">Unsecured debt</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Annual Expenses</div>
-              <div className="snap-val a">{formatINR(expenses * 12, true)}</div>
-              <div className="snap-sub">{formatINR(expenses)} × 12</div>
+              <div className="snap-lbl">Car Loan</div>
+              <div className="snap-val r">{formatINR(carLoan, true)}</div>
+              <div className="snap-sub">Vehicle finance</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">10Y Projection</div>
-              <div className="snap-val go">{formatINR(Math.round(netWorth * Math.pow(1.12, 10)), true)}</div>
-              <div className="snap-sub">At 12% CAGR</div>
+              <div className="snap-lbl">Credit Card Debt</div>
+              <div className="snap-val r">{formatINR(creditCardDebt, true)}</div>
+              <div className="snap-sub">Revolving credit</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">Retirement Target</div>
-              <div className="snap-val r">₹3-5 Cr</div>
-              <div className="snap-sub">Recommended</div>
+              <div className="snap-lbl">Other Loans</div>
+              <div className="snap-val r">{formatINR(otherLoans, true)}</div>
+              <div className="snap-sub">Education / Other</div>
             </div>
             <div className="snap-cell">
-              <div className="snap-lbl">NW Gap</div>
-              <div className="snap-val a">{formatINR(Math.max(0, (income * 12 * 3) - netWorth), true)}</div>
-              <div className="snap-sub">vs 3× target</div>
+              <div className="snap-lbl">Debt-to-Income</div>
+              <div className="snap-val a">{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(1) : 0}%</div>
+              <div className="snap-sub">Target: &lt;30%</div>
             </div>
+          </div>
+          <div style={{borderTop:'1px dashed var(--border)',margin:'12px 0',paddingTop:'12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)'}}>TOTAL LIABILITIES</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--red)'}}>{formatINR(totalLiabilities, true)}</span>
           </div>
         </div>
       </div>
