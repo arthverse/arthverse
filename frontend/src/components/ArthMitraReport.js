@@ -1,5 +1,169 @@
 import { useEffect, useState } from "react";
 
+// Pillar Details Data
+const PILLAR_DETAILS = {
+  'Savings Rate': {
+    icon: '💰',
+    description: 'Measures how much of your income you save each month',
+    benchmark: 'Target: Save at least 30% of income',
+    factors: [
+      { label: 'Current Savings Rate', getValue: (d) => `${d.savingsRate}%` },
+      { label: 'Monthly Savings', getValue: (d) => d.formatINR(d.savings) },
+      { label: 'Annual Savings', getValue: (d) => d.formatINR(d.savings * 12) },
+    ],
+    tips: [
+      'Automate savings - set up auto-transfer on salary day',
+      'Follow 50-30-20 rule: 50% needs, 30% wants, 20% savings',
+      'Track expenses to identify areas to cut',
+      'Increase savings by 1% every quarter'
+    ],
+    scoreLogic: 'Score = (Savings Rate / 30%) × 100. Max 20 points.'
+  },
+  'EMI Tolerance': {
+    icon: '🏦',
+    description: 'Measures your debt burden relative to income',
+    benchmark: 'Target: Total EMIs should be < 40% of income',
+    factors: [
+      { label: 'Total EMIs/month', getValue: (d) => d.formatINR(d.totalEMI) },
+      { label: 'EMI-to-Income Ratio', getValue: (d) => `${d.emiRatio}%` },
+      { label: 'Debt-to-Income Ratio', getValue: (d) => `${d.debtRatio}%` },
+    ],
+    tips: [
+      'Keep total EMIs below 40% of take-home pay',
+      'Prioritize high-interest debt (credit cards first)',
+      'Consider balance transfer for lower rates',
+      'Avoid taking new loans until existing ones reduce'
+    ],
+    scoreLogic: 'Score = 100 - (Debt-to-Income %). Max 20 points.'
+  },
+  'Emergency Fund': {
+    icon: '🛡️',
+    description: 'Liquid savings to cover unexpected expenses',
+    benchmark: 'Target: 6 months of expenses in liquid form',
+    factors: [
+      { label: 'Current Emergency Fund', getValue: (d) => d.formatINR2(d.emergencyFund) },
+      { label: 'Monthly Expenses', getValue: (d) => d.formatINR(d.expenses) },
+      { label: 'Months Covered', getValue: (d) => `${Math.round(d.emergencyFund / d.expenses)} months` },
+      { label: 'Required (6 months)', getValue: (d) => d.formatINR2(d.expenses * 6) },
+    ],
+    tips: [
+      'Keep emergency fund in liquid funds or savings account',
+      'Build gradually - save ₹X per month until target reached',
+      'Don\'t invest emergency fund in equity or lock-ins',
+      'Replenish immediately after using'
+    ],
+    scoreLogic: 'Score = (Current Fund / 6-month expenses) × 100. Max 15 points.'
+  },
+  'Investment Portfolio': {
+    icon: '📈',
+    description: 'Your wealth-building investments beyond savings',
+    benchmark: 'Target: Investments = 2.5× annual income',
+    factors: [
+      { label: 'Mutual Funds', getValue: (d) => d.formatINR2(d.mutualFunds) },
+      { label: 'Stocks', getValue: (d) => d.formatINR2(d.stocks) },
+      { label: 'PF/NPS', getValue: (d) => d.formatINR2(d.pfNps) },
+      { label: 'Total Investments', getValue: (d) => d.formatINR2(d.mutualFunds + d.stocks + d.pfNps) },
+    ],
+    tips: [
+      'Start SIP in index funds for long-term wealth',
+      'Diversify across equity, debt, and gold',
+      'Review portfolio annually and rebalance',
+      'Maximize tax-saving investments (80C, 80D)'
+    ],
+    scoreLogic: 'Score = (Investments / 2.5× annual income) × 100. Max 15 points.'
+  },
+  'Net Worth': {
+    icon: '💎',
+    description: 'Total assets minus total liabilities',
+    benchmark: 'Target: Net Worth = 3× annual income by age 35',
+    factors: [
+      { label: 'Total Assets', getValue: (d) => d.formatINR2(d.totalAssets) },
+      { label: 'Total Liabilities', getValue: (d) => d.formatINR2(d.totalLiabilities) },
+      { label: 'Net Worth', getValue: (d) => d.formatINR2(d.netWorth) },
+      { label: 'Net Worth Multiple', getValue: (d) => `${(d.netWorth / (d.income * 12)).toFixed(2)}× income` },
+    ],
+    tips: [
+      'Track net worth quarterly to see progress',
+      'Focus on growing assets, not just income',
+      'Pay down high-interest debt to boost net worth',
+      'Invest in appreciating assets (equity, real estate)'
+    ],
+    scoreLogic: 'Score = (Net Worth / 3× annual income) × 100. Max 15 points.'
+  },
+  'Asset Allocation': {
+    icon: '📊',
+    description: 'How your wealth is distributed across asset classes',
+    benchmark: 'Ideal: 40-50% Equity, 25-30% Debt, 15-20% Real Estate, 5-10% Gold',
+    factors: [
+      { label: 'Equity %', getValue: (d) => `${((d.mutualFunds + d.stocks) / d.totalAssets * 100).toFixed(1)}%` },
+      { label: 'Debt %', getValue: (d) => `${((d.fd + d.pfNps) / d.totalAssets * 100).toFixed(1)}%` },
+      { label: 'Real Estate %', getValue: (d) => `${(d.realEstate / d.totalAssets * 100).toFixed(1)}%` },
+      { label: 'Gold %', getValue: (d) => `${(d.gold / d.totalAssets * 100).toFixed(1)}%` },
+    ],
+    tips: [
+      'Younger investors: Higher equity allocation (60-70%)',
+      'Rebalance annually to maintain target allocation',
+      'Don\'t over-allocate to gold (max 10%)',
+      'Consider REITs if no direct real estate'
+    ],
+    scoreLogic: 'Score based on deviation from ideal allocation. Max 10 points.'
+  },
+  'Financial Habits': {
+    icon: '📋',
+    description: 'Day-to-day money management practices',
+    benchmark: 'Good habits = Consistent wealth building',
+    factors: [
+      { label: 'Budget Tracking', getValue: () => 'Monthly' },
+      { label: 'Auto-Pay Setup', getValue: () => 'All EMIs' },
+      { label: 'Investment Regularity', getValue: () => 'Monthly SIP' },
+      { label: 'Expense Review', getValue: () => 'Quarterly' },
+    ],
+    tips: [
+      'Track every expense using an app',
+      'Set up auto-pay for all bills and EMIs',
+      'Review subscriptions monthly - cancel unused ones',
+      'Do a financial review every quarter'
+    ],
+    scoreLogic: 'Score based on self-reported habits questionnaire. Max 10 points.'
+  },
+  'Life Insurance': {
+    icon: '☂️',
+    description: 'Protection for your family\'s financial future',
+    benchmark: 'Target: Term cover = 15× annual income',
+    factors: [
+      { label: 'Current Life Cover', getValue: () => '₹0' },
+      { label: 'Required Cover', getValue: (d) => `₹${((d.income * 12 * 15) / 10000000).toFixed(2)} Cr` },
+      { label: 'Cover Gap', getValue: (d) => `₹${((d.income * 12 * 15) / 10000000).toFixed(2)} Cr` },
+      { label: 'Recommended Premium', getValue: (d) => `₹${Math.round(d.income * 0.02)}/mo` },
+    ],
+    tips: [
+      'Buy pure term insurance, not ULIP or endowment',
+      'Cover should be 15-20× annual income',
+      'Buy early - premiums increase with age',
+      'Add critical illness rider for comprehensive protection'
+    ],
+    scoreLogic: 'Score = 100% if adequate cover, 0% if none. Max 5 points.'
+  },
+  'Health Insurance': {
+    icon: '🏥',
+    description: 'Protection against medical emergencies',
+    benchmark: 'Target: ₹10L+ family floater or ₹5L+ individual',
+    factors: [
+      { label: 'Current Health Cover', getValue: () => '₹0' },
+      { label: 'Required Cover', getValue: () => '₹10L+' },
+      { label: 'Cover Gap', getValue: () => '₹10L+' },
+      { label: 'Recommended Premium', getValue: () => '₹15,000-25,000/yr' },
+    ],
+    tips: [
+      'Buy family floater plan with ₹10L+ cover',
+      'Add super top-up for cost-effective higher cover',
+      'Check for no-claim bonus and restoration benefit',
+      'Don\'t rely only on employer\'s group insurance'
+    ],
+    scoreLogic: 'Score = 100% if adequate cover, 0% if none. Max 5 points.'
+  }
+};
+
 const css = `
 
 /* ═══ ROOT TOKENS ═══ */
@@ -239,11 +403,37 @@ const css = `
   .arthm-page .snap2{grid-template-columns:1fr}
   .arthm-page .snap-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ═══ PILLAR MODAL ═══ */
+.pillar-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.pillar-modal{background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,.25)}
+.pillar-modal-header{background:linear-gradient(135deg,#18170F,#2E2D26);padding:20px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:1}
+.pillar-modal-icon{font-size:32px}
+.pillar-modal-title{flex:1}
+.pillar-modal-title h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#E8AA3A;margin:0 0 4px 0}
+.pillar-modal-title p{font-size:12px;color:rgba(255,255,255,.6);margin:0}
+.pillar-modal-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .2s}
+.pillar-modal-close:hover{background:rgba(255,255,255,.2)}
+.pillar-modal-body{padding:24px}
+.pillar-modal-section{margin-bottom:20px}
+.pillar-modal-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B6860;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.pillar-modal-section-title::after{content:'';flex:1;height:1px;background:#DDD9D1}
+.pillar-factors{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pillar-factor{background:#F7F6F3;border:1px solid #DDD9D1;border-radius:10px;padding:12px 14px}
+.pillar-factor-label{font-size:11px;color:#6B6860;margin-bottom:4px}
+.pillar-factor-value{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#18170F}
+.pillar-tips{list-style:none;padding:0;margin:0}
+.pillar-tips li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #DDD9D1;font-size:13px;color:#2E2D26}
+.pillar-tips li:last-child{border-bottom:none}
+.pillar-tips li::before{content:'✓';color:#1C7A50;font-weight:700;flex-shrink:0}
+.pillar-benchmark{background:linear-gradient(135deg,#EEF8F3,#EBF7F7);border:1px solid #8DCFAD;border-radius:10px;padding:14px 16px;font-size:13px;color:#1C7A50;font-weight:600}
+.pillar-score-logic{background:#F7F6F3;border:1px solid #DDD9D1;border-radius:10px;padding:14px 16px;font-size:12px;color:#6B6860;font-family:'JetBrains Mono',monospace}
 `;
 
 export default function ArthMitraReport({ userData, healthScore, questionnaire }) {
   const [expandedRows, setExpandedRows] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
+  const [selectedPillar, setSelectedPillar] = useState(null);
 
   // Calculate financial metrics
   const income = questionnaire?.monthly_income || userData?.monthlyIncome || 145000;
@@ -693,13 +883,96 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               <div style={{display:'flex',alignItems:'baseline',gap:'4px',marginBottom:'6px'}}>
                 <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:pillar.color}}>{Math.round(pillar.score)}%</span>
               </div>
-              <div style={{height:'4px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden'}}>
+              <div style={{height:'4px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'10px'}}>
                 <div style={{width:`${pillar.score}%`,height:'100%',background:pillar.color,borderRadius:'2px'}}></div>
               </div>
+              <button
+                onClick={() => setSelectedPillar(pillar.name)}
+                style={{
+                  width:'100%',
+                  padding:'6px 10px',
+                  background:'transparent',
+                  border:'1px solid var(--border)',
+                  borderRadius:'6px',
+                  fontSize:'10px',
+                  fontWeight:600,
+                  color:'var(--blu)',
+                  cursor:'pointer',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  gap:'4px',
+                  transition:'all .2s'
+                }}
+                onMouseOver={(e) => { e.target.style.background = 'var(--blubg)'; e.target.style.borderColor = 'var(--blu)'; }}
+                onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'var(--border)'; }}
+              >
+                <span>View Details</span>
+                <span style={{fontSize:'12px'}}>→</span>
+              </button>
             </div>
           ))}
         </div>
       </div>
+
+      {/* PILLAR DETAILS MODAL */}
+      {selectedPillar && PILLAR_DETAILS[selectedPillar] && (
+        <div className="pillar-modal-overlay" onClick={() => setSelectedPillar(null)}>
+          <div className="pillar-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="pillar-modal-header">
+              <div className="pillar-modal-icon">{PILLAR_DETAILS[selectedPillar].icon}</div>
+              <div className="pillar-modal-title">
+                <h3>{selectedPillar}</h3>
+                <p>{PILLAR_DETAILS[selectedPillar].description}</p>
+              </div>
+              <button className="pillar-modal-close" onClick={() => setSelectedPillar(null)}>×</button>
+            </div>
+            <div className="pillar-modal-body">
+              {/* Benchmark */}
+              <div className="pillar-modal-section">
+                <div className="pillar-benchmark">{PILLAR_DETAILS[selectedPillar].benchmark}</div>
+              </div>
+
+              {/* Current Status */}
+              <div className="pillar-modal-section">
+                <div className="pillar-modal-section-title">Your Current Status</div>
+                <div className="pillar-factors">
+                  {PILLAR_DETAILS[selectedPillar].factors.map((factor, i) => (
+                    <div key={i} className="pillar-factor">
+                      <div className="pillar-factor-label">{factor.label}</div>
+                      <div className="pillar-factor-value">{factor.getValue({
+                        income, expenses, savings, savingsRate, 
+                        emergencyFund, mutualFunds, stocks, pfNps, fd, gold, realEstate,
+                        totalAssets, totalLiabilities, netWorth,
+                        totalEMI: homeLoan + personalLoan + carLoan,
+                        emiRatio: ((homeLoan + personalLoan + carLoan) / income * 100).toFixed(1),
+                        debtRatio: (totalLiabilities / (income * 12) * 100).toFixed(1),
+                        formatINR, formatINR2
+                      })}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tips */}
+              <div className="pillar-modal-section">
+                <div className="pillar-modal-section-title">How to Improve</div>
+                <ul className="pillar-tips">
+                  {PILLAR_DETAILS[selectedPillar].tips.map((tip, i) => (
+                    <li key={i}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Score Logic */}
+              <div className="pillar-modal-section">
+                <div className="pillar-modal-section-title">Score Calculation</div>
+                <div className="pillar-score-logic">{PILLAR_DETAILS[selectedPillar].scoreLogic}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 3. INCOME & EXPENSE BREAKDOWN */}
       <div className="sh an in"><div className="shn">5</div><div className="sht">Income & Expense Breakdown</div><div className="shl"></div></div>
