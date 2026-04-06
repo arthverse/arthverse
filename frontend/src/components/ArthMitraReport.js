@@ -1060,20 +1060,21 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                           {checkpoint.options.map((opt, j) => (
                             <div key={j} style={{
                               display:'flex',
-                              justifyContent:'space-between',
                               alignItems:'center',
-                              padding:'6px 0',
+                              padding:'8px 0',
                               borderBottom: j < checkpoint.options.length - 1 ? '1px solid #E5E4E0' : 'none',
-                              fontSize:'11px',
+                              fontSize:'12px',
+                              color:'#2E2D26',
                             }}>
-                              <span style={{color:'#2E2D26'}}>{opt.label}</span>
                               <span style={{
-                                fontFamily:"'JetBrains Mono',monospace",
-                                fontWeight:600,
-                                color: opt.penalty ? '#DC2626' : opt.points > 0 ? '#166534' : '#6B7280',
-                              }}>
-                                → {opt.penalty ? `(${Math.abs(opt.points)}) pt penalty` : opt.points > 0 ? `${opt.points} pt` : `${opt.points} pt`}
-                              </span>
+                                width:'20px',
+                                height:'20px',
+                                borderRadius:'50%',
+                                border:'2px solid #DDD9D1',
+                                marginRight:'10px',
+                                flexShrink:0,
+                              }}></span>
+                              <span>{opt.label}</span>
                             </div>
                           ))}
                         </div>
