@@ -12,7 +12,7 @@ import AggregatedFinancialData from '../components/AggregatedFinancialData';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import PaymentSection from '../components/PaymentSection';
 import AnalysisResults from '../components/AnalysisResults';
-import PremiumReport from '../components/PremiumReport';
+import ArthMitraReport from '../components/ArthMitraReport';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
@@ -316,9 +316,8 @@ Check your score too! 👇
             </div>
           ) : (
             <div className="col-span-1 md:col-span-4">
-              <PremiumReport
-                token={token}
-                user={userData}
+              <ArthMitraReport
+                userData={userData}
                 healthScore={healthScore}
                 questionnaire={questionnaire}
               />
