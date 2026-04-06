@@ -562,156 +562,202 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#A8762A,#C9922C,#A8762A,transparent)'}}></div>
       </div>
 
-      {/* PRIORITY ACTION PLAN */}
+      {/* 1. PRIORITY ACTION PLAN WITH BREAKUP */}
       <div className="sh an in" style={{animationDelay:'.24s'}}>
         <div className="shn">3</div>
         <div className="sht">Priority Action Plan</div>
         <div className="shl"></div>
-        <div className="shb">Score impact roadmap</div>
+        <div className="shb">Savings ₹{formatINR(Math.round(savings * 12 * 0.1))} + Risk Reduction ₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr</div>
       </div>
 
-      <div className="card an in" style={{animationDelay:'.26s'}}>
-        <div className="card-hd">
-          <div className="card-t">🎯 Score Impact Roadmap — {score} → 80+</div>
-          <span className="tag tg">Actions identified</span>
+      {/* Potential Savings Breakup */}
+      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'16px',animationDelay:'.26s'}}>
+        <div style={{background:'linear-gradient(135deg,#166534,#15803d)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
+          <span style={{fontSize:'14px'}}>💰</span>
+          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Potential Savings Breakup — {formatINR(Math.round(savings * 12 * 0.1))}/year</span>
         </div>
-        <div className="card-b" style={{padding:0,overflowX:'auto'}}>
-          <table className="apt">
+        <div style={{padding:'16px 20px'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
             <thead>
-              <tr>
-                <th style={{width:'42%'}}>Priority Action</th>
-                <th style={{width:'10%'}}>When</th>
-                <th style={{width:'23%'}}>Risk / Benefit</th>
-                <th style={{width:'8%',textAlign:'center'}}>Status</th>
-                <th style={{width:'15%',textAlign:'center'}}>Score Impact</th>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>AREA</th>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT</th>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>OPTIMIZED</th>
+                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>SAVINGS</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td style={{fontWeight:600,color:'var(--t0)'}}>☂️ Buy Term Life Insurance (15× income)</td>
-                <td><span className="tag tr" style={{fontSize:'10px'}}>This week</span></td>
-                <td style={{fontSize:'11px',color:'var(--grn)'}}>Protect family wealth</td>
-                <td style={{textAlign:'center'}}>⬜</td>
-                <td style={{textAlign:'center'}}><span className="tag tg" style={{fontSize:'10px'}}>+5 pts</span></td>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏦 High-Interest Debt Restructure</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>CC @ 36% APR</td>
+                <td style={{padding:'12px 8px',color:'var(--grn)'}}>Balance Transfer @ 12%</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(creditCardDebt * 0.24))}</td>
               </tr>
-              <tr style={{background:'var(--bg3)'}}>
-                <td style={{fontWeight:600,color:'var(--t0)'}}>🏥 Buy Health Insurance (₹10L+ cover)</td>
-                <td><span className="tag tr" style={{fontSize:'10px'}}>This week</span></td>
-                <td style={{fontSize:'11px',color:'var(--grn)'}}>Medical emergency protection</td>
-                <td style={{textAlign:'center'}}>⬜</td>
-                <td style={{textAlign:'center'}}><span className="tag tg" style={{fontSize:'10px'}}>+5 pts</span></td>
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>📊 Tax-Efficient Investments</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>No 80C utilization</td>
+                <td style={{padding:'12px 8px',color:'var(--grn)'}}>Full ₹1.5L in ELSS</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(income * 12 * 0.3 * 0.1))}</td>
               </tr>
-              <tr>
-                <td style={{fontWeight:600,color:'var(--t0)'}}>🛡 Build Emergency Fund (6 months expenses)</td>
-                <td><span className="tag ta" style={{fontSize:'10px'}}>Month 1–5</span></td>
-                <td style={{fontSize:'11px',color:'var(--grn)'}}>Financial safety net</td>
-                <td style={{textAlign:'center'}}>⬜</td>
-                <td style={{textAlign:'center'}}><span className="tag tg" style={{fontSize:'10px'}}>+10 pts</span></td>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>⛽ Expense Optimization</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>No tracking</td>
+                <td style={{padding:'12px 8px',color:'var(--grn)'}}>10% expense cut</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(expenses * 12 * 0.1))}</td>
               </tr>
-              <tr style={{background:'var(--bg3)'}}>
-                <td style={{fontWeight:600,color:'var(--t0)'}}>📈 Start SIP (Index Fund)</td>
-                <td><span className="tag ta" style={{fontSize:'10px'}}>Month 1</span></td>
-                <td style={{fontSize:'11px',color:'var(--grn)'}}>Wealth compounding</td>
-                <td style={{textAlign:'center'}}>⬜</td>
-                <td style={{textAlign:'center'}}><span className="tag tg" style={{fontSize:'10px'}}>+5 pts</span></td>
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>💳 Credit Card Rewards</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>Random card usage</td>
+                <td style={{padding:'12px 8px',color:'var(--grn)'}}>Optimized card selection</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(expenses * 12 * 0.02))}</td>
               </tr>
-              <tr className="tot-r">
-                <td colSpan="2" style={{fontSize:'12px'}}>✅ Score at Completion</td>
-                <td colSpan="3" style={{textAlign:'right',fontSize:'13px',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>80+ · EXCELLENT</td>
+              <tr style={{background:'var(--bg2)'}}>
+                <td colSpan="3" style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL POTENTIAL SAVINGS / YEAR</td>
+                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'16px'}}>{formatINR(Math.round(savings * 12 * 0.1))}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* SCORE JOURNEY ROADMAP */}
-      <div className="sh an in"><div className="shn">7</div><div className="sht">🎯 Your Score Journey</div><div className="shl"></div></div>
-      <div className="rmap an in">
-        <div className="rmap-hd">What changes, when, and by how much</div>
-        <div className="rmap-rows">
-          <div className="rm-row rn">
-            <div className="rm-dot">{score}</div>
-            <div className="rm-inf">
-              <div className="rm-when">Today</div>
-              <div className="rm-lbl">{getScoreRating(score)} — You are here now</div>
-              <div className="rm-sub">Current financial standing based on your data.</div>
+      {/* Risk Reduction Breakup */}
+      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',animationDelay:'.28s'}}>
+        <div style={{background:'linear-gradient(135deg,#991b1b,#dc2626)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
+          <span style={{fontSize:'14px'}}>🛡️</span>
+          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Risk Reduction Breakup — ₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr Coverage Gap</span>
+        </div>
+        <div style={{padding:'16px 20px'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
+            <thead>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>RISK AREA</th>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT COVER</th>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>REQUIRED COVER</th>
+                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>GAP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>☂️ Term Life Insurance</td>
+                <td style={{padding:'12px 8px',color:'var(--red)'}}>₹0</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>₹{((income * 12 * 15) / 10000000).toFixed(2)} Cr (15× income)</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--red)',fontWeight:700}}>₹{((income * 12 * 15) / 10000000).toFixed(2)} Cr</td>
+              </tr>
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏥 Health Insurance</td>
+                <td style={{padding:'12px 8px',color:'var(--red)'}}>₹0</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>₹{(Math.max(1000000, netWorth / 10) / 100000).toFixed(1)}L (family floater)</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--red)',fontWeight:700}}>₹{(Math.max(1000000, netWorth / 10) / 100000).toFixed(1)}L</td>
+              </tr>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🚗 Vehicle Insurance</td>
+                <td style={{padding:'12px 8px',color:'var(--amb)'}}>Third-Party Only</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>Comprehensive (IDV based)</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>Upgrade</td>
+              </tr>
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🛡️ Emergency Fund Gap</td>
+                <td style={{padding:'12px 8px',color:'var(--amb)'}}>{formatINR2(emergencyFund)} ({Math.round(emergencyFund / expenses)} mo)</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)'}}>{formatINR2(expenses * 6)} (6 months)</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>{formatINR2(Math.max(0, expenses * 6 - emergencyFund))}</td>
+              </tr>
+              <tr style={{background:'var(--bg2)'}}>
+                <td colSpan="3" style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL RISK EXPOSURE</td>
+                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--red)',fontWeight:700,fontSize:'16px'}}>₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 2. 9-PILLAR FINANCIAL HEALTH OVERVIEW */}
+      <div className="sh an in"><div className="shn">4</div><div className="sht">9-Pillar Financial Health Overview</div><div className="shl"></div></div>
+      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
+          {[
+            { name: 'Savings Rate', score: Math.min(100, (savings / income) * 100 * 3), max: 20, color: savings/income >= 0.3 ? 'var(--grn)' : 'var(--amb)' },
+            { name: 'EMI Tolerance', score: Math.min(100, 100 - (totalLiabilities > 0 ? (totalLiabilities / (income * 12)) * 100 : 0)), max: 20, color: 'var(--grn)' },
+            { name: 'Emergency Fund', score: Math.min(100, (emergencyFund / (expenses * 6)) * 100), max: 15, color: emergencyFund >= expenses * 6 ? 'var(--grn)' : 'var(--amb)' },
+            { name: 'Investment Portfolio', score: Math.min(100, ((mutualFunds + stocks + pfNps) / (income * 12 * 2.5)) * 100), max: 15, color: 'var(--grn)' },
+            { name: 'Net Worth', score: Math.min(100, (netWorth / (income * 12 * 3)) * 100), max: 15, color: 'var(--grn)' },
+            { name: 'Asset Allocation', score: 70, max: 10, color: 'var(--amb)' },
+            { name: 'Financial Habits', score: 60, max: 10, color: 'var(--amb)' },
+            { name: 'Life Insurance', score: 0, max: 5, color: 'var(--red)' },
+            { name: 'Health Insurance', score: 0, max: 5, color: 'var(--red)' },
+          ].map((pillar, idx) => (
+            <div key={idx} style={{padding:'16px 20px',borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',borderBottom: idx < 6 ? '1px solid var(--border)' : 'none'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
+                <span style={{fontSize:'11px',fontWeight:700,color:'var(--t2)',letterSpacing:'.03em'}}>{pillar.name}</span>
+                <span style={{fontSize:'10px',color:'var(--t3)'}}>{pillar.max} pts</span>
+              </div>
+              <div style={{display:'flex',alignItems:'baseline',gap:'4px',marginBottom:'6px'}}>
+                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:pillar.color}}>{Math.round(pillar.score)}%</span>
+              </div>
+              <div style={{height:'4px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden'}}>
+                <div style={{width:`${pillar.score}%`,height:'100%',background:pillar.color,borderRadius:'2px'}}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. INCOME & EXPENSE BREAKDOWN */}
+      <div className="sh an in"><div className="shn">5</div><div className="sht">Income & Expense Breakdown</div><div className="shl"></div></div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
+        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
+          <div style={{background:'var(--t0)',padding:'12px 16px'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>💰 INCOME SOURCES</span>
+          </div>
+          <div style={{padding:'16px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Salary/Business</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(income)}/mo</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Rental Income</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>₹0/mo</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Investment Returns</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(Math.round((mutualFunds + stocks) * 0.12 / 12))}/mo</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'12px 0',fontWeight:700}}>
+              <span style={{fontSize:'13px',color:'var(--t1)'}}>TOTAL INCOME</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',color:'var(--grn)'}}>{formatINR(income)}/mo</span>
             </div>
           </div>
-          <div className="rm-row r1">
-            <div className="rm-dot">~{Math.min(100, score + 10)}</div>
-            <div className="rm-inf">
-              <div className="rm-when">After Week 1</div>
-              <div className="rm-lbl">Insurance Protection Added</div>
-              <div className="rm-sub">Term + health insurance purchased → immediate score improvement.</div>
-            </div>
+        </div>
+        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
+          <div style={{background:'var(--t0)',padding:'12px 16px'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>💸 EXPENSE CATEGORIES</span>
           </div>
-          <div className="rm-row r2">
-            <div className="rm-dot">~{Math.min(100, score + 20)}</div>
-            <div className="rm-inf">
-              <div className="rm-when">After Month 4–5</div>
-              <div className="rm-lbl">Emergency Fund Complete</div>
-              <div className="rm-sub">6-month expenses saved in liquid funds. Safety net established.</div>
+          <div style={{padding:'16px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Housing & Utilities</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.35))}/mo</span>
             </div>
-          </div>
-          <div className="rm-row r3">
-            <div className="rm-dot">80+</div>
-            <div className="rm-inf">
-              <div className="rm-when">After 12 Months</div>
-              <div className="rm-lbl">EXCELLENT — SIP compounding</div>
-              <div className="rm-sub">Investments growing, debt managed, net worth increasing. Score 80+ = EXCELLENT.</div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Food & Groceries</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.25))}/mo</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Transport & Fuel</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.15))}/mo</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Lifestyle & Others</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.25))}/mo</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'12px 0',fontWeight:700}}>
+              <span style={{fontSize:'13px',color:'var(--t1)'}}>TOTAL EXPENSES</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',color:'var(--amb)'}}>{formatINR(expenses)}/mo</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* FINANCIAL HABITS */}
-      <div className="sh an in"><div className="shn">5</div><div className="sht">Financial Habits</div><div className="shl"></div></div>
-      <div className="hab-split an in">
-        <div className="hab-col hg">
-          <div className="hab-hd">✅ Good Habits — Keep Doing</div>
-          <div className="hab-items">
-            <div className="hab-i"><div className="hab-dot"></div>Saving {savingsRate}% of income — excellent discipline</div>
-            <div className="hab-i"><div className="hab-dot"></div>Tracking expenses and income regularly</div>
-            <div className="hab-i"><div className="hab-dot"></div>Building awareness of financial health</div>
-          </div>
-        </div>
-        <div className="hab-col ht">
-          <div className="hab-hd">📋 To-Do — Action Needed</div>
-          <div className="hab-items">
-            <div className="hab-i"><div className="hab-dot"></div><strong>Get term life insurance</strong> — 15× annual income cover</div>
-            <div className="hab-i"><div className="hab-dot"></div><strong>Get health insurance</strong> — ₹10L+ family floater</div>
-            <div className="hab-i"><div className="hab-dot"></div><strong>Build emergency fund</strong> — 6 months of expenses</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 5 GOLDEN RULES */}
-      <div className="sh an in"><div className="shn">11</div><div className="sht">5 Rules to Live By</div><div className="shl"></div></div>
-      <div className="rules an in">
-        <div className="rule">
-          <div className="rule-n">1</div>
-          <div className="rule-t"><strong>Insure before you invest.</strong> Insurance is the foundation everything else is built on. A term plan protects 25 years of wealth.</div>
-        </div>
-        <div className="rule">
-          <div className="rule-n">2</div>
-          <div className="rule-t"><strong>Emergency fund is your financial immune system.</strong> 6 months of expenses in liquid form means no emergency forces you to sell investments.</div>
-        </div>
-        <div className="rule">
-          <div className="rule-n">3</div>
-          <div className="rule-t"><strong>Good debt builds, bad debt destroys.</strong> Home loans build assets. Credit card EMIs at 36% are anchors. Clear bad debt first.</div>
-        </div>
-        <div className="rule">
-          <div className="rule-n">4</div>
-          <div className="rule-t"><strong>Start the SIP and never stop it.</strong> Index fund SIP, starting now. Don't pause for market dips — SIP averages your cost automatically.</div>
-        </div>
-        <div className="rule">
-          <div className="rule-n">5</div>
-          <div className="rule-t"><strong>Score 80+ is three decisions away.</strong> Buy insurance, build emergency fund, start SIP. The gap is not income — it is decisions within your reach today.</div>
-        </div>
-      </div>
-
-      {/* CREDIT CARD RECOMMENDATIONS */}
-      <div className="sh an in"><div className="shn">10</div><div className="sht">Credit Card Recommendation</div><div className="shl"></div><div className="shb">Based on your spending profile</div></div>
+      {/* 4. CREDIT CARD RECOMMENDATION */}
+      <div className="sh an in"><div className="shn">6</div><div className="sht">Credit Card Recommendation</div><div className="shl"></div><div className="shb">Based on your spending profile</div></div>
       <div className="cc3 an in">
         <div className="cc-c">
           <div className="cc-ico">🏦</div>
@@ -735,6 +781,189 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       <div className="callout cw an in">
         <span className="callout-ico">⚠️</span>
         <div><strong>Golden Rule:</strong> Use credit card only for planned spends. Set auto-pay for FULL outstanding (not minimum). Never convert to CC EMI at 36% interest.</div>
+      </div>
+
+      {/* 5. YOUR SCORE JOURNEY */}
+      <div className="sh an in"><div className="shn">7</div><div className="sht">Your Score Journey — {score} to 80+ in 12 Months</div><div className="shl"></div></div>
+      <div className="rmap an in">
+        <div className="rmap-hd">What changes, when, and by how much</div>
+        <div className="rmap-rows">
+          <div className="rm-row rn">
+            <div className="rm-dot">{score}</div>
+            <div className="rm-inf">
+              <div className="rm-when">Today</div>
+              <div className="rm-lbl">{getScoreRating(score)} — You are here now</div>
+              <div className="rm-sub">Current financial standing based on your data.</div>
+            </div>
+          </div>
+          <div className="rm-row r1">
+            <div className="rm-dot">~{Math.min(100, score + 10)}</div>
+            <div className="rm-inf">
+              <div className="rm-when">After Week 1</div>
+              <div className="rm-lbl">Insurance Protection Added (+10 pts)</div>
+              <div className="rm-sub">Term (₹{((income * 12 * 15) / 10000000).toFixed(1)} Cr) + Health (₹10L) insurance purchased.</div>
+            </div>
+          </div>
+          <div className="rm-row r2">
+            <div className="rm-dot">~{Math.min(100, score + 20)}</div>
+            <div className="rm-inf">
+              <div className="rm-when">After Month 3</div>
+              <div className="rm-lbl">Emergency Fund Complete (+8 pts)</div>
+              <div className="rm-sub">6-month expenses ({formatINR2(expenses * 6)}) saved in liquid funds.</div>
+            </div>
+          </div>
+          <div className="rm-row r3">
+            <div className="rm-dot">80+</div>
+            <div className="rm-inf">
+              <div className="rm-when">After 12 Months</div>
+              <div className="rm-lbl">EXCELLENT — Wealth Compounding</div>
+              <div className="rm-sub">SIP growing, debt managed, net worth increasing. Score 80+ = EXCELLENT.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. WHERE YOU'RE HEADED — NET WORTH BY ASSET CLASS */}
+      <div className="sh an in"><div className="shn">8</div><div className="sht">Where You're Headed — Net Worth by Asset Class</div><div className="shl"></div></div>
+      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px'}}>
+        <div style={{padding:'20px'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
+            <thead>
+              <tr style={{borderBottom:'2px solid var(--border)'}}>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>ASSET CLASS</th>
+                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT</th>
+                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>5Y PROJECTION</th>
+                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>10Y PROJECTION</th>
+                <th style={{textAlign:'center',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>IDEAL %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>📈 Equity (MF + Stocks)</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(mutualFunds + stocks)}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(Math.round((mutualFunds + stocks) * Math.pow(1.12, 5)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(Math.round((mutualFunds + stocks) * Math.pow(1.12, 10)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>40-50%</td>
+              </tr>
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏦 Debt (FD + PPF + NPS)</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(fd + pfNps)}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round((fd + pfNps) * Math.pow(1.07, 5)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round((fd + pfNps) * Math.pow(1.07, 10)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>25-30%</td>
+              </tr>
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏠 Real Estate</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(realEstate)}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(Math.round(realEstate * Math.pow(1.05, 5)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(Math.round(realEstate * Math.pow(1.05, 10)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>15-20%</td>
+              </tr>
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🥇 Gold / Metals</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(gold)}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round(gold * Math.pow(1.08, 5)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round(gold * Math.pow(1.08, 10)))}</td>
+                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>5-10%</td>
+              </tr>
+              <tr style={{background:'var(--bg2)'}}>
+                <td style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL NET WORTH</td>
+                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(netWorth)}</td>
+                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(Math.round(netWorth * Math.pow(1.10, 5)))}</td>
+                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(Math.round(netWorth * Math.pow(1.10, 10)))}</td>
+                <td style={{padding:'14px 8px',textAlign:'center',color:'var(--t2)',fontWeight:700}}>100%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 7. CURRENT CIBIL SCORE */}
+      <div className="sh an in"><div className="shn">9</div><div className="sht">Current CIBIL Score & How to Improve</div><div className="shl"></div></div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 2fr',gap:'16px',marginBottom:'20px'}} className="an in">
+        <div style={{background:'linear-gradient(135deg,#1e3a5f,#2d5a87)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'24px',textAlign:'center'}}>
+          <div style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',color:'rgba(255,255,255,.5)',marginBottom:'8px'}}>ESTIMATED CIBIL SCORE</div>
+          <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'48px',fontWeight:700,color:'#fff'}}>{totalLiabilities === 0 ? 750 : 720}</div>
+          <div style={{fontSize:'13px',color:'rgba(255,255,255,.7)',marginTop:'8px'}}>{totalLiabilities === 0 ? 'GOOD' : 'FAIR'}</div>
+          <div style={{fontSize:'11px',color:'rgba(255,255,255,.5)',marginTop:'4px'}}>Range: 300-900</div>
+        </div>
+        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'20px'}}>
+          <div style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',marginBottom:'12px'}}>📈 HOW TO IMPROVE YOUR CIBIL SCORE</div>
+          <div style={{display:'grid',gap:'10px'}}>
+            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'16px'}}>✅</span>
+              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Pay bills on time</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Set auto-pay for all EMIs and credit cards</div></div>
+            </div>
+            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'16px'}}>💳</span>
+              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Keep utilization below 30%</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Use less than 30% of your credit limit</div></div>
+            </div>
+            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'16px'}}>🚫</span>
+              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Avoid multiple loan applications</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Each hard inquiry reduces score by 5-10 points</div></div>
+            </div>
+            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'16px'}}>📊</span>
+              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Maintain credit mix</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Have a mix of secured and unsecured credit</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 8. KNOW YOUR RETIREMENT AGE */}
+      <div className="sh an in"><div className="shn">10</div><div className="sht">Know Your Retirement Age</div><div className="shl"></div></div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
+        <div style={{background:'linear-gradient(135deg,#166534,#15803d)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'24px',textAlign:'center'}}>
+          <div style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',color:'rgba(255,255,255,.5)',marginBottom:'8px'}}>PROJECTED RETIREMENT AGE</div>
+          <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'48px',fontWeight:700,color:'#fff'}}>{Math.max(55, 60 - Math.floor(netWorth / (expenses * 12 * 25) * 10))}</div>
+          <div style={{fontSize:'13px',color:'rgba(255,255,255,.7)',marginTop:'8px'}}>years old</div>
+          <div style={{fontSize:'11px',color:'rgba(255,255,255,.5)',marginTop:'4px'}}>Based on current savings rate</div>
+        </div>
+        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'20px'}}>
+          <div style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',marginBottom:'12px'}}>🎯 RETIREMENT TARGETS</div>
+          <div style={{display:'grid',gap:'8px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Retirement Corpus Target</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--gold)'}}>₹{((expenses * 12 * 25) / 10000000).toFixed(1)} Cr</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Current Net Worth</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--grn)'}}>{formatINR2(netWorth)}</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Gap to Fill</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--red)'}}>₹{(Math.max(0, (expenses * 12 * 25) - netWorth) / 10000000).toFixed(2)} Cr</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
+              <span style={{fontSize:'12px',color:'var(--t2)'}}>Monthly SIP Required</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--amb)'}}>{formatINR(Math.round(savings * 0.5))}/mo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 9. WHAT TO TRACK MONTHLY */}
+      <div className="sh an in"><div className="shn">11</div><div className="sht">What to Track Monthly</div><div className="shl"></div></div>
+      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
+          {[
+            { metric: 'Monthly Income', value: formatINR(income), target: 'Track all sources', icon: '💰' },
+            { metric: 'Monthly Expenses', value: formatINR(expenses), target: 'Keep < 70% income', icon: '💸' },
+            { metric: 'Savings Rate', value: `${savingsRate}%`, target: 'Target > 30%', icon: '📊' },
+            { metric: 'EMI-to-Income', value: `${((totalLiabilities > 0 ? (homeLoan + personalLoan + carLoan) * 0.01 : 0) / income * 100).toFixed(1)}%`, target: 'Keep < 40%', icon: '🏦' },
+            { metric: 'Emergency Fund', value: `${Math.round(emergencyFund / expenses)} mo`, target: 'Build to 6 mo', icon: '🛡️' },
+            { metric: 'SIP Amount', value: formatINR(Math.round(savings * 0.4)), target: '20% of income', icon: '📈' },
+            { metric: 'Net Worth', value: formatINR2(netWorth), target: 'Track growth', icon: '💎' },
+            { metric: 'CIBIL Score', value: totalLiabilities === 0 ? '750+' : '720+', target: 'Maintain > 750', icon: '📋' },
+          ].map((item, idx) => (
+            <div key={idx} style={{padding:'16px',borderRight: (idx % 4 !== 3) ? '1px solid var(--border)' : 'none',borderBottom: idx < 4 ? '1px solid var(--border)' : 'none'}}>
+              <div style={{fontSize:'16px',marginBottom:'6px'}}>{item.icon}</div>
+              <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'6px'}}>{item.metric}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--t1)',marginBottom:'4px'}}>{item.value}</div>
+              <div style={{fontSize:'10px',color:'var(--t3)'}}>{item.target}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* FOOTER */}
