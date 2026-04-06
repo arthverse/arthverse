@@ -380,95 +380,97 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       </div>
 
       {/* NET WORTH STATEMENT */}
-      <div className="snap2 an in" style={{animationDelay:'.1s'}}>
-        <div className="snap-card">
-          <div className="snap-hd">📈 Assets (What You Own)</div>
-          <div className="snap-grid">
-            <div className="snap-cell">
-              <div className="snap-lbl">Bank Balance</div>
-              <div className="snap-val g">{formatINR(bankBalance, true)}</div>
-              <div className="snap-sub">Savings & Current</div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in" style={{animationDelay:'.1s'}}>
+        {/* ASSETS */}
+        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
+          <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
+            <span style={{fontSize:'14px'}}>📈</span>
+            <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Assets (What You Own)</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Bank Balance</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(bankBalance, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Savings & Current</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Mutual Funds</div>
-              <div className="snap-val g">{formatINR(mutualFunds, true)}</div>
-              <div className="snap-sub">SIP + Lumpsum</div>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Mutual Funds</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(mutualFunds, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>SIP + Lumpsum</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">PF / NPS</div>
-              <div className="snap-val g">{formatINR(pfNps, true)}</div>
-              <div className="snap-sub">Retirement corpus</div>
+            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>PF / NPS</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(pfNps, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Retirement corpus</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Stocks</div>
-              <div className="snap-val g">{formatINR(stocks, true)}</div>
-              <div className="snap-sub">Direct equity</div>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Stocks</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(stocks, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Direct equity</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Fixed Deposits</div>
-              <div className="snap-val g">{formatINR(fd, true)}</div>
-              <div className="snap-sub">Bank FD / RD</div>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Fixed Deposits</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(fd, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Bank FD / RD</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Gold / Jewellery</div>
-              <div className="snap-val go">{formatINR(gold, true)}</div>
-              <div className="snap-sub">Physical + Digital</div>
+            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Gold / Jewellery</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--gold)',marginBottom:'4px'}}>{formatINR(gold, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Physical + Digital</div>
             </div>
-            {realEstate > 0 && (
-              <div className="snap-cell">
-                <div className="snap-lbl">Real Estate</div>
-                <div className="snap-val go">{formatINR(realEstate, true)}</div>
-                <div className="snap-sub">Property value</div>
-              </div>
-            )}
-            <div className="snap-cell">
-              <div className="snap-lbl">Emergency Fund</div>
-              <div className="snap-val g">{formatINR(emergencyFund, true)}</div>
-              <div className="snap-sub">Liquid savings</div>
+            <div style={{padding:'16px',gridColumn:'span 3'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Emergency Fund</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(emergencyFund, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Liquid savings</div>
             </div>
           </div>
-          <div style={{borderTop:'1px dashed var(--border)',margin:'12px 0',paddingTop:'12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)'}}>TOTAL ASSETS</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--grn)'}}>{formatINR(totalAssets, true)}</span>
+          <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL ASSETS</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)'}}>{formatINR(totalAssets, true)}</span>
           </div>
         </div>
-        <div className="snap-card">
-          <div className="snap-hd">📉 Liabilities (What You Owe)</div>
-          <div className="snap-grid">
-            <div className="snap-cell">
-              <div className="snap-lbl">Home Loan</div>
-              <div className="snap-val r">{formatINR(homeLoan, true)}</div>
-              <div className="snap-sub">Outstanding principal</div>
+
+        {/* LIABILITIES */}
+        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
+          <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
+            <span style={{fontSize:'14px'}}>📉</span>
+            <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Liabilities (What You Owe)</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Home Loan</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(homeLoan, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Outstanding principal</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Personal Loan</div>
-              <div className="snap-val r">{formatINR(personalLoan, true)}</div>
-              <div className="snap-sub">Unsecured debt</div>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Personal Loan</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(personalLoan, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Unsecured debt</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Car Loan</div>
-              <div className="snap-val r">{formatINR(carLoan, true)}</div>
-              <div className="snap-sub">Vehicle finance</div>
+            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Car Loan</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(carLoan, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Vehicle finance</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Credit Card Debt</div>
-              <div className="snap-val r">{formatINR(creditCardDebt, true)}</div>
-              <div className="snap-sub">Revolving credit</div>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Credit Card Debt</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(creditCardDebt, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Revolving credit</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Other Loans</div>
-              <div className="snap-val r">{formatINR(otherLoans, true)}</div>
-              <div className="snap-sub">Education / Other</div>
+            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Other Loans</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(otherLoans, true)}</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Education / Other</div>
             </div>
-            <div className="snap-cell">
-              <div className="snap-lbl">Debt-to-Income</div>
-              <div className="snap-val a">{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(1) : 0}%</div>
-              <div className="snap-sub">Target: &lt;30%</div>
+            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Debt-to-Income</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--amb)',marginBottom:'4px'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(1) : 0}%</div>
+              <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: &lt;30%</div>
             </div>
           </div>
-          <div style={{borderTop:'1px dashed var(--border)',margin:'12px 0',paddingTop:'12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)'}}>TOTAL LIABILITIES</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--red)'}}>{formatINR(totalLiabilities, true)}</span>
+          <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL LIABILITIES</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)'}}>{formatINR(totalLiabilities, true)}</span>
           </div>
         </div>
       </div>
