@@ -1850,6 +1850,15 @@ async def get_arthrakshak_summary(
     }
 
 
+# Health check endpoint for Kubernetes probes
+@app.get("/")
+async def root():
+    return {"status": "healthy", "service": "arth-verse-api"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "arth-verse-api"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
@@ -1867,6 +1876,25 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Health check endpoint for Kubernetes probes
+@app.get("/")
+async def root():
+    return {"status": "healthy", "service": "arth-verse-api"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "arth-verse-api"}
+
+@app.on_event("startup")
+async def startup_db_client():
+    try:
+        # Verify MongoDB connection on startup
+        await client.admin.command('ping')
+        logger.info("Successfully connected to MongoDB")
+    except Exception as e:
+        logger.error(f"Failed to connect to MongoDB: {e}")
+        # Don't raise - let the app start and handle DB errors per request
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
