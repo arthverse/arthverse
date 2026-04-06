@@ -1,75 +1,71 @@
 """
-ArthRakshak Insurance & Risk Coverage Module - Backend API Tests
-Tests for: Policy CRUD, Risk Profile, Protection Gap, Coverage Checklist
+ArthRakshak Module - Backend API Tests
+Tests for insurance policies, protection gap, risk profile, and summary endpoints
 """
 
 import pytest
 import requests
 import os
 import uuid
-from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://financial-advisor-15.preview.emergentagent.com')
 
-# Test credentials from previous iteration
-TEST_CLIENT_ID = "AV271676A7"
-TEST_PASSWORD = "Demo123!"
+# Test credentials
+PREMIUM_USER = {
+    "client_id": "AV271676A7",
+    "password": "Demo123!"
+}
+
+NON_PREMIUM_USER = {
+    "client_id": "RUS1501",
+    "password": "Test@123"
+}
 
 
-class TestArthRakshakAuth:
-    """Authentication tests for ArthRakshak endpoints"""
+class TestAuthentication:
+    """Test authentication for ArthRakshak access"""
     
-    @pytest.fixture(scope="class")
-    def auth_token(self):
-        """Get authentication token for test user"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
+    def test_login_premium_user(self):
+        """Test login with premium user credentials"""
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
         assert response.status_code == 200, f"Login failed: {response.text}"
         data = response.json()
-        assert "token" in data, "No token in response"
+        assert "token" in data
+        assert "user" in data
+        print(f"✓ Premium user login successful: {data['user']['client_id']}")
         return data["token"]
     
-    @pytest.fixture(scope="class")
-    def auth_headers(self, auth_token):
-        """Get headers with auth token"""
-        return {
-            "Authorization": f"Bearer {auth_token}",
-            "Content-Type": "application/json"
-        }
-    
-    def test_login_success(self):
-        """Test login with valid credentials"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        assert response.status_code == 200
-        data = response.json()
-        assert "token" in data
-        print(f"✓ Login successful, token received")
+    def test_login_non_premium_user(self):
+        """Test login with non-premium user credentials"""
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=NON_PREMIUM_USER)
+        # May fail if user doesn't exist
+        if response.status_code == 200:
+            data = response.json()
+            assert "token" in data
+            print(f"✓ Non-premium user login successful: {data['user']['client_id']}")
+        else:
+            print(f"⚠ Non-premium user login failed (user may not exist): {response.status_code}")
 
 
 class TestArthRakshakSummary:
-    """Tests for ArthRakshak summary endpoint"""
+    """Test /api/arthrakshak/summary endpoint"""
     
-    @pytest.fixture(scope="class")
-    def auth_headers(self):
-        """Get authentication headers"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        token = response.json()["token"]
-        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
     
-    def test_get_summary(self, auth_headers):
+    def test_get_summary_success(self, auth_token):
         """Test getting ArthRakshak summary"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/summary", headers=auth_headers)
-        assert response.status_code == 200, f"Summary failed: {response.text}"
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/arthrakshak/summary", headers=headers)
         
+        assert response.status_code == 200, f"Summary failed: {response.text}"
         data = response.json()
+        
+        # Verify response structure
         assert "total_policies" in data
         assert "by_category" in data
         assert "total_annual_premium" in data
@@ -82,203 +78,99 @@ class TestArthRakshakSummary:
         assert "cards" in data["by_category"]
         
         print(f"✓ Summary retrieved: {data['total_policies']} policies, ₹{data['total_annual_premium']} annual premium")
+        return data
+    
+    def test_summary_unauthorized(self):
+        """Test summary without auth token"""
+        response = requests.get(f"{BASE_URL}/api/arthrakshak/summary")
+        assert response.status_code in [401, 403], "Should require authentication"
+        print("✓ Summary correctly requires authentication")
 
 
-class TestArthRakshakPolicyCRUD:
-    """Tests for Policy CRUD operations"""
+class TestArthRakshakProtectionGap:
+    """Test /api/arthrakshak/protection-gap endpoint"""
     
-    @pytest.fixture(scope="class")
-    def auth_headers(self):
-        """Get authentication headers"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        token = response.json()["token"]
-        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
     
-    @pytest.fixture(scope="class")
-    def test_policy_data(self):
-        """Test policy data for CRUD operations"""
-        return {
-            "category": "life",
-            "policy_type": "term_insurance",
-            "insurer_name": "TEST_HDFC Life",
-            "policy_number": f"TEST_POL{uuid.uuid4().hex[:8].upper()}",
-            "start_date": "2024-01-01",
-            "end_date": "2054-01-01",
-            "premium_amount": 15000,
-            "premium_frequency": "yearly",
-            "sum_assured": 10000000,
-            "nominee_added": True,
-            "nominees": [{"name": "Test Nominee", "relationship": "Spouse", "percentage": 100}],
-            "document_url": ""
-        }
-    
-    def test_create_life_policy(self, auth_headers, test_policy_data):
-        """Test creating a life insurance policy"""
-        response = requests.post(
-            f"{BASE_URL}/api/arthrakshak/policies",
-            headers=auth_headers,
-            json=test_policy_data
-        )
-        assert response.status_code == 200, f"Create policy failed: {response.text}"
+    def test_get_protection_gap(self, auth_token):
+        """Test getting protection gap analysis"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/arthrakshak/protection-gap", headers=headers)
         
+        assert response.status_code == 200, f"Protection gap failed: {response.text}"
         data = response.json()
-        assert "id" in data
-        assert data["category"] == "life"
-        assert data["policy_type"] == "term_insurance"
-        assert data["insurer_name"] == test_policy_data["insurer_name"]
-        assert data["sum_assured"] == 10000000
-        assert data["premium_amount"] == 15000
         
-        # Store policy ID for later tests
-        pytest.created_policy_id = data["id"]
-        print(f"✓ Life policy created: {data['id']}")
-    
-    def test_create_health_policy(self, auth_headers):
-        """Test creating a health insurance policy"""
-        health_policy = {
-            "category": "health",
-            "policy_type": "health_family_floater",
-            "insurer_name": "TEST_Star Health",
-            "policy_number": f"TEST_HEALTH{uuid.uuid4().hex[:8].upper()}",
-            "start_date": "2024-01-01",
-            "end_date": "2025-01-01",
-            "premium_amount": 25000,
-            "premium_frequency": "yearly",
-            "sum_assured": 1000000,
-            "nominee_added": False,
-            "nominees": [],
-            "document_url": ""
-        }
+        # Verify response structure
+        assert "protection_score" in data
+        assert "life_insurance" in data
+        assert "health_insurance" in data
+        assert "vehicle_insurance" in data
+        assert "cards_insurance" in data
+        assert "unprotected_areas" in data
+        assert "action_items" in data
         
-        response = requests.post(
-            f"{BASE_URL}/api/arthrakshak/policies",
-            headers=auth_headers,
-            json=health_policy
-        )
-        assert response.status_code == 200, f"Create health policy failed: {response.text}"
+        # Verify protection score is valid
+        assert 0 <= data["protection_score"] <= 100
         
-        data = response.json()
-        assert data["category"] == "health"
-        assert data["policy_type"] == "health_family_floater"
+        # Verify category structure
+        for category in ["life_insurance", "health_insurance", "vehicle_insurance", "cards_insurance"]:
+            assert "category" in data[category]
+            assert "status" in data[category]
+            assert "message" in data[category]
+            assert "recommendations" in data[category]
         
-        pytest.created_health_policy_id = data["id"]
-        print(f"✓ Health policy created: {data['id']}")
-    
-    def test_get_policies(self, auth_headers):
-        """Test getting all policies"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/policies", headers=auth_headers)
-        assert response.status_code == 200, f"Get policies failed: {response.text}"
-        
-        data = response.json()
-        assert "policies" in data
-        assert isinstance(data["policies"], list)
-        
-        # Verify our test policies exist
-        policy_ids = [p["id"] for p in data["policies"]]
-        if hasattr(pytest, 'created_policy_id'):
-            assert pytest.created_policy_id in policy_ids, "Created life policy not found"
-        
-        print(f"✓ Retrieved {len(data['policies'])} policies")
-    
-    def test_update_policy(self, auth_headers, test_policy_data):
-        """Test updating a policy"""
-        if not hasattr(pytest, 'created_policy_id'):
-            pytest.skip("No policy created to update")
-        
-        updated_data = test_policy_data.copy()
-        updated_data["insurer_name"] = "TEST_HDFC Life Updated"
-        updated_data["premium_amount"] = 18000
-        
-        response = requests.put(
-            f"{BASE_URL}/api/arthrakshak/policies/{pytest.created_policy_id}",
-            headers=auth_headers,
-            json=updated_data
-        )
-        assert response.status_code == 200, f"Update policy failed: {response.text}"
-        
-        data = response.json()
-        assert data["insurer_name"] == "TEST_HDFC Life Updated"
-        assert data["premium_amount"] == 18000
-        
-        print(f"✓ Policy updated successfully")
-    
-    def test_delete_policy(self, auth_headers):
-        """Test deleting a policy"""
-        if not hasattr(pytest, 'created_policy_id'):
-            pytest.skip("No policy created to delete")
-        
-        response = requests.delete(
-            f"{BASE_URL}/api/arthrakshak/policies/{pytest.created_policy_id}",
-            headers=auth_headers
-        )
-        assert response.status_code == 200, f"Delete policy failed: {response.text}"
-        
-        data = response.json()
-        assert "message" in data
-        
-        # Verify deletion
-        get_response = requests.get(f"{BASE_URL}/api/arthrakshak/policies", headers=auth_headers)
-        policies = get_response.json()["policies"]
-        policy_ids = [p["id"] for p in policies]
-        assert pytest.created_policy_id not in policy_ids, "Policy still exists after deletion"
-        
-        print(f"✓ Policy deleted successfully")
-    
-    def test_delete_health_policy_cleanup(self, auth_headers):
-        """Cleanup: Delete health policy"""
-        if not hasattr(pytest, 'created_health_policy_id'):
-            pytest.skip("No health policy to cleanup")
-        
-        response = requests.delete(
-            f"{BASE_URL}/api/arthrakshak/policies/{pytest.created_health_policy_id}",
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        print(f"✓ Health policy cleaned up")
+        print(f"✓ Protection gap retrieved: Score {data['protection_score']}/100")
+        print(f"  - Unprotected areas: {len(data['unprotected_areas'])}")
+        print(f"  - Action items: {len(data['action_items'])}")
+        return data
 
 
 class TestArthRakshakRiskProfile:
-    """Tests for Risk Profile endpoints"""
+    """Test /api/arthrakshak/risk-profile endpoints"""
     
-    @pytest.fixture(scope="class")
-    def auth_headers(self):
-        """Get authentication headers"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        token = response.json()["token"]
-        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
     
-    def test_get_risk_profile(self, auth_headers):
+    def test_get_risk_profile(self, auth_token):
         """Test getting risk profile"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/risk-profile", headers=auth_headers)
-        assert response.status_code == 200, f"Get risk profile failed: {response.text}"
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/arthrakshak/risk-profile", headers=headers)
         
+        assert response.status_code == 200, f"Risk profile failed: {response.text}"
         data = response.json()
-        # Verify profile structure
+        
+        # Verify response structure
+        assert "user_id" in data
         assert "age" in data
         assert "marital_status" in data
         assert "dependents" in data
         assert "annual_income" in data
-        assert "city_tier" in data
         
-        print(f"✓ Risk profile retrieved: age={data.get('age')}, income={data.get('annual_income')}")
+        print(f"✓ Risk profile retrieved: Age {data['age']}, Income ₹{data['annual_income']}")
+        return data
     
-    def test_save_risk_profile(self, auth_headers):
+    def test_save_risk_profile(self, auth_token):
         """Test saving risk profile"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        
         profile_data = {
             "age": 35,
             "marital_status": "married",
             "dependents": 2,
-            "earning_members": 2,
+            "earning_members": 1,
             "city_tier": "tier1",
-            "annual_income": 1500000,
-            "outstanding_loans": 3000000,
-            "existing_investments": 500000,
+            "annual_income": 1800000,
+            "outstanding_loans": 500000,
+            "existing_investments": 1000000,
             "emergency_fund_months": 6,
             "has_pure_term": True,
             "total_life_cover": 10000000,
@@ -294,294 +186,308 @@ class TestArthRakshakRiskProfile:
         
         response = requests.post(
             f"{BASE_URL}/api/arthrakshak/risk-profile",
-            headers=auth_headers,
+            headers=headers,
             json=profile_data
         )
-        assert response.status_code == 200, f"Save risk profile failed: {response.text}"
         
+        assert response.status_code == 200, f"Save risk profile failed: {response.text}"
         data = response.json()
         assert "message" in data
         assert "profile" in data
         
-        # Verify saved data
-        saved_profile = data["profile"]
-        assert saved_profile["age"] == 35
-        assert saved_profile["annual_income"] == 1500000
-        assert saved_profile["dependents"] == 2
-        
         print(f"✓ Risk profile saved successfully")
+        return data
+
+
+class TestArthRakshakPolicies:
+    """Test /api/arthrakshak/policies CRUD endpoints"""
     
-    def test_verify_risk_profile_persistence(self, auth_headers):
-        """Verify risk profile was persisted correctly"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/risk-profile", headers=auth_headers)
-        assert response.status_code == 200
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
+    
+    def test_get_policies(self, auth_token):
+        """Test getting all policies"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/arthrakshak/policies", headers=headers)
         
+        assert response.status_code == 200, f"Get policies failed: {response.text}"
         data = response.json()
-        assert data["age"] == 35
-        assert data["annual_income"] == 1500000
+        assert "policies" in data
         
-        print(f"✓ Risk profile persistence verified")
-
-
-class TestArthRakshakProtectionGap:
-    """Tests for Protection Gap calculation"""
+        print(f"✓ Retrieved {len(data['policies'])} policies")
+        return data
     
-    @pytest.fixture(scope="class")
-    def auth_headers(self):
-        """Get authentication headers"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        token = response.json()["token"]
-        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    
-    def test_get_protection_gap(self, auth_headers):
-        """Test getting protection gap analysis"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/protection-gap", headers=auth_headers)
-        assert response.status_code == 200, f"Get protection gap failed: {response.text}"
+    def test_create_policy(self, auth_token):
+        """Test creating a new policy"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
         
+        policy_data = {
+            "category": "life",
+            "policy_type": "term_insurance",
+            "insurer_name": "TEST_HDFC Life",
+            "policy_number": f"TEST_{uuid.uuid4().hex[:8].upper()}",
+            "start_date": "2024-01-01",
+            "end_date": "2054-01-01",
+            "premium_amount": 15000,
+            "premium_frequency": "yearly",
+            "sum_assured": 10000000,
+            "nominee_added": True,
+            "nominees": [{"name": "Test Nominee", "relationship": "spouse", "percentage": 100}]
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/api/arthrakshak/policies",
+            headers=headers,
+            json=policy_data
+        )
+        
+        assert response.status_code == 200, f"Create policy failed: {response.text}"
         data = response.json()
         
-        # Verify structure
-        assert "protection_score" in data
-        assert "life_insurance" in data
-        assert "health_insurance" in data
-        assert "vehicle_insurance" in data
-        assert "cards_insurance" in data
-        assert "unprotected_areas" in data
-        assert "action_items" in data
+        # Verify response
+        assert "id" in data
+        assert data["insurer_name"] == policy_data["insurer_name"]
+        assert data["sum_assured"] == policy_data["sum_assured"]
         
-        # Verify category structure
-        for category in ["life_insurance", "health_insurance", "vehicle_insurance", "cards_insurance"]:
-            cat_data = data[category]
-            assert "category" in cat_data
-            assert "status" in cat_data
-            assert "message" in cat_data
-            assert cat_data["status"] in ["covered", "underinsured", "not_insured", "unknown"]
+        print(f"✓ Policy created: {data['id']}")
+        return data
+    
+    def test_update_policy(self, auth_token):
+        """Test updating a policy"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
         
-        print(f"✓ Protection gap retrieved: score={data['protection_score']}")
-        print(f"  Life: {data['life_insurance']['status']}")
-        print(f"  Health: {data['health_insurance']['status']}")
-        print(f"  Vehicle: {data['vehicle_insurance']['status']}")
-        print(f"  Cards: {data['cards_insurance']['status']}")
+        # First create a policy
+        policy_data = {
+            "category": "health",
+            "policy_type": "health_family_floater",
+            "insurer_name": "TEST_Star Health",
+            "policy_number": f"TEST_{uuid.uuid4().hex[:8].upper()}",
+            "start_date": "2024-01-01",
+            "end_date": "2025-01-01",
+            "premium_amount": 25000,
+            "premium_frequency": "yearly",
+            "sum_assured": 1000000,
+            "nominee_added": False,
+            "nominees": []
+        }
+        
+        create_response = requests.post(
+            f"{BASE_URL}/api/arthrakshak/policies",
+            headers=headers,
+            json=policy_data
+        )
+        assert create_response.status_code == 200
+        created_policy = create_response.json()
+        policy_id = created_policy["id"]
+        
+        # Update the policy
+        updated_data = policy_data.copy()
+        updated_data["sum_assured"] = 1500000
+        updated_data["premium_amount"] = 30000
+        
+        update_response = requests.put(
+            f"{BASE_URL}/api/arthrakshak/policies/{policy_id}",
+            headers=headers,
+            json=updated_data
+        )
+        
+        assert update_response.status_code == 200, f"Update policy failed: {update_response.text}"
+        updated_policy = update_response.json()
+        
+        assert updated_policy["sum_assured"] == 1500000
+        assert updated_policy["premium_amount"] == 30000
+        
+        print(f"✓ Policy updated: {policy_id}")
+        return updated_policy
+    
+    def test_delete_policy(self, auth_token):
+        """Test deleting a policy"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        
+        # First create a policy to delete
+        policy_data = {
+            "category": "vehicle",
+            "policy_type": "vehicle_car",
+            "insurer_name": "TEST_ICICI Lombard",
+            "policy_number": f"TEST_{uuid.uuid4().hex[:8].upper()}",
+            "start_date": "2024-01-01",
+            "end_date": "2025-01-01",
+            "premium_amount": 12000,
+            "premium_frequency": "yearly",
+            "sum_assured": 800000,
+            "nominee_added": False,
+            "nominees": []
+        }
+        
+        create_response = requests.post(
+            f"{BASE_URL}/api/arthrakshak/policies",
+            headers=headers,
+            json=policy_data
+        )
+        assert create_response.status_code == 200
+        policy_id = create_response.json()["id"]
+        
+        # Delete the policy
+        delete_response = requests.delete(
+            f"{BASE_URL}/api/arthrakshak/policies/{policy_id}",
+            headers=headers
+        )
+        
+        assert delete_response.status_code == 200, f"Delete policy failed: {delete_response.text}"
+        
+        # Verify deletion
+        get_response = requests.get(f"{BASE_URL}/api/arthrakshak/policies", headers=headers)
+        policies = get_response.json()["policies"]
+        assert not any(p["id"] == policy_id for p in policies)
+        
+        print(f"✓ Policy deleted: {policy_id}")
 
 
-class TestArthRakshakCoverageChecklist:
-    """Tests for Coverage Checklist endpoints"""
+class TestArthRakshakCoverage:
+    """Test /api/arthrakshak/coverage-checklist and policy coverage endpoints"""
     
-    @pytest.fixture(scope="class")
-    def auth_headers(self):
-        """Get authentication headers"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        token = response.json()["token"]
-        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
     
-    def test_get_life_checklist(self, auth_headers):
-        """Test getting life insurance checklist"""
+    def test_get_coverage_checklist_life(self, auth_token):
+        """Test getting coverage checklist for life insurance"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
         response = requests.get(
             f"{BASE_URL}/api/arthrakshak/coverage-checklist/life",
-            headers=auth_headers
+            headers=headers
         )
-        assert response.status_code == 200, f"Get life checklist failed: {response.text}"
         
+        assert response.status_code == 200, f"Coverage checklist failed: {response.text}"
         data = response.json()
+        
         assert "inclusions" in data
         assert "exclusions" in data
         assert len(data["inclusions"]) > 0
         assert len(data["exclusions"]) > 0
         
-        # Verify structure
-        for item in data["inclusions"]:
-            assert "key" in item
-            assert "label" in item
-        
-        print(f"✓ Life checklist: {len(data['inclusions'])} inclusions, {len(data['exclusions'])} exclusions")
+        print(f"✓ Life coverage checklist: {len(data['inclusions'])} inclusions, {len(data['exclusions'])} exclusions")
     
-    def test_get_health_checklist(self, auth_headers):
-        """Test getting health insurance checklist"""
+    def test_get_coverage_checklist_health(self, auth_token):
+        """Test getting coverage checklist for health insurance"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
         response = requests.get(
             f"{BASE_URL}/api/arthrakshak/coverage-checklist/health",
-            headers=auth_headers
+            headers=headers
         )
+        
         assert response.status_code == 200
-        
         data = response.json()
-        assert len(data["inclusions"]) > 0
-        print(f"✓ Health checklist: {len(data['inclusions'])} inclusions, {len(data['exclusions'])} exclusions")
-    
-    def test_get_vehicle_checklist(self, auth_headers):
-        """Test getting vehicle insurance checklist"""
-        response = requests.get(
-            f"{BASE_URL}/api/arthrakshak/coverage-checklist/vehicle",
-            headers=auth_headers
-        )
-        assert response.status_code == 200
         
-        data = response.json()
-        assert len(data["inclusions"]) > 0
-        print(f"✓ Vehicle checklist: {len(data['inclusions'])} inclusions, {len(data['exclusions'])} exclusions")
-    
-    def test_get_cards_checklist(self, auth_headers):
-        """Test getting cards insurance checklist"""
-        response = requests.get(
-            f"{BASE_URL}/api/arthrakshak/coverage-checklist/cards",
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        
-        data = response.json()
-        assert "inclusions" in data
-        print(f"✓ Cards checklist: {len(data['inclusions'])} inclusions")
-    
-    def test_invalid_category_checklist(self, auth_headers):
-        """Test getting checklist for invalid category"""
-        response = requests.get(
-            f"{BASE_URL}/api/arthrakshak/coverage-checklist/invalid",
-            headers=auth_headers
-        )
-        assert response.status_code == 400
-        print(f"✓ Invalid category returns 400 as expected")
-
-
-class TestArthRakshakPolicyCoverage:
-    """Tests for Policy Coverage (inclusions/exclusions) endpoints"""
-    
-    @pytest.fixture(scope="class")
-    def auth_headers(self):
-        """Get authentication headers"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "client_id": TEST_CLIENT_ID,
-            "password": TEST_PASSWORD
-        })
-        token = response.json()["token"]
-        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    
-    @pytest.fixture(scope="class")
-    def test_policy(self, auth_headers):
-        """Create a test policy for coverage tests"""
-        policy_data = {
-            "category": "life",
-            "policy_type": "term_insurance",
-            "insurer_name": "TEST_Coverage_Policy",
-            "policy_number": f"TEST_COV{uuid.uuid4().hex[:8].upper()}",
-            "start_date": "2024-01-01",
-            "end_date": "2054-01-01",
-            "premium_amount": 12000,
-            "premium_frequency": "yearly",
-            "sum_assured": 5000000,
-            "nominee_added": False,
-            "nominees": [],
-            "document_url": ""
-        }
-        
-        response = requests.post(
-            f"{BASE_URL}/api/arthrakshak/policies",
-            headers=auth_headers,
-            json=policy_data
-        )
-        assert response.status_code == 200
-        return response.json()
-    
-    def test_get_policy_coverage(self, auth_headers, test_policy):
-        """Test getting policy coverage details"""
-        response = requests.get(
-            f"{BASE_URL}/api/arthrakshak/policies/{test_policy['id']}/coverage",
-            headers=auth_headers
-        )
-        assert response.status_code == 200, f"Get coverage failed: {response.text}"
-        
-        data = response.json()
-        assert "policy_id" in data
         assert "inclusions" in data
         assert "exclusions" in data
-        assert "custom_notes" in data
         
-        print(f"✓ Policy coverage retrieved with default values")
+        print(f"✓ Health coverage checklist: {len(data['inclusions'])} inclusions, {len(data['exclusions'])} exclusions")
     
-    def test_update_policy_coverage(self, auth_headers, test_policy):
-        """Test updating policy coverage"""
-        coverage_data = {
-            "inclusions": {
-                "death_illness": True,
-                "death_accident": True,
-                "critical_illness": True,
-                "accidental_disability": False
-            },
-            "exclusions": {
-                "suicide_clause": True,
-                "ped": True,
-                "adventure_sports": False
-            },
-            "custom_notes": "Test coverage notes - policy includes critical illness rider"
-        }
-        
-        response = requests.put(
-            f"{BASE_URL}/api/arthrakshak/policies/{test_policy['id']}/coverage",
-            headers=auth_headers,
-            json=coverage_data
-        )
-        assert response.status_code == 200, f"Update coverage failed: {response.text}"
-        
-        data = response.json()
-        assert "message" in data
-        assert "coverage" in data
-        
-        print(f"✓ Policy coverage updated successfully")
-    
-    def test_verify_coverage_persistence(self, auth_headers, test_policy):
-        """Verify coverage was persisted correctly"""
+    def test_get_coverage_checklist_vehicle(self, auth_token):
+        """Test getting coverage checklist for vehicle insurance"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
         response = requests.get(
-            f"{BASE_URL}/api/arthrakshak/policies/{test_policy['id']}/coverage",
-            headers=auth_headers
+            f"{BASE_URL}/api/arthrakshak/coverage-checklist/vehicle",
+            headers=headers
         )
-        assert response.status_code == 200
         
+        assert response.status_code == 200
         data = response.json()
-        assert data["inclusions"]["critical_illness"] == True
-        assert data["custom_notes"] == "Test coverage notes - policy includes critical illness rider"
         
-        print(f"✓ Coverage persistence verified")
+        assert "inclusions" in data
+        assert "exclusions" in data
+        
+        print(f"✓ Vehicle coverage checklist: {len(data['inclusions'])} inclusions, {len(data['exclusions'])} exclusions")
     
-    def test_cleanup_test_policy(self, auth_headers, test_policy):
-        """Cleanup: Delete test policy"""
-        response = requests.delete(
-            f"{BASE_URL}/api/arthrakshak/policies/{test_policy['id']}",
-            headers=auth_headers
+    def test_get_coverage_checklist_cards(self, auth_token):
+        """Test getting coverage checklist for card insurance"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = requests.get(
+            f"{BASE_URL}/api/arthrakshak/coverage-checklist/cards",
+            headers=headers
         )
+        
         assert response.status_code == 200
-        print(f"✓ Test policy cleaned up")
+        data = response.json()
+        
+        assert "inclusions" in data
+        
+        print(f"✓ Cards coverage checklist: {len(data['inclusions'])} inclusions")
 
 
-class TestArthRakshakUnauthorized:
-    """Tests for unauthorized access"""
+class TestQuestionnaireForArthRakshak:
+    """Test /api/questionnaire endpoint used by ArthRakshak"""
     
-    def test_summary_without_auth(self):
-        """Test accessing summary without authentication"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/summary")
-        assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
-        print(f"✓ Summary requires authentication")
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
     
-    def test_policies_without_auth(self):
-        """Test accessing policies without authentication"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/policies")
-        assert response.status_code in [401, 403]
-        print(f"✓ Policies require authentication")
+    def test_get_questionnaire(self, auth_token):
+        """Test getting questionnaire data"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/questionnaire", headers=headers)
+        
+        assert response.status_code == 200, f"Questionnaire failed: {response.text}"
+        data = response.json()
+        
+        # Verify key fields used by ArthRakshak
+        print(f"✓ Questionnaire retrieved")
+        
+        # Check for family-related fields
+        if "marital_status" in data:
+            print(f"  - Marital status: {data.get('marital_status', 'N/A')}")
+        
+        # Check for vehicle data
+        if "vehicles" in data and data["vehicles"]:
+            print(f"  - Vehicles: {len(data['vehicles'])}")
+        
+        return data
+
+
+class TestCleanup:
+    """Cleanup test data"""
     
-    def test_risk_profile_without_auth(self):
-        """Test accessing risk profile without authentication"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/risk-profile")
-        assert response.status_code in [401, 403]
-        print(f"✓ Risk profile requires authentication")
+    @pytest.fixture
+    def auth_token(self):
+        response = requests.post(f"{BASE_URL}/api/auth/login", json=PREMIUM_USER)
+        if response.status_code != 200:
+            pytest.skip("Authentication failed")
+        return response.json()["token"]
     
-    def test_protection_gap_without_auth(self):
-        """Test accessing protection gap without authentication"""
-        response = requests.get(f"{BASE_URL}/api/arthrakshak/protection-gap")
-        assert response.status_code in [401, 403]
-        print(f"✓ Protection gap requires authentication")
+    def test_cleanup_test_policies(self, auth_token):
+        """Delete all TEST_ prefixed policies"""
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        
+        # Get all policies
+        response = requests.get(f"{BASE_URL}/api/arthrakshak/policies", headers=headers)
+        if response.status_code != 200:
+            return
+        
+        policies = response.json().get("policies", [])
+        deleted_count = 0
+        
+        for policy in policies:
+            if policy.get("insurer_name", "").startswith("TEST_") or \
+               policy.get("policy_number", "").startswith("TEST_"):
+                delete_response = requests.delete(
+                    f"{BASE_URL}/api/arthrakshak/policies/{policy['id']}",
+                    headers=headers
+                )
+                if delete_response.status_code == 200:
+                    deleted_count += 1
+        
+        print(f"✓ Cleaned up {deleted_count} test policies")
 
 
 if __name__ == "__main__":

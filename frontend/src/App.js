@@ -9,6 +9,7 @@ import FinancialQuestionnaire from './pages/FinancialQuestionnaire';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
 import ArthRakshakDashboard from './pages/ArthRakshakDashboard';
+import ArthRakshakFamily from './pages/ArthRakshakFamily';
 import { Toaster } from './components/ui/sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -90,6 +91,10 @@ function App() {
           {/* ArthRakshak App Routes */}
           <Route 
             path="/arthrakshak/dashboard" 
+            element={token ? <ArthRakshakFamily token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+          />
+          <Route 
+            path="/arthrakshak/old" 
             element={token ? <ArthRakshakDashboard token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
           />
         </Routes>
