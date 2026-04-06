@@ -284,6 +284,17 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
     return '₹' + absNum.toLocaleString('en-IN');
   };
 
+  // Format currency with 2 decimals for tables
+  const formatINR2 = (num) => {
+    if (num === 0 || !num) return '₹0.00L';
+    const absNum = Math.abs(num);
+    if (absNum >= 100000) {
+      const val = absNum / 100000;
+      return `₹${val.toFixed(2)}L`;
+    }
+    return '₹' + absNum.toLocaleString('en-IN');
+  };
+
   // Get score rating
   const getScoreRating = (s) => {
     if (s >= 80) return 'EXCELLENT';
@@ -390,43 +401,43 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Bank Balance</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(bankBalance, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(bankBalance)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Savings & Current</div>
             </div>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Mutual Funds</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(mutualFunds, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(mutualFunds)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>SIP + Lumpsum</div>
             </div>
             <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>PF / NPS</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(pfNps, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(pfNps)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Retirement corpus</div>
             </div>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Stocks</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(stocks, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(stocks)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Direct equity</div>
             </div>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Fixed Deposits</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(fd, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(fd)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Bank FD / RD</div>
             </div>
             <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Gold / Jewellery</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--gold)',marginBottom:'4px'}}>{formatINR(gold, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--gold)',marginBottom:'4px'}}>{formatINR2(gold)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Physical + Digital</div>
             </div>
             <div style={{padding:'16px',gridColumn:'span 3'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Emergency Fund</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR(emergencyFund, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(emergencyFund)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Liquid savings</div>
             </div>
           </div>
           <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
             <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL ASSETS</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)'}}>{formatINR(totalAssets, true)}</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)'}}>{formatINR2(totalAssets)}</span>
           </div>
         </div>
 
@@ -439,38 +450,38 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Home Loan</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(homeLoan, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(homeLoan)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Outstanding principal</div>
             </div>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Personal Loan</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(personalLoan, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(personalLoan)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Unsecured debt</div>
             </div>
             <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Car Loan</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(carLoan, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(carLoan)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Vehicle finance</div>
             </div>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Credit Card Debt</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(creditCardDebt, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(creditCardDebt)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Revolving credit</div>
             </div>
             <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Other Loans</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR(otherLoans, true)}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(otherLoans)}</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Education / Other</div>
             </div>
             <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Debt-to-Income</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--amb)',marginBottom:'4px'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(1) : 0}%</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--amb)',marginBottom:'4px'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(2) : '0.00'}%</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: &lt;30%</div>
             </div>
           </div>
           <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
             <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL LIABILITIES</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)'}}>{formatINR(totalLiabilities, true)}</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)'}}>{formatINR2(totalLiabilities)}</span>
           </div>
         </div>
       </div>
@@ -485,33 +496,33 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           {/* Row 1 */}
           <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Income</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR(income * 12, true)}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(income * 12)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>Gross salary</div>
           </div>
           <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Savings</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR(savings * 12, true)}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(savings * 12)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>{savingsRate}% rate</div>
           </div>
           <div style={{padding:'20px',borderBottom:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Total Expenses</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{formatINR(expenses * 12, true)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>{((expenses/income)*100).toFixed(1)}% income</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{formatINR2(expenses * 12)}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>{((expenses/income)*100).toFixed(2)}% income</div>
           </div>
           {/* Row 2 */}
           <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Net Worth</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--gold)',marginBottom:'6px'}}>{formatINR(netWorth, true)}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--gold)',marginBottom:'6px'}}>{formatINR2(netWorth)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>{(netWorth / (income * 12)).toFixed(2)}× income</div>
           </div>
           <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Free Surplus</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR(savings * 12, true)}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(savings * 12)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>After all outflows</div>
           </div>
           <div style={{padding:'20px'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Score</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{score}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{score.toFixed(2)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: 80+</div>
           </div>
         </div>
