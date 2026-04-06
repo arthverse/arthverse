@@ -110,21 +110,94 @@ const PILLAR_DETAILS = {
   },
   'Financial Habits': {
     icon: '📋',
-    description: 'Day-to-day money management practices',
-    benchmark: 'Good habits = Consistent wealth building',
+    description: 'Financial Stability Checkpoints — 7 key behaviors that indicate financial discipline',
+    benchmark: 'Target: Score 8+ out of 10 points across all checkpoints',
     factors: [
-      { label: 'Budget Tracking', getValue: () => 'Monthly' },
-      { label: 'Auto-Pay Setup', getValue: () => 'All EMIs' },
-      { label: 'Investment Regularity', getValue: () => 'Monthly SIP' },
-      { label: 'Expense Review', getValue: () => 'Quarterly' },
+      { label: 'Health Insurance', getValue: () => 'Check Q1' },
+      { label: 'Term Life Insurance', getValue: () => 'Check Q2' },
+      { label: 'ITR Filing', getValue: () => 'Check Q3' },
+      { label: 'Credit Card Usage', getValue: () => 'Check Q4-Q5' },
+    ],
+    checkpoints: [
+      {
+        q: 'Q1',
+        question: 'Do you have a personal health insurance policy (not just employer-provided)?',
+        color: '#D97706',
+        options: [
+          { label: 'A. Yes – Personal/family floater policy (≥ ₹5L cover)', points: 1 },
+          { label: 'B. No – Only employer-provided health cover', points: 0 },
+          { label: 'C. No health insurance at all', points: -2, penalty: true },
+        ]
+      },
+      {
+        q: 'Q2',
+        question: 'Do you have a pure Term Life Insurance policy?',
+        color: '#D97706',
+        options: [
+          { label: 'A. Yes – Pure term plan (coverage ≥ 10× annual income)', points: 1 },
+          { label: 'B. No – Only ULIP/Endowment/LIC money-back plan', points: 0 },
+          { label: 'C. No life insurance at all', points: -3, penalty: true },
+        ]
+      },
+      {
+        q: 'Q3',
+        question: 'Do you file your Income Tax Return (ITR) every year before the deadline?',
+        color: '#166534',
+        options: [
+          { label: 'A. Yes – Always on time, and I check Form 26AS/claim TDS refunds', points: 1 },
+          { label: 'B. Yes – But usually after the deadline', points: 0.5 },
+          { label: 'C. Only when required (loan/visa application)', points: 0 },
+          { label: 'D. No – I do not file ITR', points: 0 },
+        ]
+      },
+      {
+        q: 'Q4',
+        question: 'Do you carry a credit card?',
+        color: '#6B7280',
+        options: [
+          { label: 'A. Yes', points: 1 },
+          { label: 'B. No', points: 0 },
+        ]
+      },
+      {
+        q: 'Q5',
+        question: 'Do you carry a revolving credit card balance (i.e., not paying the full amount each month)?',
+        color: '#DC2626',
+        options: [
+          { label: 'A. No – I always pay the full outstanding amount', points: 0, penalty: false },
+          { label: 'B. Occasionally – a few times a year', points: -0.5, penalty: true },
+          { label: 'C. Yes – I regularly carry a balance and pay only minimum', points: -1, penalty: true },
+        ]
+      },
+      {
+        q: 'Q6',
+        question: 'Do you have an active personal loan taken for consumption (not for buying an asset)?',
+        color: '#DC2626',
+        options: [
+          { label: 'A. No personal loan for consumption', points: 0, penalty: false },
+          { label: 'B. Yes – one loan, actively paying it off', points: -0.5, penalty: true },
+          { label: 'C. Yes – multiple personal/consumer loans active', points: -1, penalty: true },
+        ]
+      },
+      {
+        q: 'Q7',
+        question: 'Do you invest regularly beyond savings accounts and Fixed Deposits?',
+        color: '#2563EB',
+        options: [
+          { label: 'A. Yes – Regular SIP/stocks/MF investments', points: 1 },
+          { label: 'B. No – All savings kept only in FD or savings account', points: 0 },
+        ]
+      },
     ],
     tips: [
-      'Track every expense using an app',
-      'Set up auto-pay for all bills and EMIs',
-      'Review subscriptions monthly - cancel unused ones',
-      'Do a financial review every quarter'
+      'Get personal health insurance (₹5L+ cover) - don\'t rely only on employer',
+      'Buy pure term insurance (10-15× income) - avoid ULIPs/endowments',
+      'File ITR on time every year - helps with loan approvals',
+      'Always pay credit card in full - avoid 36%+ interest trap',
+      'Never take personal loans for consumption/lifestyle',
+      'Invest regularly in MF/stocks beyond just FD/savings'
     ],
-    scoreLogic: 'Score based on self-reported habits questionnaire. Max 10 points.'
+    scoreLogic: 'Score = Sum of all checkpoint points. Max positive: 5 pts. Penalties can reduce score. Total converted to 10 points.'
   },
   'Life Insurance': {
     icon: '☂️',
@@ -953,6 +1026,62 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                   ))}
                 </div>
               </div>
+
+              {/* Financial Stability Checkpoints (for Financial Habits pillar) */}
+              {PILLAR_DETAILS[selectedPillar].checkpoints && (
+                <div className="pillar-modal-section">
+                  <div className="pillar-modal-section-title">Financial Stability Checkpoints (7 Questions)</div>
+                  <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+                    {PILLAR_DETAILS[selectedPillar].checkpoints.map((checkpoint, i) => (
+                      <div key={i} style={{
+                        background:'#F7F6F3',
+                        border:'1px solid #DDD9D1',
+                        borderRadius:'10px',
+                        overflow:'hidden'
+                      }}>
+                        <div style={{
+                          display:'flex',
+                          alignItems:'flex-start',
+                          gap:'12px',
+                          padding:'12px 14px',
+                          background:checkpoint.color,
+                        }}>
+                          <span style={{
+                            background:'rgba(255,255,255,0.2)',
+                            padding:'2px 8px',
+                            borderRadius:'4px',
+                            fontSize:'11px',
+                            fontWeight:700,
+                            color:'#fff',
+                          }}>{checkpoint.q}</span>
+                          <span style={{fontSize:'12px',fontWeight:600,color:'#fff',lineHeight:1.4}}>{checkpoint.question}</span>
+                        </div>
+                        <div style={{padding:'10px 14px'}}>
+                          {checkpoint.options.map((opt, j) => (
+                            <div key={j} style={{
+                              display:'flex',
+                              justifyContent:'space-between',
+                              alignItems:'center',
+                              padding:'6px 0',
+                              borderBottom: j < checkpoint.options.length - 1 ? '1px solid #E5E4E0' : 'none',
+                              fontSize:'11px',
+                            }}>
+                              <span style={{color:'#2E2D26'}}>{opt.label}</span>
+                              <span style={{
+                                fontFamily:"'JetBrains Mono',monospace",
+                                fontWeight:600,
+                                color: opt.penalty ? '#DC2626' : opt.points > 0 ? '#166534' : '#6B7280',
+                              }}>
+                                → {opt.penalty ? `(${Math.abs(opt.points)}) pt penalty` : opt.points > 0 ? `${opt.points} pt` : `${opt.points} pt`}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Tips */}
               <div className="pillar-modal-section">
