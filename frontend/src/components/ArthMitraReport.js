@@ -956,50 +956,52 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                     <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'var(--grn)',fontWeight:700,marginLeft:'auto'}}>{formatINR(Math.round(allocationDeviationSavings))}</span>
                   </div>
                   <div style={{fontSize:'10px',color:'var(--t3)',marginBottom:'10px'}}>
-                    Formula: |Actual% - Ideal%| × Total Assets × 12% Expected Return
+                    Formula: |Actual Amount - Ideal Amount| × 12% Expected Return
                   </div>
                   <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',background:'var(--bg2)',borderRadius:'8px',overflow:'hidden'}}>
                     <thead>
                       <tr style={{background:'var(--bg4)'}}>
                         <th style={{padding:'8px',textAlign:'left',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>ASSET CLASS</th>
-                        <th style={{padding:'8px',textAlign:'center',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>ACTUAL</th>
-                        <th style={{padding:'8px',textAlign:'center',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>IDEAL</th>
-                        <th style={{padding:'8px',textAlign:'center',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>DEVIATION</th>
+                        <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>ACTUAL</th>
+                        <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>IDEAL</th>
+                        <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>DEVIATION</th>
                         <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>IMPACT</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr style={{borderBottom:'1px solid var(--border)'}}>
                         <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>📈 Equity (MF + Stocks)</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:equityActual < idealEquity ? 'var(--red)' : 'var(--grn)'}}>{(equityActual * 100).toFixed(1)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{(idealEquity * 100).toFixed(0)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:equityDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{(equityDeviation * 100).toFixed(1)}%</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(mutualFunds + stocks)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{formatINR2(totalAssets * idealEquity)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:equityDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{formatINR2(Math.abs((mutualFunds + stocks) - (totalAssets * idealEquity)))}</td>
                         <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:600}}>{formatINR(Math.round(equitySavingsImpact))}</td>
                       </tr>
                       <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
                         <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>🏦 Debt (FD + PF + Bank)</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:debtActual > idealDebt ? 'var(--amb)' : 'var(--grn)'}}>{(debtActual * 100).toFixed(1)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{(idealDebt * 100).toFixed(0)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:debtDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{(debtDeviation * 100).toFixed(1)}%</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(fd + pfNps + bankBalance)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{formatINR2(totalAssets * idealDebt)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:debtDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{formatINR2(Math.abs((fd + pfNps + bankBalance) - (totalAssets * idealDebt)))}</td>
                         <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:600}}>{formatINR(Math.round(debtSavingsImpact))}</td>
                       </tr>
                       <tr style={{borderBottom:'1px solid var(--border)'}}>
                         <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>🥇 Gold / Jewellery</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:goldActual !== idealGold ? 'var(--amb)' : 'var(--grn)'}}>{(goldActual * 100).toFixed(1)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{(idealGold * 100).toFixed(0)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:goldDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{(goldDeviation * 100).toFixed(1)}%</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(gold)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{formatINR2(totalAssets * idealGold)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:goldDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{formatINR2(Math.abs(gold - (totalAssets * idealGold)))}</td>
                         <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:600}}>{formatINR(Math.round(goldSavingsImpact))}</td>
                       </tr>
                       <tr style={{background:'var(--bg3)'}}>
                         <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>🏠 Real Estate</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:realEstateActual < idealRealEstate ? 'var(--red)' : 'var(--grn)'}}>{(realEstateActual * 100).toFixed(1)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{(idealRealEstate * 100).toFixed(0)}%</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:realEstateDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{(realEstateDeviation * 100).toFixed(1)}%</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(realEstate)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)'}}>{formatINR2(totalAssets * idealRealEstate)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:realEstateDeviation > 0.05 ? 'var(--amb)' : 'var(--grn)'}}>{formatINR2(Math.abs(realEstate - (totalAssets * idealRealEstate)))}</td>
                         <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:600}}>{formatINR(Math.round(realEstateSavingsImpact))}</td>
                       </tr>
                       <tr style={{background:'var(--goldbg)',borderTop:'2px solid var(--border)'}}>
-                        <td colSpan="3" style={{padding:'8px',fontWeight:700,color:'var(--t0)',fontSize:'10px'}}>TOTAL DEVIATION IMPACT</td>
-                        <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>{(allocationDeviation * 100).toFixed(1)}%</td>
+                        <td style={{padding:'8px',fontWeight:700,color:'var(--t0)',fontSize:'10px'}}>TOTAL</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)',fontWeight:700}}>{formatINR2(totalAssets)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)',fontWeight:700}}>{formatINR2(totalAssets)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>{formatINR2(allocationDeviation * totalAssets)}</td>
                         <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(allocationDeviationSavings))}</td>
                       </tr>
                     </tbody>
