@@ -939,13 +939,64 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               </tr>
               )}
               {investmentGapSavings > 0 && (
+              <>
               <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--grn)'}}>📈 Investment Gap × 10%</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
-                  {`(${formatINR2(targetInvestments)} - ${formatINR2(totalInvestments)}) × 10%`}
+                <td colSpan="3" style={{padding:'12px 8px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
+                    <span style={{fontWeight:600,color:'var(--grn)'}}>📈 Investment Gap × 10%</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'var(--grn)',fontWeight:700,marginLeft:'auto'}}>{formatINR(Math.round(investmentGapSavings))}</span>
+                  </div>
+                  <div style={{fontSize:'10px',color:'var(--t3)',marginBottom:'10px'}}>
+                    Formula: (Target Investments - Current Investments) × 10% potential return
+                  </div>
+                  <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',background:'var(--bg2)',borderRadius:'8px',overflow:'hidden'}}>
+                    <thead>
+                      <tr style={{background:'var(--bg4)'}}>
+                        <th style={{padding:'8px',textAlign:'left',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>INVESTMENT TYPE</th>
+                        <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>CURRENT</th>
+                        <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>TARGET</th>
+                        <th style={{padding:'8px',textAlign:'right',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>GAP</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{borderBottom:'1px solid var(--border)'}}>
+                        <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>📊 Mutual Funds</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(mutualFunds)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t3)',fontSize:'10px'}}>—</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t3)',fontSize:'10px'}}>—</td>
+                      </tr>
+                      <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                        <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>📈 Stocks / Equities</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(stocks)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t3)',fontSize:'10px'}}>—</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t3)',fontSize:'10px'}}>—</td>
+                      </tr>
+                      <tr style={{borderBottom:'1px solid var(--border)'}}>
+                        <td style={{padding:'8px',fontWeight:500,color:'var(--t1)'}}>🏦 PF / NPS</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(pfNps)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t3)',fontSize:'10px'}}>—</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t3)',fontSize:'10px'}}>—</td>
+                      </tr>
+                      <tr style={{background:'var(--bg3)',borderBottom:'1px solid var(--border)'}}>
+                        <td style={{padding:'8px',fontWeight:700,color:'var(--t0)'}}>Total Investments</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--blu)',fontWeight:700}}>{formatINR2(totalInvestments)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t2)',fontWeight:700}}>{formatINR2(targetInvestments)}</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>{formatINR2(investmentGap)}</td>
+                      </tr>
+                      <tr style={{background:'var(--goldbg)'}}>
+                        <td colSpan="2" style={{padding:'8px'}}>
+                          <div style={{fontSize:'10px',color:'var(--t2)'}}>
+                            <strong>Target:</strong> 2.5× Annual Income = 2.5 × {formatINR2(income * 12)} = {formatINR2(targetInvestments)}
+                          </div>
+                        </td>
+                        <td style={{padding:'8px',textAlign:'right',fontSize:'10px',color:'var(--t2)'}}>Gap × 10%</td>
+                        <td style={{padding:'8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(investmentGapSavings))}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(investmentGapSavings))}</td>
               </tr>
+              </>
               )}
               {allocationDeviationSavings > 0 && (
               <>
