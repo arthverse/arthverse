@@ -47,10 +47,14 @@ module.exports = {
                         input: 'hsl(var(--input))',
                         ring: 'hsl(var(--ring))',
                         brand: {
-                                blue: '#1e3a8a',
-                                orange: '#ea580c'
+                                blue: '#2563EB',
+                                'blue-dark': '#1D4ED8',
+                                'blue-light': '#3B82F6',
+                                orange: '#F97316',
+                                'orange-dark': '#EA580C',
+                                'orange-light': '#FB923C'
                         },
-                        alabaster: '#fdfbf7'
+                        alabaster: '#F8FAFC'
                 },
                 fontFamily: {
                         heading: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
@@ -60,8 +64,8 @@ module.exports = {
                 boxShadow: {
                         'card': '0 2px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.04)',
                         'floating': '0 20px 40px rgba(0,0,0,0.08)',
-                        'glow-orange': '0 0 20px rgba(234,88,12,0.3)',
-                        'glow-blue': '0 0 20px rgba(30,58,138,0.3)'
+                        'glow-orange': '0 0 20px rgba(249,115,22,0.3)',
+                        'glow-blue': '0 0 20px rgba(37,99,235,0.3)'
                 },
                 keyframes: {
                         'accordion-down': {

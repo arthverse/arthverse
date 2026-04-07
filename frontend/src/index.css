@@ -19,26 +19,34 @@ code {
 
 @layer base {
     :root {
-        --background: 220 17% 97%;
-        --foreground: 215 25% 12%;
+        --background: 210 40% 98%;
+        --foreground: 222 47% 11%;
         --card: 0 0% 100%;
-        --card-foreground: 215 25% 12%;
+        --card-foreground: 222 47% 11%;
         --popover: 0 0% 100%;
-        --popover-foreground: 215 25% 12%;
-        --primary: 217 100% 50%;
+        --popover-foreground: 222 47% 11%;
+        --primary: 221 83% 53%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 29 100% 50%;
+        --secondary: 24 95% 53%;
         --secondary-foreground: 0 0% 100%;
-        --muted: 220 14% 96%;
+        --muted: 210 40% 96%;
         --muted-foreground: 215 16% 47%;
-        --accent: 220 14% 96%;
-        --accent-foreground: 215 25% 12%;
+        --accent: 210 40% 96%;
+        --accent-foreground: 222 47% 11%;
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
-        --border: 220 13% 91%;
-        --input: 220 13% 91%;
-        --ring: 217 100% 50%;
+        --border: 214 32% 91%;
+        --input: 214 32% 91%;
+        --ring: 221 83% 53%;
         --radius: 0.5rem;
+        
+        /* Brand Colors */
+        --brand-blue: #2563EB;
+        --brand-blue-dark: #1D4ED8;
+        --brand-blue-light: #3B82F6;
+        --brand-orange: #F97316;
+        --brand-orange-dark: #EA580C;
+        --brand-orange-light: #FB923C;
     }
 }
 
