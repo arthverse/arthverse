@@ -507,6 +507,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [expandedRows, setExpandedRows] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
   const [selectedPillar, setSelectedPillar] = useState(null);
+  const [showInvestmentDetails, setShowInvestmentDetails] = useState(false);
+  const [showAllocationDetails, setShowAllocationDetails] = useState(false);
 
   // Calculate financial metrics
   const income = questionnaire?.monthly_income || userData?.monthlyIncome || 145000;
@@ -901,14 +903,6 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           <span style={{fontSize:'14px'}}>💰</span>
           <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Potential Savings Breakup — {formatINR(potentialSavings)}/year</span>
         </div>
-        
-        {/* Formula Display */}
-        <div style={{background:'var(--bg3)',padding:'12px 20px',borderBottom:'1px solid var(--border)'}}>
-          <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'6px'}}>📐 Formula</div>
-          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'11px',color:'var(--t1)',lineHeight:1.6,background:'var(--bg2)',padding:'10px 12px',borderRadius:'8px',border:'1px solid var(--border)'}}>
-            Potential Savings = <span style={{color:'var(--blu)'}}>Savings Deficit × 12</span> + <span style={{color:'var(--amb)'}}>Excess EMI × 12</span> + <span style={{color:'var(--grn)'}}>Investment Gap × 10%</span> + <span style={{color:'var(--teal)'}}>Asset Allocation Deviation × Expected Rate</span>
-          </div>
-        </div>
 
         <div style={{padding:'16px 20px'}}>
           <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
@@ -941,14 +935,20 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               {investmentGapSavings > 0 && (
               <>
               <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td colSpan="3" style={{padding:'12px 8px'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
-                    <span style={{fontWeight:600,color:'var(--grn)'}}>📈 Investment Gap × 10%</span>
-                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'var(--grn)',fontWeight:700,marginLeft:'auto'}}>{formatINR(Math.round(investmentGapSavings))}</span>
-                  </div>
-                  <div style={{fontSize:'10px',color:'var(--t3)',marginBottom:'10px'}}>
-                    Formula: (Target Investments - Current Investments) × 10% potential return
-                  </div>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--grn)'}}>📈 Investment Gap × 10%</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
+                  <button 
+                    onClick={() => setShowInvestmentDetails(!showInvestmentDetails)}
+                    style={{background:'none',border:'1px solid var(--border)',borderRadius:'4px',padding:'4px 10px',fontSize:'10px',color:'var(--blu)',cursor:'pointer',fontWeight:600,display:'flex',alignItems:'center',gap:'4px'}}
+                  >
+                    {showInvestmentDetails ? '▼ Hide Details' : '▶ View Details'}
+                  </button>
+                </td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(investmentGapSavings))}</td>
+              </tr>
+              {showInvestmentDetails && (
+              <tr style={{borderBottom:'1px solid var(--border)'}}>
+                <td colSpan="3" style={{padding:'0 8px 12px 8px'}}>
                   <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',background:'var(--bg2)',borderRadius:'8px',overflow:'hidden'}}>
                     <thead>
                       <tr style={{background:'var(--bg4)'}}>
@@ -996,19 +996,26 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                   </table>
                 </td>
               </tr>
+              )}
               </>
               )}
               {allocationDeviationSavings > 0 && (
               <>
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td colSpan="3" style={{padding:'12px 8px'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
-                    <span style={{fontWeight:600,color:'var(--teal)'}}>⚖️ Asset Allocation Deviation</span>
-                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'var(--grn)',fontWeight:700,marginLeft:'auto'}}>{formatINR(Math.round(allocationDeviationSavings))}</span>
-                  </div>
-                  <div style={{fontSize:'10px',color:'var(--t3)',marginBottom:'10px'}}>
-                    Formula: |Actual Amount - Ideal Amount| × 12% Expected Return
-                  </div>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--teal)'}}>⚖️ Asset Allocation Deviation</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
+                  <button 
+                    onClick={() => setShowAllocationDetails(!showAllocationDetails)}
+                    style={{background:'none',border:'1px solid var(--border)',borderRadius:'4px',padding:'4px 10px',fontSize:'10px',color:'var(--blu)',cursor:'pointer',fontWeight:600,display:'flex',alignItems:'center',gap:'4px'}}
+                  >
+                    {showAllocationDetails ? '▼ Hide Details' : '▶ View Details'}
+                  </button>
+                </td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(allocationDeviationSavings))}</td>
+              </tr>
+              {showAllocationDetails && (
+              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                <td colSpan="3" style={{padding:'0 8px 12px 8px'}}>
                   <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',background:'var(--bg2)',borderRadius:'8px',overflow:'hidden'}}>
                     <thead>
                       <tr style={{background:'var(--bg4)'}}>
@@ -1059,6 +1066,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                   </table>
                 </td>
               </tr>
+              )}
               </>
               )}
               <tr style={{background:'var(--bg2)'}}>
