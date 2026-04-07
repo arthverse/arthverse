@@ -904,33 +904,34 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               </tr>
             </thead>
             <tbody>
+              {savingsDeficitAnnual > 0 && (
               <tr style={{borderBottom:'1px solid var(--border)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--blu)'}}>📉 Savings Deficit × 12</td>
                 <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
-                  {actualSavingsRate >= targetSavingsRate 
-                    ? <span style={{color:'var(--grn)'}}>✓ Already saving {(actualSavingsRate * 100).toFixed(1)}% (Target: 30%)</span>
-                    : `(${(targetSavingsRate * 100).toFixed(0)}% - ${(actualSavingsRate * 100).toFixed(1)}%) × ${formatINR(income)} × 12`}
+                  {`(${(targetSavingsRate * 100).toFixed(0)}% - ${(actualSavingsRate * 100).toFixed(1)}%) × ${formatINR(income)} × 12`}
                 </td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(savingsDeficitAnnual))}</td>
               </tr>
+              )}
+              {excessEMIAnnual > 0 && (
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--amb)'}}>🏦 Excess EMI × 12</td>
                 <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
-                  {actualEMIRate <= targetEMIRate 
-                    ? <span style={{color:'var(--grn)'}}>✓ EMI ratio {(actualEMIRate * 100).toFixed(1)}% within limit (Target: &lt;40%)</span>
-                    : `(${(actualEMIRate * 100).toFixed(1)}% - ${(targetEMIRate * 100).toFixed(0)}%) × ${formatINR(income)} × 12`}
+                  {`(${(actualEMIRate * 100).toFixed(1)}% - ${(targetEMIRate * 100).toFixed(0)}%) × ${formatINR(income)} × 12`}
                 </td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(excessEMIAnnual))}</td>
               </tr>
+              )}
+              {investmentGapSavings > 0 && (
               <tr style={{borderBottom:'1px solid var(--border)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--grn)'}}>📈 Investment Gap × 10%</td>
                 <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
-                  {investmentGap <= 0 
-                    ? <span style={{color:'var(--grn)'}}>✓ Investments ({formatINR2(totalInvestments)}) exceed 2.5× income target</span>
-                    : `(${formatINR2(targetInvestments)} - ${formatINR2(totalInvestments)}) × 10%`}
+                  {`(${formatINR2(targetInvestments)} - ${formatINR2(totalInvestments)}) × 10%`}
                 </td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(investmentGapSavings))}</td>
               </tr>
+              )}
+              {allocationDeviationSavings > 0 && (
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--teal)'}}>⚖️ Asset Allocation Deviation</td>
                 <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
@@ -938,6 +939,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 </td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(allocationDeviationSavings))}</td>
               </tr>
+              )}
               <tr style={{background:'var(--bg2)'}}>
                 <td colSpan="2" style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL POTENTIAL SAVINGS / YEAR</td>
                 <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'16px'}}>{formatINR(potentialSavings)}</td>
