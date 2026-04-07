@@ -536,6 +536,52 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
 
   const netWorth = totalAssets - totalLiabilities;
 
+  // EMI calculations
+  const homeLoanEMI = questionnaire?.home_loan_emi || 0;
+  const personalLoanEMI = questionnaire?.personal_loan_emi || 0;
+  const carLoanEMI = questionnaire?.car_loan_emi || 0;
+  const totalEMI = homeLoanEMI + personalLoanEMI + carLoanEMI;
+  const emiRatio = income > 0 ? ((totalEMI / income) * 100).toFixed(1) : 0;
+
+  // ═══ POTENTIAL SAVINGS FORMULA ═══
+  // Potential Savings = Savings Deficit × 12 + Excess EMI × 12 + Investment Gap × 10% + Asset Allocation Deviation × Expected Rate
+  
+  // 1. Savings Deficit (Target: 30% of income)
+  const targetSavingsRate = 0.30;
+  const actualSavingsRate = income > 0 ? savings / income : 0;
+  const savingsDeficit = actualSavingsRate < targetSavingsRate 
+    ? (targetSavingsRate - actualSavingsRate) * income 
+    : 0;
+  const savingsDeficitAnnual = savingsDeficit * 12;
+
+  // 2. Excess EMI (Target: EMI should be < 40% of income)
+  const targetEMIRate = 0.40;
+  const actualEMIRate = income > 0 ? totalEMI / income : 0;
+  const excessEMI = actualEMIRate > targetEMIRate 
+    ? (actualEMIRate - targetEMIRate) * income 
+    : 0;
+  const excessEMIAnnual = excessEMI * 12;
+
+  // 3. Investment Gap (Target: Investments = 2.5× annual income)
+  const totalInvestments = mutualFunds + stocks + pfNps;
+  const targetInvestments = income * 12 * 2.5;
+  const investmentGap = totalInvestments < targetInvestments 
+    ? targetInvestments - totalInvestments 
+    : 0;
+  const investmentGapSavings = investmentGap * 0.10; // 10% of gap
+
+  // 4. Asset Allocation Deviation (Ideal: 50% Equity, 30% Debt, 10% Gold, 10% Real Estate)
+  const equityActual = totalAssets > 0 ? (mutualFunds + stocks) / totalAssets : 0;
+  const debtActual = totalAssets > 0 ? (fd + pfNps + bankBalance) / totalAssets : 0;
+  const goldActual = totalAssets > 0 ? gold / totalAssets : 0;
+  const idealEquity = 0.50, idealDebt = 0.30, idealGold = 0.10;
+  const allocationDeviation = Math.abs(equityActual - idealEquity) + Math.abs(debtActual - idealDebt) + Math.abs(goldActual - idealGold);
+  const expectedRate = 0.12; // 12% expected return
+  const allocationDeviationSavings = allocationDeviation * totalAssets * expectedRate;
+
+  // Total Potential Savings
+  const potentialSavings = Math.round(savingsDeficitAnnual + excessEMIAnnual + investmentGapSavings + allocationDeviationSavings);
+
   // Format currency
   const formatINR = (num, lakh = false) => {
     if (!num) return '₹0';
@@ -814,7 +860,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
 
           <div style={{padding:'14px 24px 18px'}}>
             <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'5px'}}>Potential Savings</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'26px',fontWeight:700,color:'#22C55E',lineHeight:1,letterSpacing:'-.02em'}}>{formatINR(Math.round(savings * 12 * 0.1))}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'26px',fontWeight:700,color:'#22C55E',lineHeight:1,letterSpacing:'-.02em'}}>{formatINR(potentialSavings)}</div>
           </div>
 
           <div style={{padding:'14px 24px 18px'}}>
@@ -830,53 +876,71 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         <div className="shn">3</div>
         <div className="sht">Priority Action Plan</div>
         <div className="shl"></div>
-        <div className="shb">Savings ₹{formatINR(Math.round(savings * 12 * 0.1))} + Risk Reduction ₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr</div>
+        <div className="shb">Savings ₹{formatINR(potentialSavings)} + Risk Reduction ₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr</div>
       </div>
 
       {/* Potential Savings Breakup */}
       <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'16px',animationDelay:'.26s'}}>
         <div style={{background:'linear-gradient(135deg,#166534,#15803d)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
           <span style={{fontSize:'14px'}}>💰</span>
-          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Potential Savings Breakup — {formatINR(Math.round(savings * 12 * 0.1))}/year</span>
+          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Potential Savings Breakup — {formatINR(potentialSavings)}/year</span>
         </div>
+        
+        {/* Formula Display */}
+        <div style={{background:'var(--bg3)',padding:'12px 20px',borderBottom:'1px solid var(--border)'}}>
+          <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'6px'}}>📐 Formula</div>
+          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'11px',color:'var(--t1)',lineHeight:1.6,background:'var(--bg2)',padding:'10px 12px',borderRadius:'8px',border:'1px solid var(--border)'}}>
+            Potential Savings = <span style={{color:'var(--blu)'}}>Savings Deficit × 12</span> + <span style={{color:'var(--amb)'}}>Excess EMI × 12</span> + <span style={{color:'var(--grn)'}}>Investment Gap × 10%</span> + <span style={{color:'var(--teal)'}}>Asset Allocation Deviation × Expected Rate</span>
+          </div>
+        </div>
+
         <div style={{padding:'16px 20px'}}>
           <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
             <thead>
               <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>AREA</th>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT</th>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>OPTIMIZED</th>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>COMPONENT</th>
+                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CALCULATION</th>
                 <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>SAVINGS</th>
               </tr>
             </thead>
             <tbody>
               <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏦 High-Interest Debt Restructure</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>CC @ 36% APR</td>
-                <td style={{padding:'12px 8px',color:'var(--grn)'}}>Balance Transfer @ 12%</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(creditCardDebt * 0.24))}</td>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--blu)'}}>📉 Savings Deficit × 12</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
+                  {actualSavingsRate >= targetSavingsRate 
+                    ? <span style={{color:'var(--grn)'}}>✓ Already saving {(actualSavingsRate * 100).toFixed(1)}% (Target: 30%)</span>
+                    : `(${(targetSavingsRate * 100).toFixed(0)}% - ${(actualSavingsRate * 100).toFixed(1)}%) × ${formatINR(income)} × 12`}
+                </td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(savingsDeficitAnnual))}</td>
               </tr>
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>📊 Tax-Efficient Investments</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>No 80C utilization</td>
-                <td style={{padding:'12px 8px',color:'var(--grn)'}}>Full ₹1.5L in ELSS</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(income * 12 * 0.3 * 0.1))}</td>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--amb)'}}>🏦 Excess EMI × 12</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
+                  {actualEMIRate <= targetEMIRate 
+                    ? <span style={{color:'var(--grn)'}}>✓ EMI ratio {(actualEMIRate * 100).toFixed(1)}% within limit (Target: &lt;40%)</span>
+                    : `(${(actualEMIRate * 100).toFixed(1)}% - ${(targetEMIRate * 100).toFixed(0)}%) × ${formatINR(income)} × 12`}
+                </td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(excessEMIAnnual))}</td>
               </tr>
               <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>⛽ Expense Optimization</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>No tracking</td>
-                <td style={{padding:'12px 8px',color:'var(--grn)'}}>10% expense cut</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(expenses * 12 * 0.1))}</td>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--grn)'}}>📈 Investment Gap × 10%</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
+                  {investmentGap <= 0 
+                    ? <span style={{color:'var(--grn)'}}>✓ Investments ({formatINR2(totalInvestments)}) exceed 2.5× income target</span>
+                    : `(${formatINR2(targetInvestments)} - ${formatINR2(totalInvestments)}) × 10%`}
+                </td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(investmentGapSavings))}</td>
               </tr>
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>💳 Credit Card Rewards</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>Random card usage</td>
-                <td style={{padding:'12px 8px',color:'var(--grn)'}}>Optimized card selection</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(expenses * 12 * 0.02))}</td>
+                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--teal)'}}>⚖️ Asset Allocation Deviation</td>
+                <td style={{padding:'12px 8px',color:'var(--t2)',fontSize:'11px'}}>
+                  {(allocationDeviation * 100).toFixed(1)}% deviation × {formatINR2(totalAssets)} × 12% rate
+                </td>
+                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700}}>{formatINR(Math.round(allocationDeviationSavings))}</td>
               </tr>
               <tr style={{background:'var(--bg2)'}}>
-                <td colSpan="3" style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL POTENTIAL SAVINGS / YEAR</td>
-                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'16px'}}>{formatINR(Math.round(savings * 12 * 0.1))}</td>
+                <td colSpan="2" style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL POTENTIAL SAVINGS / YEAR</td>
+                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'16px'}}>{formatINR(potentialSavings)}</td>
               </tr>
             </tbody>
           </table>

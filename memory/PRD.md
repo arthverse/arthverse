@@ -13,6 +13,16 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Modal headers updated from gold (#E8AA3A) to orange (#F97316)
 - **Testing**: 100% frontend pass rate verified
 
+### ✅ Potential Savings Formula Update (Apr 7, 2026)
+- Implemented new formula: `Potential Savings = Savings Deficit × 12 + Excess EMI × 12 + Investment Gap × 10% + Asset Allocation Deviation × Expected Rate`
+- Formula displayed in styled box with color-coded components
+- Component breakdown table shows:
+  - Savings Deficit (Target: 30% savings rate)
+  - Excess EMI (Target: EMI < 40% of income)
+  - Investment Gap (Target: 2.5× annual income in investments)
+  - Asset Allocation Deviation (vs ideal 50% Equity, 30% Debt, 10% Gold)
+- Each component shows calculation method and savings amount
+
 ### ✅ ArthMitra Premium Report (Apr 6, 2026)
 - 9-Pillar Financial Health Overview with View Details modals
 - Assets & Liabilities tables with 2 decimal precision
