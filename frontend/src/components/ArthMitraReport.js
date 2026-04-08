@@ -576,23 +576,23 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   // Use 10-factor score if available, fallback to legacy score
   const score = tenFactorData?.normalized_score ?? healthScore?.score ?? healthScore?.overall_score ?? 80;
   
-  // Assets breakdown
-  const bankBalance = questionnaire?.bank_balance || healthScore?.financials?.bank_balance || 100000;
-  const mutualFunds = questionnaire?.mutual_funds_value || healthScore?.financials?.mutual_funds || 500000;
-  const pfNps = questionnaire?.pf_nps_value || healthScore?.financials?.pf_nps || 800000;
-  const stocks = questionnaire?.stocks_value || healthScore?.financials?.stocks || 200000;
-  const fd = questionnaire?.fd_value || healthScore?.financials?.fd || 300000;
-  const gold = questionnaire?.gold_value || healthScore?.financials?.gold || 150000;
-  const realEstate = questionnaire?.real_estate_value || healthScore?.financials?.real_estate || 0;
-  const emergencyFund = questionnaire?.emergency_fund || healthScore?.financials?.emergency_fund || 200000;
+  // Assets breakdown - use ?? to properly handle 0 values (|| treats 0 as falsy)
+  const bankBalance = questionnaire?.bank_balance ?? healthScore?.financials?.bank_balance ?? 0;
+  const mutualFunds = questionnaire?.mutual_funds_value ?? healthScore?.financials?.mutual_funds ?? 0;
+  const pfNps = questionnaire?.pf_nps_value ?? healthScore?.financials?.pf_nps ?? 0;
+  const stocks = questionnaire?.stocks_value ?? healthScore?.financials?.stocks ?? 0;
+  const fd = questionnaire?.fd_value ?? healthScore?.financials?.fd ?? 0;
+  const gold = questionnaire?.gold_value ?? healthScore?.financials?.gold ?? 0;
+  const realEstate = questionnaire?.real_estate_value ?? healthScore?.financials?.real_estate ?? 0;
+  const emergencyFund = questionnaire?.emergency_fund ?? healthScore?.financials?.emergency_fund ?? 0;
   const totalAssets = bankBalance + mutualFunds + pfNps + stocks + fd + gold + realEstate + emergencyFund;
 
-  // Liabilities breakdown
-  const homeLoan = questionnaire?.home_loan || healthScore?.financials?.home_loan || 0;
-  const personalLoan = questionnaire?.personal_loan || healthScore?.financials?.personal_loan || 0;
-  const carLoan = questionnaire?.car_loan || healthScore?.financials?.car_loan || 0;
-  const creditCardDebt = questionnaire?.credit_card_debt || healthScore?.financials?.credit_card_debt || 0;
-  const otherLoans = questionnaire?.other_loans || healthScore?.financials?.other_loans || 0;
+  // Liabilities breakdown - use ?? to properly handle 0 values
+  const homeLoan = questionnaire?.home_loan ?? healthScore?.financials?.home_loan ?? 0;
+  const personalLoan = questionnaire?.personal_loan ?? healthScore?.financials?.personal_loan ?? 0;
+  const carLoan = questionnaire?.car_loan ?? healthScore?.financials?.car_loan ?? 0;
+  const creditCardDebt = questionnaire?.credit_card_debt ?? healthScore?.financials?.credit_card_debt ?? 0;
+  const otherLoans = questionnaire?.other_loans ?? healthScore?.financials?.other_loans ?? 0;
   const totalLiabilities = homeLoan + personalLoan + carLoan + creditCardDebt + otherLoans;
 
   const netWorth = totalAssets - totalLiabilities;
