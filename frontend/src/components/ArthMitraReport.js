@@ -2689,18 +2689,18 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             </div>
           </div>
           <div className="rm-row r1">
-            <div className="rm-dot">~{Math.min(100, score + 10)}</div>
+            <div className="rm-dot">~{Math.min(100, Math.round(score + 10/1.4))}</div>
             <div className="rm-inf">
               <div className="rm-when">After Week 1</div>
-              <div className="rm-lbl">Insurance Protection Added (+10 pts)</div>
+              <div className="rm-lbl">Insurance Protection Added</div>
               <div className="rm-sub">Term (₹{((income * 12 * 15) / 10000000).toFixed(1)} Cr) + Health (₹10L) insurance purchased.</div>
             </div>
           </div>
           <div className="rm-row r2">
-            <div className="rm-dot">~{Math.min(100, score + 20)}</div>
+            <div className="rm-dot">~{Math.min(100, Math.round(score + 18/1.4))}</div>
             <div className="rm-inf">
               <div className="rm-when">After Month 3</div>
-              <div className="rm-lbl">Emergency Fund Complete (+8 pts)</div>
+              <div className="rm-lbl">Emergency Fund Complete</div>
               <div className="rm-sub">6-month expenses ({formatINR2(expenses * 6)}) saved in liquid funds.</div>
             </div>
           </div>
