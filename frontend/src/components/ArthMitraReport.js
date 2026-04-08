@@ -530,6 +530,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [loadingScore, setLoadingScore] = useState(true);
   const [opportunityData, setOpportunityData] = useState(null);
   const [loadingOpportunity, setLoadingOpportunity] = useState(true);
+  const [opportunityTab, setOpportunityTab] = useState('savings'); // 'savings' or 'risks'
 
   // Fetch 10-Factor Score and Opportunity Analysis
   useEffect(() => {
@@ -949,20 +950,284 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#2563EB,#3B82F6,#2563EB,transparent)'}}></div>
       </div>
 
-      {/* 1. PRIORITY ACTION PLAN WITH BREAKUP */}
+      {/* 3. FINANCIAL OPPORTUNITY ANALYZER */}
       <div className="sh an in" style={{animationDelay:'.24s'}}>
         <div className="shn">3</div>
-        <div className="sht">Priority Action Plan</div>
+        <div className="sht">Financial Opportunity Analyzer</div>
         <div className="shl"></div>
-        <div className="shb">Savings ₹{formatINR(potentialSavings)} + Risk Reduction ₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr</div>
+        <div className="shb">Unlock Your Financial Potential</div>
       </div>
 
-      {/* Potential Savings Breakup */}
-      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'16px',animationDelay:'.26s'}}>
-        <div style={{background:'linear-gradient(135deg,#166534,#15803d)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-          <span style={{fontSize:'14px'}}>💰</span>
-          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Potential Savings Breakup — {formatINR(potentialSavings)}/year</span>
+      {/* Opportunity Analyzer Hero Section */}
+      {loadingOpportunity ? (
+        <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'40px',textAlign:'center',marginBottom:'20px'}}>
+          <div style={{color:'var(--t3)'}}>Loading Financial Opportunity Analysis...</div>
         </div>
+      ) : opportunityData ? (
+        <>
+        {/* Hero Cards */}
+        <div className="an in" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px',animationDelay:'.26s'}}>
+          {/* Savings Opportunities Hero */}
+          <div style={{background:'linear-gradient(135deg,#166534 0%,#15803d 50%,#22c55e 100%)',borderRadius:'var(--r16)',padding:'24px',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:'-30px',right:'-30px',width:'120px',height:'120px',borderRadius:'50%',background:'rgba(255,255,255,0.1)'}}></div>
+            <div style={{position:'relative',zIndex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}}>
+                <span style={{fontSize:'28px'}}>💰</span>
+                <span style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.7)'}}>Saving Opportunities</span>
+              </div>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:'36px',fontWeight:800,color:'#fff',marginBottom:'8px'}}>
+                {formatINR(opportunityData.summary?.total_annual_savings_potential || 0)}
+              </div>
+              <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
+                {opportunityData.summary?.total_saving_opportunities || 0} opportunities identified
+              </div>
+              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.6)',marginTop:'8px'}}>
+                Potential annual gains through optimization
+              </div>
+            </div>
+          </div>
+
+          {/* Risk Reduction Hero */}
+          <div style={{background:'linear-gradient(135deg,#991b1b 0%,#dc2626 50%,#ef4444 100%)',borderRadius:'var(--r16)',padding:'24px',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:'-30px',right:'-30px',width:'120px',height:'120px',borderRadius:'50%',background:'rgba(255,255,255,0.1)'}}></div>
+            <div style={{position:'relative',zIndex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}}>
+                <span style={{fontSize:'28px'}}>🛡️</span>
+                <span style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.7)'}}>Risk Reduction Gaps</span>
+              </div>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:'36px',fontWeight:800,color:'#fff',marginBottom:'8px'}}>
+                ₹{((opportunityData.summary?.total_coverage_gap || 0) / 10000000).toFixed(2)} Cr
+              </div>
+              <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
+                {opportunityData.summary?.total_risk_reduction_opportunities || 0} protection gaps found
+              </div>
+              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.6)',marginTop:'8px'}}>
+                Coverage needed to protect your family
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Selector */}
+        <div className="an in" style={{display:'flex',gap:'8px',marginBottom:'16px',animationDelay:'.28s'}}>
+          <button
+            onClick={() => setOpportunityTab('savings')}
+            style={{
+              flex:1,
+              padding:'14px 20px',
+              borderRadius:'var(--r12)',
+              border: opportunityTab === 'savings' ? '2px solid var(--grn)' : '1px solid var(--border)',
+              background: opportunityTab === 'savings' ? 'var(--grnbg)' : 'var(--bg2)',
+              cursor:'pointer',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              gap:'10px',
+              transition:'all .2s'
+            }}
+          >
+            <span style={{fontSize:'20px'}}>💰</span>
+            <div style={{textAlign:'left'}}>
+              <div style={{fontSize:'12px',fontWeight:700,color: opportunityTab === 'savings' ? 'var(--grn)' : 'var(--t1)'}}>Saving Opportunities</div>
+              <div style={{fontSize:'10px',color:'var(--t3)'}}>{opportunityData.saving_opportunities?.length || 0} items</div>
+            </div>
+          </button>
+          <button
+            onClick={() => setOpportunityTab('risks')}
+            style={{
+              flex:1,
+              padding:'14px 20px',
+              borderRadius:'var(--r12)',
+              border: opportunityTab === 'risks' ? '2px solid var(--red)' : '1px solid var(--border)',
+              background: opportunityTab === 'risks' ? 'var(--redbg)' : 'var(--bg2)',
+              cursor:'pointer',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              gap:'10px',
+              transition:'all .2s'
+            }}
+          >
+            <span style={{fontSize:'20px'}}>🛡️</span>
+            <div style={{textAlign:'left'}}>
+              <div style={{fontSize:'12px',fontWeight:700,color: opportunityTab === 'risks' ? 'var(--red)' : 'var(--t1)'}}>Risk Reduction</div>
+              <div style={{fontSize:'10px',color:'var(--t3)'}}>{opportunityData.risk_reductions?.length || 0} items</div>
+            </div>
+          </button>
+        </div>
+
+        {/* Savings Opportunities Tab Content */}
+        {opportunityTab === 'savings' && (
+          <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',animationDelay:'.30s'}}>
+            <div style={{background:'linear-gradient(135deg,#166534,#15803d)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                <span style={{fontSize:'14px'}}>💰</span>
+                <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Saving Opportunities</span>
+              </div>
+              <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
+                Total: {formatINR(opportunityData.summary?.total_annual_savings_potential || 0)}/year
+              </div>
+            </div>
+            <div style={{padding:'16px'}}>
+              {opportunityData.saving_opportunities?.length > 0 ? (
+                <div style={{display:'grid',gap:'12px'}}>
+                  {opportunityData.saving_opportunities.map((opp, idx) => (
+                    <div key={idx} style={{
+                      background:'var(--bg3)',
+                      borderRadius:'var(--r12)',
+                      padding:'16px',
+                      borderLeft: opp.priority === 'high' ? '4px solid var(--grn)' : '4px solid var(--amb)'
+                    }}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
+                        <div>
+                          <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
+                          <span style={{
+                            display:'inline-block',
+                            padding:'2px 8px',
+                            borderRadius:'20px',
+                            fontSize:'9px',
+                            fontWeight:700,
+                            textTransform:'uppercase',
+                            background: opp.priority === 'high' ? 'var(--grnbg)' : 'var(--ambbg)',
+                            color: opp.priority === 'high' ? 'var(--grn)' : 'var(--amb)',
+                            border: `1px solid ${opp.priority === 'high' ? 'var(--grnbr)' : 'var(--ambbr)'}`
+                          }}>{opp.priority} priority</span>
+                        </div>
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
+                            +{formatINR(opp.annual_impact || opp.gap || 0)}
+                          </div>
+                          <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
+                        </div>
+                      </div>
+                      <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
+                      {(opp.actual !== undefined && opp.ideal !== undefined) && (
+                        <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                          <div>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{formatINR(opp.actual)}</div>
+                          </div>
+                          <div>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{formatINR(opp.ideal)}</div>
+                          </div>
+                          <div>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>GAP</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--red)'}}>{formatINR(opp.gap)}</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                  Great job! No saving opportunities identified - you're doing well!
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Risk Reduction Tab Content */}
+        {opportunityTab === 'risks' && (
+          <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',animationDelay:'.30s'}}>
+            <div style={{background:'linear-gradient(135deg,#991b1b,#dc2626)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                <span style={{fontSize:'14px'}}>🛡️</span>
+                <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Risk Reduction Gaps</span>
+              </div>
+              <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
+                Coverage Gap: ₹{((opportunityData.summary?.total_coverage_gap || 0) / 10000000).toFixed(2)} Cr
+              </div>
+            </div>
+            <div style={{padding:'16px'}}>
+              {opportunityData.risk_reductions?.length > 0 ? (
+                <div style={{display:'grid',gap:'12px'}}>
+                  {opportunityData.risk_reductions.map((risk, idx) => (
+                    <div key={idx} style={{
+                      background:'var(--bg3)',
+                      borderRadius:'var(--r12)',
+                      padding:'16px',
+                      borderLeft: risk.priority === 'high' || risk.priority === 'critical' ? '4px solid var(--red)' : '4px solid var(--amb)'
+                    }}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
+                        <div>
+                          <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{risk.component}</div>
+                          <span style={{
+                            display:'inline-block',
+                            padding:'2px 8px',
+                            borderRadius:'20px',
+                            fontSize:'9px',
+                            fontWeight:700,
+                            textTransform:'uppercase',
+                            background: risk.priority === 'high' || risk.priority === 'critical' ? 'var(--redbg)' : 'var(--ambbg)',
+                            color: risk.priority === 'high' || risk.priority === 'critical' ? 'var(--red)' : 'var(--amb)',
+                            border: `1px solid ${risk.priority === 'high' || risk.priority === 'critical' ? 'var(--redbr)' : 'var(--ambbr)'}`
+                          }}>{risk.priority} priority</span>
+                        </div>
+                        {typeof risk.gap === 'number' && risk.gap > 1 && (
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--red)'}}>
+                              ₹{risk.gap >= 10000000 ? ((risk.gap / 10000000).toFixed(2) + ' Cr') : (risk.gap >= 100000 ? ((risk.gap / 100000).toFixed(1) + 'L') : risk.gap.toLocaleString('en-IN'))}
+                            </div>
+                            <div style={{fontSize:'10px',color:'var(--t3)'}}>coverage gap</div>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{risk.message}</div>
+                      {(risk.actual !== undefined && risk.required !== undefined) && (
+                        <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                          <div>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>CURRENT</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>
+                              {typeof risk.actual === 'string' ? risk.actual : formatINR(risk.actual)}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>REQUIRED</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>
+                              {typeof risk.required === 'string' ? risk.required : (risk.required >= 10000000 ? '₹' + (risk.required / 10000000).toFixed(2) + ' Cr' : formatINR(risk.required))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {risk.unadapted_habits && (
+                        <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                          <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'8px'}}>HABITS TO IMPROVE</div>
+                          <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
+                            {risk.unadapted_habits.map((habit, hIdx) => (
+                              <span key={hIdx} style={{
+                                padding:'4px 10px',
+                                background:'var(--redbg)',
+                                border:'1px solid var(--redbr)',
+                                borderRadius:'20px',
+                                fontSize:'10px',
+                                color:'var(--red)'
+                              }}>{habit}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                  Great news! No major risk gaps identified - you're well protected!
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        </>
+      ) : (
+        /* Fallback to old UI if no opportunity data */
+        <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'16px',animationDelay:'.26s'}}>
+          <div style={{background:'linear-gradient(135deg,#166534,#15803d)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
+            <span style={{fontSize:'14px'}}>💰</span>
+            <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Potential Savings Breakup — {formatINR(potentialSavings)}/year</span>
+          </div>
 
         <div style={{padding:'16px 20px'}}>
           <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
@@ -1137,58 +1402,9 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           </table>
         </div>
       </div>
+      )}
 
-      {/* Risk Reduction Breakup */}
-      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',animationDelay:'.28s'}}>
-        <div style={{background:'linear-gradient(135deg,#991b1b,#dc2626)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-          <span style={{fontSize:'14px'}}>🛡️</span>
-          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Risk Reduction Breakup — ₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr Coverage Gap</span>
-        </div>
-        <div style={{padding:'16px 20px'}}>
-          <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
-            <thead>
-              <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>RISK AREA</th>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT COVER</th>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>REQUIRED COVER</th>
-                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>GAP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>☂️ Term Life Insurance</td>
-                <td style={{padding:'12px 8px',color:'var(--red)'}}>₹0</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>₹{((income * 12 * 15) / 10000000).toFixed(2)} Cr (15× income)</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--red)',fontWeight:700}}>₹{((income * 12 * 15) / 10000000).toFixed(2)} Cr</td>
-              </tr>
-              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏥 Health Insurance</td>
-                <td style={{padding:'12px 8px',color:'var(--red)'}}>₹0</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>₹{(Math.max(1000000, netWorth / 10) / 100000).toFixed(1)}L (family floater)</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--red)',fontWeight:700}}>₹{(Math.max(1000000, netWorth / 10) / 100000).toFixed(1)}L</td>
-              </tr>
-              <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🚗 Vehicle Insurance</td>
-                <td style={{padding:'12px 8px',color:'var(--amb)'}}>Third-Party Only</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>Comprehensive (IDV based)</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>Upgrade</td>
-              </tr>
-              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🛡️ Emergency Fund Gap</td>
-                <td style={{padding:'12px 8px',color:'var(--amb)'}}>{formatINR2(emergencyFund)} ({Math.round(emergencyFund / expenses)} mo)</td>
-                <td style={{padding:'12px 8px',color:'var(--t2)'}}>{formatINR2(expenses * 6)} (6 months)</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)',fontWeight:700}}>{formatINR2(Math.max(0, expenses * 6 - emergencyFund))}</td>
-              </tr>
-              <tr style={{background:'var(--bg2)'}}>
-                <td colSpan="3" style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL RISK EXPOSURE</td>
-                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--red)',fontWeight:700,fontSize:'16px'}}>₹{(income * 12 * 10 / 10000000).toFixed(2)} Cr</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 2. 10-FACTOR FINANCIAL HEALTH ANALYSIS */}
+      {/* 4. 10-FACTOR FINANCIAL HEALTH ANALYSIS */}
       <div className="sh an in"><div className="shn">4</div><div className="sht">10-Factor Financial Health Analysis</div><div className="shl"></div></div>
       <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px'}}>
         {loadingScore ? (
