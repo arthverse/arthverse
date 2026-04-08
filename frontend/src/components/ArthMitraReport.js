@@ -2693,7 +2693,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             <div className="rm-inf">
               <div className="rm-when">After Week 1</div>
               <div className="rm-lbl">Insurance Protection Added</div>
-              <div className="rm-sub">Term (₹{((income * 12 * 15) / 10000000).toFixed(1)} Cr) + Health (₹10L) insurance purchased.</div>
+              <div className="rm-sub">Term (₹{((opportunityData?.risk_reductions?.find(r => r.component === 'Life Insurance')?.required || (income * 12 * 15)) / 10000000).toFixed(2)} Cr) + Health (₹{((opportunityData?.risk_reductions?.find(r => r.component === 'Health Insurance')?.required || 500000) / 100000).toFixed(0)}L) insurance purchased.</div>
             </div>
           </div>
           <div className="rm-row r2">
@@ -2701,15 +2701,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             <div className="rm-inf">
               <div className="rm-when">After Month 3</div>
               <div className="rm-lbl">Emergency Fund Complete</div>
-              <div className="rm-sub">6-month expenses ({formatINR2(expenses * 6)}) saved in liquid funds.</div>
-            </div>
-          </div>
-          <div className="rm-row r3">
-            <div className="rm-dot">80+</div>
-            <div className="rm-inf">
-              <div className="rm-when">After 12 Months</div>
-              <div className="rm-lbl">EXCELLENT — Wealth Compounding</div>
-              <div className="rm-sub">SIP growing, debt managed, net worth increasing. Score 80+ = EXCELLENT.</div>
+              <div className="rm-sub">Required fund (₹{((opportunityData?.saving_opportunities?.find(o => o.component?.includes('Emergency Fund Reallocation'))?.ideal || (expenses * 2)) / 100000).toFixed(2)}L) saved in liquid funds.</div>
             </div>
           </div>
         </div>
