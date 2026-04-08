@@ -2505,7 +2505,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             {(() => {
               // Calculate totals from actual user-filled data only
               const housingExpenses = (questionnaire?.rent_expense ?? 0) + (questionnaire?.telecom_utilities ?? 0);
-              const foodExpenses = questionnaire?.food_groceries ?? 0;
+              const foodExpenses = (questionnaire?.food_groceries ?? 0) + (questionnaire?.groceries ?? 0);
               const healthExpenses = questionnaire?.healthcare ?? 0;
               const transportExpenses = questionnaire?.transport_fuel ?? 0;
               const lifestyleExpenses = (questionnaire?.entertainment ?? 0) + (questionnaire?.shopping ?? 0) + (questionnaire?.other_expenses ?? 0);
@@ -2564,6 +2564,25 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                               <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
                                 <span style={{color:'var(--t2)'}}>Utilities</span>
                                 <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.telecom_utilities)}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                        
+                        {/* Food & Groceries */}
+                        {foodExpenses > 0 && (
+                          <>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🛒 FOOD & GROCERIES</div>
+                            {(questionnaire?.groceries ?? 0) > 0 && (
+                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                                <span style={{color:'var(--t2)'}}>Groceries</span>
+                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.groceries)}</span>
+                              </div>
+                            )}
+                            {(questionnaire?.food_groceries ?? 0) > 0 && (
+                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                                <span style={{color:'var(--t2)'}}>Food</span>
+                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.food_groceries)}</span>
                               </div>
                             )}
                           </>
