@@ -943,7 +943,23 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 <span style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.7)'}}>Saving Opportunities</span>
               </div>
               <div style={{fontFamily:"'Playfair Display',serif",fontSize:'36px',fontWeight:800,color:'#fff',marginBottom:'8px'}}>
-                {formatINR(opportunityData.summary?.total_annual_savings_potential || 0)}
+                {(() => {
+                  // Calculate total: only use excess fund return (10%) for Emergency Fund opportunities
+                  const emergencyOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Emergency Fund')) || [];
+                  const reallocationOpp = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation');
+                  const actualFund = reallocationOpp?.actual || emergencyFund || 0;
+                  const idealFund = reallocationOpp?.ideal || (expenses * 2) || 0;
+                  const excessFund = actualFund - idealFund;
+                  const emergencyReturn = excessFund > 0 ? Math.round(excessFund * 0.10) : 0;
+                  
+                  // Add investment and allocation opportunities if present
+                  const investmentOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Investment')) || [];
+                  const allocationOpp = opportunityData.saving_opportunities?.find(opp => opp.component === 'Asset Allocation');
+                  const investmentTotal = investmentOpps.reduce((sum, opp) => sum + (opp.annual_impact || 0), 0);
+                  const allocationTotal = allocationOpp?.annual_impact || 0;
+                  
+                  return formatINR(emergencyReturn + investmentTotal + allocationTotal);
+                })()}
               </div>
               <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
                 {(() => {
@@ -1082,7 +1098,22 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Saving Opportunities</span>
               </div>
               <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
-                Total: {formatINR(opportunityData.summary?.total_annual_savings_potential || 0)}/year
+                {(() => {
+                  // Calculate corrected total (excess fund × 10% for Emergency Fund)
+                  const emergencyOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Emergency Fund')) || [];
+                  const reallocationOpp = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation');
+                  const actualFund = reallocationOpp?.actual || emergencyFund || 0;
+                  const idealFund = reallocationOpp?.ideal || (expenses * 2) || 0;
+                  const excessFund = actualFund - idealFund;
+                  const emergencyReturn = excessFund > 0 ? Math.round(excessFund * 0.10) : 0;
+                  
+                  const investmentOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Investment')) || [];
+                  const allocationOpp = opportunityData.saving_opportunities?.find(opp => opp.component === 'Asset Allocation');
+                  const investmentTotal = investmentOpps.reduce((sum, opp) => sum + (opp.annual_impact || 0), 0);
+                  const allocationTotal = allocationOpp?.annual_impact || 0;
+                  
+                  return `Total: ${formatINR(emergencyReturn + investmentTotal + allocationTotal)}/year`;
+                })()}
               </div>
             </div>
             
@@ -1195,7 +1226,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                           </div>
                           <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                             <div style={{textAlign:'right'}}>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>+{formatINR(emergencyTotal)}</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>+{formatINR(Math.round(excessFund * 0.10))}</div>
                               <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
                             </div>
                             <div style={{
@@ -1242,16 +1273,15 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                                 </div>
                               </div>
                               
-                              {/* What to do with excess - Breakdown of all opportunities */}
+                              {/* Action Advice - Simplified */}
                               <div style={{background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r8)',padding:'12px'}}>
-                                <div style={{fontSize:'11px',fontWeight:600,color:'#166534',marginBottom:'8px'}}>💰 Total Potential Gain: {formatINR(emergencyTotal)}/year</div>
-                                <div style={{display:'flex',flexDirection:'column',gap:'4px',fontSize:'10px',color:'#15803D'}}>
-                                  {emergencyOpps.map((opp, idx) => (
-                                    <div key={idx} style={{display:'flex',justifyContent:'space-between'}}>
-                                      <span>{opp.component.replace('Emergency Fund ', '').replace('Reallocation', 'Invest Excess')}</span>
-                                      <span style={{fontWeight:600}}>+{formatINR(opp.annual_impact || 0)}</span>
-                                    </div>
-                                  ))}
+                                <div style={{fontSize:'11px',fontWeight:600,color:'#166534',marginBottom:'8px'}}>💰 What You Should Do</div>
+                                <div style={{fontSize:'11px',color:'#15803D',lineHeight:1.6}}>
+                                  1. Transfer <strong>{formatINR2(Math.round(idealFund * 0.25))}</strong> each to Liquid MF and Sweep FD<br/>
+                                  2. Invest <strong>{formatINR2(excessFund)}</strong> in high-return Real Estate to correct asset allocation<br/>
+                                  <div style={{marginTop:'8px',paddingTop:'8px',borderTop:'1px solid rgba(22,101,52,0.2)'}}>
+                                    <strong>Potential Annual Return: {formatINR(Math.round(excessFund * 0.10))}</strong> (at ~10% return)
+                                  </div>
                                 </div>
                               </div>
                             </div>
