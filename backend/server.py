@@ -697,16 +697,21 @@ async def get_health_score_v2(credentials: HTTPAuthorizationCredentials = Depend
     )
     
     monthly_expenses = (
-        questionnaire.get("housing_emi_rent", 0) +
-        questionnaire.get("utilities", 0) +
+        questionnaire.get("rent_expense", 0) +
+        questionnaire.get("telecom_utilities", 0) +
         questionnaire.get("groceries", 0) +
         questionnaire.get("transportation", 0) +
         questionnaire.get("healthcare", 0) +
-        questionnaire.get("education", 0) +
+        questionnaire.get("education_expenses", 0) +
         questionnaire.get("entertainment", 0) +
         questionnaire.get("shopping", 0) +
         questionnaire.get("insurance_premiums", 0) +
-        questionnaire.get("other_expenses", 0)
+        questionnaire.get("other_expenses", 0) +
+        questionnaire.get("home_loan_emi", 0) +
+        questionnaire.get("car_loan_emi", 0) +
+        questionnaire.get("education_loan_emi", 0) +
+        questionnaire.get("personal_loan_emi", 0) +
+        questionnaire.get("other_loan_emi", 0)
     )
     
     # Build data dict for calculator
@@ -824,16 +829,21 @@ async def get_opportunity_analysis(credentials: HTTPAuthorizationCredentials = D
     )
     
     monthly_expenses = (
-        questionnaire.get("housing_emi_rent", 0) +
-        questionnaire.get("utilities", 0) +
+        questionnaire.get("rent_expense", 0) +
+        questionnaire.get("telecom_utilities", 0) +
         questionnaire.get("groceries", 0) +
         questionnaire.get("transportation", 0) +
         questionnaire.get("healthcare", 0) +
-        questionnaire.get("education", 0) +
+        questionnaire.get("education_expenses", 0) +
         questionnaire.get("entertainment", 0) +
         questionnaire.get("shopping", 0) +
         questionnaire.get("insurance_premiums", 0) +
-        questionnaire.get("other_expenses", 0)
+        questionnaire.get("other_expenses", 0) +
+        questionnaire.get("home_loan_emi", 0) +
+        questionnaire.get("car_loan_emi", 0) +
+        questionnaire.get("education_loan_emi", 0) +
+        questionnaire.get("personal_loan_emi", 0) +
+        questionnaire.get("other_loan_emi", 0)
     )
     
     calc_data = {

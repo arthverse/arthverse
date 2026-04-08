@@ -111,7 +111,7 @@ EMERGENCY_FUND_MONTHS = {
 EMERGENCY_FUND_ALLOCATION = {
     "single_stable": {
         "no_cc": {"savings": 25, "fd": 25, "liquid": 50},
-        "with_cc": {"savings": 20, "fd": 20, "liquid": 60}
+        "with_cc": {"savings": 25, "fd": 25, "liquid": 50}
     },
     "married_children": {
         "no_cc": {"savings": 40, "fd": 30, "liquid": 30},
