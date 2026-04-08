@@ -531,6 +531,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [opportunityData, setOpportunityData] = useState(null);
   const [loadingOpportunity, setLoadingOpportunity] = useState(true);
   const [opportunityTab, setOpportunityTab] = useState('savings'); // 'savings' or 'risks'
+  const [savingsSubTab, setSavingsSubTab] = useState('investment'); // 'investment', 'allocation', 'emergency'
 
   // Fetch 10-Factor Score and Opportunity Analysis
   useEffect(() => {
@@ -1068,63 +1069,351 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 Total: {formatINR(opportunityData.summary?.total_annual_savings_potential || 0)}/year
               </div>
             </div>
+            
+            {/* Sub-tabs for Saving Opportunities */}
+            <div style={{display:'flex',borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+              <button
+                onClick={() => setSavingsSubTab('investment')}
+                style={{
+                  flex:1,
+                  padding:'12px 16px',
+                  background: savingsSubTab === 'investment' ? 'var(--bg2)' : 'transparent',
+                  border:'none',
+                  borderBottom: savingsSubTab === 'investment' ? '2px solid var(--grn)' : '2px solid transparent',
+                  cursor:'pointer',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  gap:'6px',
+                  transition:'all .2s'
+                }}
+              >
+                <span style={{fontSize:'16px'}}>📈</span>
+                <span style={{fontSize:'11px',fontWeight:700,color: savingsSubTab === 'investment' ? 'var(--grn)' : 'var(--t2)'}}>Investment</span>
+              </button>
+              <button
+                onClick={() => setSavingsSubTab('allocation')}
+                style={{
+                  flex:1,
+                  padding:'12px 16px',
+                  background: savingsSubTab === 'allocation' ? 'var(--bg2)' : 'transparent',
+                  border:'none',
+                  borderBottom: savingsSubTab === 'allocation' ? '2px solid var(--blu)' : '2px solid transparent',
+                  cursor:'pointer',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  gap:'6px',
+                  transition:'all .2s'
+                }}
+              >
+                <span style={{fontSize:'16px'}}>⚖️</span>
+                <span style={{fontSize:'11px',fontWeight:700,color: savingsSubTab === 'allocation' ? 'var(--blu)' : 'var(--t2)'}}>Asset Allocation</span>
+              </button>
+              <button
+                onClick={() => setSavingsSubTab('emergency')}
+                style={{
+                  flex:1,
+                  padding:'12px 16px',
+                  background: savingsSubTab === 'emergency' ? 'var(--bg2)' : 'transparent',
+                  border:'none',
+                  borderBottom: savingsSubTab === 'emergency' ? '2px solid var(--amb)' : '2px solid transparent',
+                  cursor:'pointer',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  gap:'6px',
+                  transition:'all .2s'
+                }}
+              >
+                <span style={{fontSize:'16px'}}>🛡️</span>
+                <span style={{fontSize:'11px',fontWeight:700,color: savingsSubTab === 'emergency' ? 'var(--amb)' : 'var(--t2)'}}>Emergency Fund</span>
+              </button>
+            </div>
+
             <div style={{padding:'16px'}}>
-              {opportunityData.saving_opportunities?.length > 0 ? (
-                <div style={{display:'grid',gap:'12px'}}>
-                  {opportunityData.saving_opportunities.map((opp, idx) => (
-                    <div key={idx} style={{
-                      background:'var(--bg3)',
-                      borderRadius:'var(--r12)',
-                      padding:'16px',
-                      borderLeft: opp.priority === 'high' ? '4px solid var(--grn)' : '4px solid var(--amb)'
-                    }}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
-                        <div>
-                          <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
-                          <span style={{
-                            display:'inline-block',
-                            padding:'2px 8px',
-                            borderRadius:'20px',
-                            fontSize:'9px',
-                            fontWeight:700,
-                            textTransform:'uppercase',
-                            background: opp.priority === 'high' ? 'var(--grnbg)' : 'var(--ambbg)',
-                            color: opp.priority === 'high' ? 'var(--grn)' : 'var(--amb)',
-                            border: `1px solid ${opp.priority === 'high' ? 'var(--grnbr)' : 'var(--ambbr)'}`
-                          }}>{opp.priority} priority</span>
-                        </div>
-                        <div style={{textAlign:'right'}}>
-                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
-                            +{formatINR(opp.annual_impact || opp.gap || 0)}
-                          </div>
-                          <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
-                        </div>
+              {/* Investment Sub-Tab */}
+              {savingsSubTab === 'investment' && (() => {
+                const investmentOpps = opportunityData.saving_opportunities?.filter(opp => 
+                  opp.component.includes('Investment Amount') || 
+                  opp.component.includes('Investment Portfolio')
+                ) || [];
+                
+                // Calculate total investment portfolio value (at purchase cost, not current NAV)
+                const portfolioBreakdown = {
+                  equityMF: mutualFunds,
+                  stocks: stocks,
+                  debtMF: fd,
+                  ppfNps: pfNps,
+                  fixedDeposits: fd,
+                  realEstate: realEstate,
+                  goldSilver: gold,
+                  ulipEndowment: 0
+                };
+                const totalPortfolioValue = mutualFunds + stocks + pfNps + fd + gold + realEstate;
+                
+                return (
+                  <>
+                    {/* Investment Portfolio Value Summary */}
+                    <div style={{background:'var(--blubg)',border:'1px solid var(--blubr)',borderRadius:'var(--r12)',padding:'16px',marginBottom:'16px'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                        <div style={{fontSize:'12px',fontWeight:700,color:'var(--blu)'}}>📊 Your Investment Portfolio (At Cost)</div>
+                        <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--blu)'}}>{formatINR2(totalPortfolioValue)}</div>
                       </div>
-                      <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
-                      {(opp.actual !== undefined && opp.ideal !== undefined) && (
-                        <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
-                          <div>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{formatINR(opp.actual)}</div>
+                      <div style={{fontSize:'10px',color:'var(--t3)',marginBottom:'12px'}}>Values shown are investment/purchase amounts, not current market value</div>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px'}}>
+                        <thead>
+                          <tr style={{borderBottom:'1px solid var(--blubr)'}}>
+                            <th style={{textAlign:'left',padding:'8px 4px',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>ASSET CLASS</th>
+                            <th style={{textAlign:'left',padding:'8px 4px',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>WHAT TO COUNT</th>
+                            <th style={{textAlign:'right',padding:'8px 4px',fontWeight:600,color:'var(--t2)',fontSize:'9px',letterSpacing:'.05em'}}>AMOUNT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {mutualFunds > 0 && (
+                            <tr style={{borderBottom:'1px solid var(--border)'}}>
+                              <td style={{padding:'8px 4px',color:'var(--t1)'}}>Equity MF</td>
+                              <td style={{padding:'8px 4px',color:'var(--t3)',fontSize:'10px'}}>Investment amount (not current NAV)</td>
+                              <td style={{padding:'8px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(mutualFunds)}</td>
+                            </tr>
+                          )}
+                          {stocks > 0 && (
+                            <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                              <td style={{padding:'8px 4px',color:'var(--t1)'}}>Stocks</td>
+                              <td style={{padding:'8px 4px',color:'var(--t3)',fontSize:'10px'}}>Purchase price of all holdings</td>
+                              <td style={{padding:'8px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(stocks)}</td>
+                            </tr>
+                          )}
+                          {fd > 0 && (
+                            <tr style={{borderBottom:'1px solid var(--border)'}}>
+                              <td style={{padding:'8px 4px',color:'var(--t1)'}}>Debt MF / Bonds / FD</td>
+                              <td style={{padding:'8px 4px',color:'var(--t3)',fontSize:'10px'}}>Amount invested at face value</td>
+                              <td style={{padding:'8px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(fd)}</td>
+                            </tr>
+                          )}
+                          {pfNps > 0 && (
+                            <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                              <td style={{padding:'8px 4px',color:'var(--t1)'}}>PPF / NPS</td>
+                              <td style={{padding:'8px 4px',color:'var(--t3)',fontSize:'10px'}}>Total contributions made</td>
+                              <td style={{padding:'8px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(pfNps)}</td>
+                            </tr>
+                          )}
+                          {realEstate > 0 && (
+                            <tr style={{borderBottom:'1px solid var(--border)'}}>
+                              <td style={{padding:'8px 4px',color:'var(--t1)'}}>Real Estate</td>
+                              <td style={{padding:'8px 4px',color:'var(--t3)',fontSize:'10px'}}>Down payment + EMI principal paid</td>
+                              <td style={{padding:'8px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(realEstate)}</td>
+                            </tr>
+                          )}
+                          {gold > 0 && (
+                            <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
+                              <td style={{padding:'8px 4px',color:'var(--t1)'}}>Gold / Silver</td>
+                              <td style={{padding:'8px 4px',color:'var(--t3)',fontSize:'10px'}}>Purchase cost (not current price)</td>
+                              <td style={{padding:'8px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--t1)'}}>{formatINR2(gold)}</td>
+                            </tr>
+                          )}
+                          <tr style={{background:'var(--goldbg)'}}>
+                            <td colSpan="2" style={{padding:'10px 4px',fontWeight:700,color:'var(--t0)'}}>TOTAL PORTFOLIO VALUE</td>
+                            <td style={{padding:'10px 4px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'var(--blu)'}}>{formatINR2(totalPortfolioValue)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Investment Opportunities */}
+                    {investmentOpps.length > 0 ? (
+                      <div style={{display:'grid',gap:'12px'}}>
+                        {investmentOpps.map((opp, idx) => (
+                          <div key={idx} style={{
+                            background:'var(--bg3)',
+                            borderRadius:'var(--r12)',
+                            padding:'16px',
+                            borderLeft: opp.priority === 'high' ? '4px solid var(--grn)' : '4px solid var(--amb)'
+                          }}>
+                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
+                              <div>
+                                <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
+                                <span style={{
+                                  display:'inline-block',
+                                  padding:'2px 8px',
+                                  borderRadius:'20px',
+                                  fontSize:'9px',
+                                  fontWeight:700,
+                                  textTransform:'uppercase',
+                                  background: opp.priority === 'high' ? 'var(--grnbg)' : 'var(--ambbg)',
+                                  color: opp.priority === 'high' ? 'var(--grn)' : 'var(--amb)',
+                                  border: `1px solid ${opp.priority === 'high' ? 'var(--grnbr)' : 'var(--ambbr)'}`
+                                }}>{opp.priority} priority</span>
+                              </div>
+                              <div style={{textAlign:'right'}}>
+                                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
+                                  +{formatINR(opp.annual_impact || opp.gap || 0)}
+                                </div>
+                                <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
+                              </div>
+                            </div>
+                            <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
+                            {(opp.actual !== undefined && opp.ideal !== undefined) && (
+                              <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                                <div>
+                                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
+                                  <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{formatINR(opp.actual)}</div>
+                                </div>
+                                <div>
+                                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
+                                  <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{formatINR(opp.ideal)}</div>
+                                </div>
+                                <div>
+                                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>GAP</div>
+                                  <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--red)'}}>{formatINR(opp.gap)}</div>
+                                </div>
+                              </div>
+                            )}
                           </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                        Great job! Your investment strategy is on track!
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+
+              {/* Asset Allocation Sub-Tab */}
+              {savingsSubTab === 'allocation' && (() => {
+                const allocationOpps = opportunityData.saving_opportunities?.filter(opp => 
+                  opp.component.includes('Asset Allocation')
+                ) || [];
+                
+                return allocationOpps.length > 0 ? (
+                  <div style={{display:'grid',gap:'12px'}}>
+                    {allocationOpps.map((opp, idx) => (
+                      <div key={idx} style={{
+                        background:'var(--bg3)',
+                        borderRadius:'var(--r12)',
+                        padding:'16px',
+                        borderLeft: opp.priority === 'high' ? '4px solid var(--blu)' : (opp.priority === 'medium' ? '4px solid var(--amb)' : '4px solid var(--t3)')
+                      }}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
                           <div>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{formatINR(opp.ideal)}</div>
+                            <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
+                            <span style={{
+                              display:'inline-block',
+                              padding:'2px 8px',
+                              borderRadius:'20px',
+                              fontSize:'9px',
+                              fontWeight:700,
+                              textTransform:'uppercase',
+                              background: opp.priority === 'high' ? 'var(--blubg)' : (opp.priority === 'medium' ? 'var(--ambbg)' : 'var(--bg4)'),
+                              color: opp.priority === 'high' ? 'var(--blu)' : (opp.priority === 'medium' ? 'var(--amb)' : 'var(--t2)'),
+                              border: `1px solid ${opp.priority === 'high' ? 'var(--blubr)' : (opp.priority === 'medium' ? 'var(--ambbr)' : 'var(--border)')}`
+                            }}>{opp.priority} priority</span>
                           </div>
-                          <div>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>GAP</div>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--red)'}}>{formatINR(opp.gap)}</div>
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
+                              +{formatINR(opp.annual_impact || opp.gap || 0)}
+                            </div>
+                            <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
-                  Great job! No saving opportunities identified - you're doing well!
-                </div>
-              )}
+                        <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
+                        {(opp.actual_pct !== undefined && opp.ideal_pct !== undefined) && (
+                          <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{opp.actual_pct}%</div>
+                            </div>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{opp.ideal_pct}%</div>
+                            </div>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>DEVIATION</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--red)'}}>{opp.gap_pct}%</div>
+                            </div>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>AMOUNT</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--blu)'}}>{formatINR(opp.gap)}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                    Great job! Your asset allocation is well balanced!
+                  </div>
+                );
+              })()}
+
+              {/* Emergency Fund Sub-Tab */}
+              {savingsSubTab === 'emergency' && (() => {
+                const emergencyOpps = opportunityData.saving_opportunities?.filter(opp => 
+                  opp.component.includes('Emergency Fund')
+                ) || [];
+                
+                return emergencyOpps.length > 0 ? (
+                  <div style={{display:'grid',gap:'12px'}}>
+                    {emergencyOpps.map((opp, idx) => (
+                      <div key={idx} style={{
+                        background:'var(--bg3)',
+                        borderRadius:'var(--r12)',
+                        padding:'16px',
+                        borderLeft: opp.priority === 'high' ? '4px solid var(--amb)' : '4px solid var(--t3)'
+                      }}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
+                          <div>
+                            <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
+                            <span style={{
+                              display:'inline-block',
+                              padding:'2px 8px',
+                              borderRadius:'20px',
+                              fontSize:'9px',
+                              fontWeight:700,
+                              textTransform:'uppercase',
+                              background: opp.priority === 'high' ? 'var(--ambbg)' : 'var(--bg4)',
+                              color: opp.priority === 'high' ? 'var(--amb)' : 'var(--t2)',
+                              border: `1px solid ${opp.priority === 'high' ? 'var(--ambbr)' : 'var(--border)'}`
+                            }}>{opp.priority} priority</span>
+                          </div>
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
+                              +{formatINR(opp.annual_impact || opp.gap || 0)}
+                            </div>
+                            <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
+                          </div>
+                        </div>
+                        <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
+                        {(opp.actual !== undefined && opp.ideal !== undefined) && (
+                          <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{formatINR(opp.actual)}</div>
+                            </div>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{formatINR(opp.ideal)}</div>
+                            </div>
+                            {opp.excess !== undefined && (
+                              <div>
+                                <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>EXCESS</div>
+                                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--blu)'}}>{formatINR(opp.excess)}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                    Great job! Your emergency fund is adequate!
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}

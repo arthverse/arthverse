@@ -9,15 +9,18 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - **Complete UI Integration** of gap analysis in ArthMitra Report
 - **Hero Section**: Two gradient cards showing Saving Opportunities (green) and Risk Reduction Gaps (red)
 - **Tabbed Interface**: Switch between Saving Opportunities and Risk Reduction views
-- **Opportunity Cards**: Display 8 saving opportunities with:
-  - Priority badges (HIGH/MEDIUM/LOW)
-  - Annual impact amounts (+₹X/year)
-  - ACTUAL/IDEAL/GAP breakdowns
-- **Risk Cards**: Display 4 risk reduction items with:
-  - Priority badges
-  - Coverage gap amounts
-  - CURRENT/REQUIRED breakdowns
-  - Unadapted habits list (for Financial Habits item)
+- **Sub-Tabs for Saving Opportunities**:
+  - **Investment Tab**: Shows Investment Portfolio (At Cost) breakdown with all asset classes
+    - Equity MF (Investment amount, not current NAV)
+    - Stocks (Purchase price of all holdings)
+    - Debt MF / Bonds / FD (Amount invested at face value)
+    - PPF / NPS (Total contributions made)
+    - Gold / Silver (Purchase cost, not current price)
+    - Real Estate (Down payment + EMI principal paid)
+  - **Asset Allocation Tab**: Shows allocation optimization opportunities
+  - **Emergency Fund Tab**: Shows emergency fund reallocation opportunities
+- **Opportunity Cards**: Display priority badges, annual impact amounts, ACTUAL/IDEAL/GAP breakdowns
+- **Risk Cards**: Display coverage gaps, CURRENT/REQUIRED breakdowns
 - **Backend API**: `/api/reports/opportunity-analysis` returns structured data
 - **Testing**: 100% pass rate on all features
 
