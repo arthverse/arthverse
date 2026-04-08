@@ -917,40 +917,6 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         </div>
       </div>
 
-      {/* SCORE SUMMARY BANNER */}
-      <div className="an in" style={{background:'var(--t0)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',border:'1px solid rgba(37,99,235,.2)',position:'relative',animationDelay:'.22s'}}>
-        <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#2563EB,#3B82F6,#2563EB,transparent)'}}></div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',position:'relative'}}>
-          <div style={{position:'absolute',left:'50%',top:0,bottom:0,width:'1px',background:'repeating-linear-gradient(to bottom,#3B82F6 0px,#3B82F6 6px,transparent 6px,transparent 12px)',transform:'translateX(-50%)',zIndex:2}}></div>
-          <div style={{position:'absolute',left:0,right:0,top:'50%',height:'1px',background:'rgba(255,255,255,.1)',zIndex:1}}></div>
-
-          <div style={{padding:'18px 24px 14px'}}>
-            <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'6px'}}>ArthSthithi Score</div>
-            <div style={{display:'flex',alignItems:'baseline',gap:'2px'}}>
-              <span style={{fontFamily:"'Playfair Display',serif",fontSize:'36px',fontWeight:800,color:'#F97316',lineHeight:1,letterSpacing:'-.02em'}}>{score}</span>
-              <span style={{fontSize:'16px',color:'rgba(255,255,255,.3)',fontFamily:"'JetBrains Mono',monospace"}}>/100</span>
-            </div>
-          </div>
-
-          <div style={{padding:'18px 24px 14px'}}>
-            <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'6px'}}>Band</div>
-            <div style={{fontFamily:"'Playfair Display',serif",fontSize:'28px',fontWeight:800,color:'#F97316',lineHeight:1}}>{getScoreRating(score)}</div>
-            <div style={{fontSize:'10px',color:'rgba(255,255,255,.3)',marginTop:'4px'}}>Next milestone: {score < 50 ? '50+ = Fair' : score < 70 ? '70+ = Good' : score < 80 ? '80+ = Excellent' : 'Maintain!'}</div>
-          </div>
-
-          <div style={{padding:'14px 24px 18px'}}>
-            <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'5px'}}>Potential Savings</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'26px',fontWeight:700,color:'#22C55E',lineHeight:1,letterSpacing:'-.02em'}}>{formatINR(potentialSavings)}</div>
-          </div>
-
-          <div style={{padding:'14px 24px 18px'}}>
-            <div style={{fontSize:'9.5px',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.4)',marginBottom:'5px'}}>Risk Reduction</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'26px',fontWeight:700,color:'#EF4444',lineHeight:1,letterSpacing:'-.02em'}}>{formatINR(Math.round(income * 12 * 10), true)}</div>
-          </div>
-        </div>
-        <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#2563EB,#3B82F6,#2563EB,transparent)'}}></div>
-      </div>
-
       {/* 3. FINANCIAL OPPORTUNITY ANALYZER */}
       <div className="sh an in" style={{animationDelay:'.24s'}}>
         <div className="shn">3</div>
