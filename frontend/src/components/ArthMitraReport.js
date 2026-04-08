@@ -1446,21 +1446,90 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                         </div>
                       </div>
                       
-                      {/* Step 4 */}
-                      <div style={{background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r12)',padding:'16px',border:'1px solid var(--grnbr)'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
-                          <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'var(--grn)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'12px',fontWeight:700}}>4</div>
-                          <div style={{fontSize:'13px',fontWeight:700,color:'#166534'}}>Invest Excess in Growth Assets</div>
-                        </div>
-                        <div style={{fontSize:'12px',color:'#15803D',marginLeft:'38px'}}>
-                          Invest remaining <strong style={{color:'#166534'}}>{formatINR2(excessFund)}</strong> in equity mutual funds or stocks to correct your asset allocation and build long-term wealth
-                        </div>
-                        <div style={{marginTop:'10px',marginLeft:'38px',padding:'8px 12px',background:'#fff',borderRadius:'var(--r8)',display:'inline-block'}}>
-                          <span style={{fontSize:'11px',color:'#166534'}}>Potential annual return: </span>
-                          <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#166534'}}>+{formatINR(Math.round(excessFund * 0.12))}</span>
-                          <span style={{fontSize:'10px',color:'#15803D'}}> (at 12% returns)</span>
-                        </div>
-                      </div>
+                      {/* Step 4 - Dynamic based on asset allocation gaps */}
+                      {(() => {
+                        // Find the biggest asset allocation gap
+                        const allocationOpps = opportunityData.saving_opportunities?.filter(opp => 
+                          opp.component.includes('Asset Allocation')
+                        ) || [];
+                        
+                        // Sort by gap amount (descending) to find the biggest opportunity
+                        const sortedOpps = [...allocationOpps].sort((a, b) => (b.gap || 0) - (a.gap || 0));
+                        const topOpp = sortedOpps[0];
+                        
+                        // Determine what to recommend
+                        const hasRealEstateGap = allocationOpps.some(o => o.component.includes('Real Estate') && o.gap > 0);
+                        const realEstateOpp = allocationOpps.find(o => o.component.includes('Real Estate'));
+                        const realEstateGap = realEstateOpp?.gap || 0;
+                        
+                        const hasEquityGap = allocationOpps.some(o => o.component.includes('Equity') && o.gap > 0);
+                        const equityOpp = allocationOpps.find(o => o.component.includes('Equity'));
+                        const equityGap = equityOpp?.gap || 0;
+                        
+                        // Calculate recommended allocations from excess fund
+                        const totalGap = realEstateGap + equityGap;
+                        const recommendRealEstate = Math.min(excessFund, realEstateGap);
+                        const recommendEquity = Math.min(excessFund - recommendRealEstate, equityGap);
+                        const remaining = excessFund - recommendRealEstate - recommendEquity;
+                        
+                        return (
+                          <div style={{background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r12)',padding:'16px',border:'1px solid var(--grnbr)'}}>
+                            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
+                              <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'var(--grn)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'12px',fontWeight:700}}>4</div>
+                              <div style={{fontSize:'13px',fontWeight:700,color:'#166534'}}>Invest Excess to Correct Asset Allocation</div>
+                            </div>
+                            <div style={{fontSize:'12px',color:'#15803D',marginLeft:'38px',marginBottom:'12px'}}>
+                              Invest remaining <strong style={{color:'#166534'}}>{formatINR2(excessFund)}</strong> to balance your portfolio:
+                            </div>
+                            
+                            {/* Investment Recommendations Table */}
+                            <div style={{marginLeft:'38px',background:'#fff',borderRadius:'var(--r8)',overflow:'hidden'}}>
+                              <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px'}}>
+                                <thead>
+                                  <tr style={{background:'#E5E4E0'}}>
+                                    <th style={{padding:'8px 12px',textAlign:'left',fontWeight:600,color:'#166534'}}>Asset Class</th>
+                                    <th style={{padding:'8px 12px',textAlign:'right',fontWeight:600,color:'#166534'}}>Amount</th>
+                                    <th style={{padding:'8px 12px',textAlign:'center',fontWeight:600,color:'#166534'}}>Why?</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {hasRealEstateGap && recommendRealEstate > 0 && (
+                                    <tr style={{borderBottom:'1px solid #E5E4E0'}}>
+                                      <td style={{padding:'10px 12px'}}><span style={{marginRight:'6px'}}>🏠</span>Real Estate / REITs</td>
+                                      <td style={{padding:'10px 12px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#166534'}}>{formatINR2(recommendRealEstate)}</td>
+                                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:'10px',color:'#15803D'}}>Current: {realEstateOpp?.actual_pct?.toFixed(0)}% → Ideal: {realEstateOpp?.ideal_pct}%</td>
+                                    </tr>
+                                  )}
+                                  {hasEquityGap && recommendEquity > 0 && (
+                                    <tr style={{borderBottom:'1px solid #E5E4E0'}}>
+                                      <td style={{padding:'10px 12px'}}><span style={{marginRight:'6px'}}>📈</span>Equity MF / Stocks</td>
+                                      <td style={{padding:'10px 12px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#166534'}}>{formatINR2(recommendEquity)}</td>
+                                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:'10px',color:'#15803D'}}>Current: {equityOpp?.actual_pct?.toFixed(0)}% → Ideal: {equityOpp?.ideal_pct}%</td>
+                                    </tr>
+                                  )}
+                                  {!hasRealEstateGap && !hasEquityGap && (
+                                    <tr style={{borderBottom:'1px solid #E5E4E0'}}>
+                                      <td style={{padding:'10px 12px'}}><span style={{marginRight:'6px'}}>📊</span>Balanced MF / Index Funds</td>
+                                      <td style={{padding:'10px 12px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#166534'}}>{formatINR2(excessFund)}</td>
+                                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:'10px',color:'#15803D'}}>Diversified growth</td>
+                                    </tr>
+                                  )}
+                                  <tr style={{background:'#DCFCE7'}}>
+                                    <td style={{padding:'10px 12px',fontWeight:700,color:'#166534'}}>Total to Invest</td>
+                                    <td style={{padding:'10px 12px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#166534'}}>{formatINR2(excessFund)}</td>
+                                    <td style={{padding:'10px 12px',textAlign:'center',fontSize:'10px',color:'#166534'}}>Correct allocation gaps</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                            
+                            <div style={{marginTop:'12px',marginLeft:'38px',padding:'10px 14px',background:'#fff',borderRadius:'var(--r8)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                              <span style={{fontSize:'11px',color:'#166534'}}>Potential annual return:</span>
+                              <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#166534',fontSize:'14px'}}>+{formatINR(Math.round(excessFund * 0.10))} <span style={{fontSize:'10px',fontWeight:400}}>(~10% avg)</span></span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                     
                     {/* Pro Tip */}
