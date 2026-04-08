@@ -946,7 +946,23 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 {formatINR(opportunityData.summary?.total_annual_savings_potential || 0)}
               </div>
               <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
-                {opportunityData.summary?.total_saving_opportunities || 0} opportunities identified
+                {(() => {
+                  // Count actual displayed cards (same logic as tab)
+                  let count = 0;
+                  const investmentOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Investment')) || [];
+                  const emergencyOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Emergency Fund')) || [];
+                  const allocationOpp = opportunityData.saving_opportunities?.find(opp => opp.component === 'Asset Allocation');
+                  const reallocationOpp = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation');
+                  const actualFund = reallocationOpp?.actual || emergencyFund || 0;
+                  const idealFund = reallocationOpp?.ideal || (expenses * 2) || 0;
+                  const excessFund = actualFund - idealFund;
+                  
+                  if (investmentOpps.length > 0) count++;
+                  if (emergencyOpps.length > 0 && excessFund > 0) count++;
+                  if (allocationOpp) count++;
+                  
+                  return count + ' opportunities identified';
+                })()}
               </div>
               <div style={{fontSize:'11px',color:'rgba(255,255,255,0.6)',marginTop:'8px'}}>
                 Potential annual gains through optimization
@@ -966,7 +982,14 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 ₹{((opportunityData.summary?.total_coverage_gap || 0) / 10000000).toFixed(2)} Cr
               </div>
               <div style={{fontSize:'12px',color:'rgba(255,255,255,0.8)'}}>
-                {opportunityData.summary?.total_risk_reduction_opportunities || 0} protection gaps found
+                {(() => {
+                  // Count: Asset Allocation as 1 card (if exists) + other risk items
+                  const assetAllocationRisk = opportunityData.risk_reductions?.find(r => r.component === 'Asset Allocation');
+                  const otherRisks = opportunityData.risk_reductions?.filter(r => r.component !== 'Asset Allocation') || [];
+                  let count = otherRisks.length;
+                  if (assetAllocationRisk) count++;
+                  return count + ' protection gaps found';
+                })()}
               </div>
               <div style={{fontSize:'11px',color:'rgba(255,255,255,0.6)',marginTop:'8px'}}>
                 Coverage needed to protect your family
