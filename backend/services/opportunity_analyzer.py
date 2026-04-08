@@ -704,18 +704,18 @@ def analyze_financial_opportunities(data: Dict[str, Any]) -> Dict[str, Any]:
     education_loan_emi = data.get("education_loan_emi", 0)
     other_loan_emi = data.get("other_loan_emi", 0)
     
-    # Assets
+    # Assets - Use *_value fields if available, fallback to original field names
     savings_account = data.get("bank_balance", 0)
     sweep_fd = data.get("sweep_fd", 0)
     liquid_mf = data.get("liquid_mf", 0)
-    equity_mf = data.get("mutual_funds", 0)
-    stocks = data.get("stocks", 0)
+    equity_mf = data.get("mutual_funds_value", 0) or data.get("mutual_funds", 0)
+    stocks = data.get("stocks_value", 0) or data.get("stocks", 0)
     debt_mf = data.get("debt_mf", 0)
-    ppf_nps = data.get("pf_nps", 0)
-    fd = data.get("fd", 0)
-    real_estate = data.get("real_estate", 0)
-    gold = data.get("gold", 0)
-    silver = data.get("silver", 0)
+    ppf_nps = data.get("pf_nps_value", 0) or data.get("pf_nps", 0)
+    fd = data.get("fd_value", 0) or data.get("fd", 0) or data.get("fixed_deposits", 0)
+    real_estate = data.get("property_value", 0) or data.get("real_estate", 0)
+    gold = data.get("gold_value", 0) or data.get("gold", 0)
+    silver = data.get("silver_value", 0) or data.get("silver", 0)
     
     # Liabilities
     total_liabilities = (
@@ -744,7 +744,8 @@ def analyze_financial_opportunities(data: Dict[str, Any]) -> Dict[str, Any]:
     metals_value = gold + silver
     total_assets = equity_value + debt_value + real_estate + metals_value
     net_worth = total_assets - total_liabilities
-    total_investment_value = equity_mf + stocks + debt_mf + ppf_nps + fd
+    # Investment portfolio includes: Equity MF, Stocks, Debt MF/FD, PPF/NPS, Gold/Silver
+    total_investment_value = equity_mf + stocks + debt_mf + ppf_nps + fd + gold
     
     # Collect all opportunities
     saving_opportunities = []

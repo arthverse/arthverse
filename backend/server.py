@@ -853,18 +853,18 @@ async def get_opportunity_analysis(credentials: HTTPAuthorizationCredentials = D
         "education_loan_emi": questionnaire.get("education_loan_emi", 0),
         "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
         
-        # Assets
+        # Assets - Use *_value fields if available, fallback to original field names
         "bank_balance": questionnaire.get("bank_balance", 0),
         "sweep_fd": questionnaire.get("sweep_fd", 0),
         "liquid_mf": questionnaire.get("liquid_mf", 0),
-        "mutual_funds": questionnaire.get("mutual_funds", 0),
-        "stocks": questionnaire.get("stocks", 0),
+        "mutual_funds": questionnaire.get("mutual_funds_value", 0) or questionnaire.get("mutual_funds", 0),
+        "stocks": questionnaire.get("stocks_value", 0) or questionnaire.get("stocks", 0),
         "debt_mf": questionnaire.get("debt_mf", 0),
-        "pf_nps": questionnaire.get("pf_nps", 0),
-        "fd": questionnaire.get("fd", 0),
-        "real_estate": questionnaire.get("real_estate", 0),
-        "gold": questionnaire.get("gold", 0),
-        "silver": questionnaire.get("silver", 0),
+        "pf_nps": questionnaire.get("pf_nps_value", 0) or questionnaire.get("pf_nps", 0),
+        "fd": questionnaire.get("fd_value", 0) or questionnaire.get("fd", 0) or questionnaire.get("fixed_deposits", 0),
+        "real_estate": questionnaire.get("property_value", 0) or questionnaire.get("real_estate", 0),
+        "gold": questionnaire.get("gold_value", 0) or questionnaire.get("gold", 0),
+        "silver": questionnaire.get("silver_value", 0) or questionnaire.get("silver", 0),
         
         # Liabilities
         "home_loan_outstanding": questionnaire.get("home_loan_outstanding", 0),
