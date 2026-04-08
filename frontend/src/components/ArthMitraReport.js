@@ -1030,7 +1030,25 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             <span style={{fontSize:'20px'}}>💰</span>
             <div style={{textAlign:'left'}}>
               <div style={{fontSize:'12px',fontWeight:700,color: opportunityTab === 'savings' ? 'var(--grn)' : 'var(--t1)'}}>Saving Opportunities</div>
-              <div style={{fontSize:'10px',color:'var(--t3)'}}>{opportunityData.saving_opportunities?.length || 0} items</div>
+              <div style={{fontSize:'10px',color:'var(--t3)'}}>
+                {(() => {
+                  // Count actual displayed cards, not raw items
+                  let count = 0;
+                  const investmentOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Investment')) || [];
+                  const emergencyOpps = opportunityData.saving_opportunities?.filter(opp => opp.component.includes('Emergency Fund')) || [];
+                  const allocationOpp = opportunityData.saving_opportunities?.find(opp => opp.component === 'Asset Allocation');
+                  const reallocationOpp = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation');
+                  const actualFund = reallocationOpp?.actual || emergencyFund || 0;
+                  const idealFund = reallocationOpp?.ideal || (expenses * 2) || 0;
+                  const excessFund = actualFund - idealFund;
+                  
+                  if (investmentOpps.length > 0) count++;
+                  if (emergencyOpps.length > 0 && excessFund > 0) count++;
+                  if (allocationOpp) count++;
+                  
+                  return count + ' items';
+                })()}
+              </div>
             </div>
           </button>
           <button
@@ -1052,7 +1070,16 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             <span style={{fontSize:'20px'}}>🛡️</span>
             <div style={{textAlign:'left'}}>
               <div style={{fontSize:'12px',fontWeight:700,color: opportunityTab === 'risks' ? 'var(--red)' : 'var(--t1)'}}>Risk Reduction</div>
-              <div style={{fontSize:'10px',color:'var(--t3)'}}>{opportunityData.risk_reductions?.length || 0} items</div>
+              <div style={{fontSize:'10px',color:'var(--t3)'}}>
+                {(() => {
+                  // Count: Asset Allocation as 1 card (if exists) + other risk items
+                  const assetAllocationRisk = opportunityData.risk_reductions?.find(r => r.component === 'Asset Allocation');
+                  const otherRisks = opportunityData.risk_reductions?.filter(r => r.component !== 'Asset Allocation') || [];
+                  let count = otherRisks.length;
+                  if (assetAllocationRisk) count++;
+                  return count + ' items';
+                })()}
+              </div>
             </div>
           </button>
         </div>
@@ -1179,7 +1206,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                           </div>
                           <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                             <div style={{textAlign:'right'}}>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>+{formatINR(Math.round(excessFund * 0.10))}</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>+{formatINR(emergencyTotal)}</div>
                               <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
                             </div>
                             <div style={{
@@ -1226,11 +1253,16 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                                 </div>
                               </div>
                               
-                              {/* What to do with excess */}
+                              {/* What to do with excess - Breakdown of all opportunities */}
                               <div style={{background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r8)',padding:'12px'}}>
-                                <div style={{fontSize:'11px',fontWeight:600,color:'#166534',marginBottom:'4px'}}>💰 Invest Excess {formatINR2(excessFund)}</div>
-                                <div style={{fontSize:'11px',color:'#15803D'}}>
-                                  Move excess to Real Estate / Equity to correct asset allocation and earn ~{formatINR(Math.round(excessFund * 0.10))}/year extra
+                                <div style={{fontSize:'11px',fontWeight:600,color:'#166534',marginBottom:'8px'}}>💰 Total Potential Gain: {formatINR(emergencyTotal)}/year</div>
+                                <div style={{display:'flex',flexDirection:'column',gap:'4px',fontSize:'10px',color:'#15803D'}}>
+                                  {emergencyOpps.map((opp, idx) => (
+                                    <div key={idx} style={{display:'flex',justifyContent:'space-between'}}>
+                                      <span>{opp.component.replace('Emergency Fund ', '').replace('Reallocation', 'Invest Excess')}</span>
+                                      <span style={{fontWeight:600}}>+{formatINR(opp.annual_impact || 0)}</span>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
