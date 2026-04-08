@@ -5,6 +5,22 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### ✅ Financial Opportunity Analyzer UI (Apr 8, 2026)
+- **Complete UI Integration** of gap analysis in ArthMitra Report
+- **Hero Section**: Two gradient cards showing Saving Opportunities (green) and Risk Reduction Gaps (red)
+- **Tabbed Interface**: Switch between Saving Opportunities and Risk Reduction views
+- **Opportunity Cards**: Display 8 saving opportunities with:
+  - Priority badges (HIGH/MEDIUM/LOW)
+  - Annual impact amounts (+₹X/year)
+  - ACTUAL/IDEAL/GAP breakdowns
+- **Risk Cards**: Display 4 risk reduction items with:
+  - Priority badges
+  - Coverage gap amounts
+  - CURRENT/REQUIRED breakdowns
+  - Unadapted habits list (for Financial Habits item)
+- **Backend API**: `/api/reports/opportunity-analysis` returns structured data
+- **Testing**: 100% pass rate on all features
+
 ### ✅ 10-Factor Financial Health Scoring System (Apr 8, 2026)
 - **Complete replacement** of 9-Pillar model with comprehensive 10-Factor analysis
 - **Total: 140 points normalized to 100** for easy understanding
@@ -192,7 +208,9 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - `GET /api/auth/me` - Get current user
 
 ### ArthVyay
-- `GET /api/reports/health-score` - Financial health score
+- `GET /api/reports/health-score` - Financial health score (legacy)
+- `GET /api/reports/health-score-v2` - 10-Factor financial health score
+- `GET /api/reports/opportunity-analysis` - Financial opportunity & risk gap analysis
 - `POST /api/questionnaire` - Save questionnaire
 - `GET /api/questionnaire` - Get questionnaire
 
