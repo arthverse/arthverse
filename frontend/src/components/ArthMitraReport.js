@@ -1749,9 +1749,164 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         if (!component) return null;
         const percentage = component.max_points > 0 ? (component.score / component.max_points) * 100 : 0;
         const color = percentage >= 70 ? '#22C55E' : (percentage >= 40 ? '#F59E0B' : '#EF4444');
+        const colorBg = percentage >= 70 ? '#22C55E20' : (percentage >= 40 ? '#F59E0B20' : '#EF444420');
         const icons = { 'Savings Rate': '💰', 'EMI Tolerance': '🏦', 'Emergency Fund': '🛡️', 'Investment Portfolio': '📈', 
                        'Net Worth': '💎', 'Asset Allocation': '⚖️', 'Financial Habits': '✅', 'Life Insurance': '❤️', 
                        'Health Insurance': '🏥', 'Vehicle Insurance': '🚗' };
+        
+        // Build Ideal vs Actual comparison data
+        const getComparisonData = () => {
+          const d = component.details || {};
+          switch(component.component) {
+            case 'Savings Rate':
+              return {
+                metrics: [
+                  { label: 'Savings Rate', actual: `${d.actual_savings_rate?.toFixed(1)}%`, ideal: `${d.target_savings_rate?.toFixed(1)}%`, isGood: d.actual_savings_rate >= d.target_savings_rate },
+                  { label: 'Monthly Savings', actual: `₹${(d.monthly_savings || 0).toLocaleString('en-IN')}`, ideal: `₹${((d.target_savings_rate/100) * (income || 0)).toLocaleString('en-IN')}`, isGood: d.achievement_percentage >= 100 }
+                ],
+                tips: [
+                  'Track all expenses using an app or spreadsheet',
+                  'Set up automatic transfers to savings on salary day',
+                  'Review and cut unnecessary subscriptions',
+                  'Follow the 50-30-20 rule: 50% needs, 30% wants, 20% savings'
+                ]
+              };
+            case 'EMI Tolerance':
+              return {
+                metrics: [
+                  { label: 'EMI to Income Ratio', actual: `${d.actual_dti_ratio?.toFixed(1)}%`, ideal: `< ${d.tolerance_limit?.toFixed(0)}%`, isGood: d.actual_dti_ratio <= d.tolerance_limit },
+                  { label: 'Total EMI', actual: `₹${(d.total_emi || 0).toLocaleString('en-IN')}`, ideal: `< ₹${((d.tolerance_limit/100) * (income || 0)).toLocaleString('en-IN')}`, isGood: d.actual_dti_ratio <= d.tolerance_limit }
+                ],
+                tips: d.actual_dti_ratio > 0 ? [
+                  'Consider prepaying high-interest loans first',
+                  'Avoid taking new loans until existing ones are paid off',
+                  'Refinance loans if better interest rates are available',
+                  'Build an emergency fund to avoid debt during crises'
+                ] : [
+                  'Great! You have no debt - maintain this discipline',
+                  'Continue avoiding unnecessary loans',
+                  'If you take a loan, ensure EMI stays under 40% of income'
+                ]
+              };
+            case 'Emergency Fund':
+              return {
+                metrics: [
+                  { label: 'Emergency Fund', actual: `₹${((d.actual_fund || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.required_fund || 0)/100000).toFixed(2)}L (${d.required_months || 6} months)`, isGood: d.adequacy_ratio >= 100 },
+                  { label: 'Fund Adequacy', actual: `${d.adequacy_ratio?.toFixed(0)}%`, ideal: '100%', isGood: d.adequacy_ratio >= 100 }
+                ],
+                tips: d.adequacy_ratio < 100 ? [
+                  `Build up to ${d.required_months || 6} months of expenses`,
+                  'Keep emergency fund in liquid instruments (savings, liquid MF)',
+                  'Do not invest emergency fund in stocks or equity MF',
+                  'Replenish immediately if you use the fund'
+                ] : [
+                  'Consider moving excess funds to higher-return investments',
+                  'Split between savings (40%), sweep FD (30%), liquid MF (30%)',
+                  'Review allocation to optimize returns while maintaining liquidity'
+                ]
+              };
+            case 'Investment Portfolio':
+              return {
+                metrics: [
+                  { label: 'Portfolio Value', actual: `₹${((d.actual_value || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.target_value || 0)/100000).toFixed(2)}L (${d.target_multiple?.toFixed(1)}x income)`, isGood: (d.actual_value || 0) >= (d.target_value || 0) },
+                  { label: 'Wealth Multiple', actual: `${d.actual_multiple?.toFixed(2)}x`, ideal: `${d.target_multiple?.toFixed(1)}x annual income`, isGood: (d.actual_multiple || 0) >= (d.target_multiple || 0) }
+                ],
+                tips: [
+                  'Start SIPs in diversified equity mutual funds',
+                  'Increase investment amount by 10% every year',
+                  'Maximize tax-saving investments (80C, NPS)',
+                  'Diversify across equity, debt, and gold'
+                ]
+              };
+            case 'Net Worth':
+              return {
+                metrics: [
+                  { label: 'Net Worth', actual: `₹${((d.actual_net_worth || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.target_net_worth || 0)/100000).toFixed(2)}L`, isGood: (d.actual_net_worth || 0) >= (d.target_net_worth || 0) },
+                  { label: 'Net Worth Multiple', actual: `${d.net_worth_multiple?.toFixed(2)}x`, ideal: `${d.target_multiple?.toFixed(1)}x annual income`, isGood: (d.net_worth_multiple || 0) >= (d.target_multiple || 0) }
+                ],
+                tips: [
+                  'Focus on increasing assets while reducing liabilities',
+                  'Avoid depreciating assets (expensive cars, gadgets)',
+                  'Invest in appreciating assets (equity, real estate)',
+                  'Pay off high-interest debt as priority'
+                ]
+              };
+            case 'Asset Allocation':
+              const alloc = d.allocation_by_class || {};
+              return {
+                metrics: Object.entries(alloc).map(([asset, data]) => ({
+                  label: asset.charAt(0).toUpperCase() + asset.slice(1).replace(/_/g, ' '),
+                  actual: `${data.actual?.toFixed(1)}%`,
+                  ideal: `${data.ideal}%`,
+                  isGood: Math.abs(data.actual - data.ideal) <= 10
+                })),
+                tips: [
+                  'Rebalance portfolio annually to maintain target allocation',
+                  'Use age-based allocation: (100 - age)% in equity',
+                  'Don\'t over-allocate to gold (max 10%)',
+                  'Include real estate for long-term wealth creation'
+                ]
+              };
+            case 'Financial Habits':
+              return {
+                metrics: (d.breakdown || []).map(habit => ({
+                  label: habit.question?.replace(/_/g, ' ').replace(/habit /gi, ''),
+                  actual: habit.response === 'yes' ? '✅ Yes' : (habit.response === 'no' ? '❌ No' : '➖ Neutral'),
+                  ideal: '✅ Yes',
+                  isGood: habit.points > 0
+                })),
+                tips: [
+                  'File ITR on time every year',
+                  'Pay credit card bills in full before due date',
+                  'Get term life insurance (10-15x annual income)',
+                  'Invest beyond just FDs - try mutual funds'
+                ]
+              };
+            case 'Life Insurance':
+              return {
+                metrics: [
+                  { label: 'Current Coverage', actual: `₹${((d.current_coverage || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.recommended_coverage || 0)/10000000).toFixed(2)} Cr`, isGood: (d.current_coverage || 0) >= (d.recommended_coverage || 0) },
+                  { label: 'Coverage Multiple', actual: `${d.coverage_multiple?.toFixed(1)}x income`, ideal: `${d.recommended_multiple || 15}x income`, isGood: (d.coverage_multiple || 0) >= (d.recommended_multiple || 15) }
+                ],
+                tips: [
+                  'Get pure term insurance (not ULIP or endowment)',
+                  'Coverage should be 15-20x annual income for young earners',
+                  'Buy early for lower premiums',
+                  'Review coverage when income increases significantly'
+                ]
+              };
+            case 'Health Insurance':
+              return {
+                metrics: [
+                  { label: 'Current Coverage', actual: `₹${((d.current_coverage || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.recommended_coverage || 0)/100000).toFixed(2)}L`, isGood: (d.current_coverage || 0) >= (d.recommended_coverage || 0) },
+                  { label: 'Family Members Covered', actual: d.members_covered || 'Unknown', ideal: `${d.family_members || 1} members`, isGood: true }
+                ],
+                tips: [
+                  'Get family floater policy for better value',
+                  'Minimum ₹10-15L coverage for metro cities',
+                  'Add super top-up for cost-effective high coverage',
+                  'Don\'t rely only on employer health insurance'
+                ]
+              };
+            case 'Vehicle Insurance':
+              return {
+                metrics: [
+                  { label: 'Insurance Type', actual: d.current_type || 'None', ideal: 'Comprehensive', isGood: d.current_type === 'Comprehensive' }
+                ],
+                tips: [
+                  'Always choose comprehensive over third-party only',
+                  'Add-ons: Zero depreciation, roadside assistance',
+                  'Compare quotes before renewal',
+                  'Don\'t let policy lapse - NCB will be lost'
+                ]
+              };
+            default:
+              return { metrics: [], tips: [] };
+          }
+        };
+        
+        const comparisonData = getComparisonData();
+        
         return (
           <div className="pillar-modal-overlay" onClick={() => setSelectedPillar(null)}>
             <div className="pillar-modal" onClick={(e) => e.stopPropagation()} style={{maxWidth:'600px'}}>
@@ -1765,7 +1920,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               </div>
               <div className="pillar-modal-body" style={{maxHeight:'60vh',overflowY:'auto'}}>
                 {/* Score Bar */}
-                <div style={{marginBottom:'20px'}}>
+                <div style={{marginBottom:'24px'}}>
                   <div style={{display:'flex',justifyContent:'space-between',marginBottom:'8px'}}>
                     <span style={{fontWeight:600,color:'#18170F'}}>Achievement</span>
                     <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:color}}>{percentage.toFixed(1)}%</span>
@@ -1773,92 +1928,42 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                   <div style={{height:'10px',background:'#F3F2EE',borderRadius:'5px',overflow:'hidden'}}>
                     <div style={{width:`${Math.min(100,percentage)}%`,height:'100%',background:color,borderRadius:'5px',transition:'width 0.5s'}}></div>
                   </div>
-                  <div style={{marginTop:'8px',padding:'10px 14px',background:color+'20',borderRadius:'8px',fontSize:'13px',fontWeight:600,color:color}}>
-                    Status: {component.details?.status || 'Calculating...'}
-                  </div>
                 </div>
                 
-                {/* Details Table */}
-                {component.details && (
-                  <div style={{marginBottom:'20px'}}>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Detailed Analysis</h4>
-                    <div style={{background:'#F7F6F3',borderRadius:'10px',padding:'16px',fontSize:'12px'}}>
-                      <table style={{width:'100%',borderCollapse:'collapse'}}>
-                        <tbody>
-                          {Object.entries(component.details).filter(([key]) => 
-                            !['status', 'breakdown', 'allocation', 'fund_breakdown', 'emi_breakdown', 'allocation_by_class', 'ideal_allocation'].includes(key)
-                          ).map(([key, value], i) => (
-                            <tr key={i} style={{borderBottom:'1px solid #E5E4E0'}}>
-                              <td style={{padding:'8px 4px',fontWeight:500,color:'#6B6860',textTransform:'capitalize'}}>
-                                {key.replace(/_/g, ' ')}
-                              </td>
-                              <td style={{padding:'8px 4px',fontFamily:"'JetBrains Mono',monospace",fontWeight:600,textAlign:'right',color:'#18170F'}}>
-                                {typeof value === 'number' ? (
-                                  key.includes('ratio') || key.includes('rate') || key.includes('achievement') || key.includes('deviation') || key.includes('percentage')
-                                    ? `${value.toFixed(1)}%`
-                                    : value >= 100000 ? `₹${(value/100000).toFixed(2)}L` : `₹${value.toLocaleString('en-IN')}`
-                                ) : typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-                
-                {/* EMI Breakdown for EMI Tolerance */}
-                {component.component === 'EMI Tolerance' && component.details?.emi_breakdown && (
-                  <div style={{marginBottom:'20px'}}>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>EMI Breakdown</h4>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'10px'}}>
-                      {Object.entries(component.details.emi_breakdown).map(([loan, emi], i) => (
-                        <div key={i} style={{background:'#F7F6F3',borderRadius:'8px',padding:'12px'}}>
-                          <div style={{fontSize:'10px',color:'#6B6860',textTransform:'capitalize'}}>{loan.replace(/_/g, ' ')}</div>
-                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#18170F'}}>₹{emi.toLocaleString('en-IN')}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Emergency Fund Breakdown */}
-                {component.component === 'Emergency Fund' && component.details?.fund_breakdown && (
-                  <div style={{marginBottom:'20px'}}>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Fund Allocation</h4>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
-                      {Object.entries(component.details.fund_breakdown).map(([source, amount], i) => (
-                        <div key={i} style={{background:'#F7F6F3',borderRadius:'8px',padding:'12px',textAlign:'center'}}>
-                          <div style={{fontSize:'10px',color:'#6B6860',textTransform:'capitalize',marginBottom:'4px'}}>{source.replace(/_/g, ' ')}</div>
-                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#18170F'}}>
-                            ₹{amount >= 100000 ? `${(amount/100000).toFixed(1)}L` : amount.toLocaleString('en-IN')}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Asset Allocation Breakdown */}
-                {component.component === 'Asset Allocation' && component.details?.allocation_by_class && (
-                  <div style={{marginBottom:'20px'}}>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Asset Class Comparison</h4>
-                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',background:'#F7F6F3',borderRadius:'10px',overflow:'hidden'}}>
+                {/* Actual vs Ideal Comparison Table */}
+                {comparisonData.metrics.length > 0 && (
+                  <div style={{marginBottom:'24px'}}>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F',display:'flex',alignItems:'center',gap:'8px'}}>
+                      <span>📊</span> Actual vs Ideal
+                    </h4>
+                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',background:'#F7F6F3',borderRadius:'10px',overflow:'hidden'}}>
                       <thead>
                         <tr style={{background:'#E5E4E0'}}>
-                          <th style={{padding:'10px',textAlign:'left',fontWeight:600}}>Asset Class</th>
-                          <th style={{padding:'10px',textAlign:'right',fontWeight:600}}>Actual</th>
-                          <th style={{padding:'10px',textAlign:'right',fontWeight:600}}>Ideal</th>
-                          <th style={{padding:'10px',textAlign:'right',fontWeight:600}}>Deviation</th>
+                          <th style={{padding:'12px',textAlign:'left',fontWeight:600,color:'#18170F'}}>Metric</th>
+                          <th style={{padding:'12px',textAlign:'right',fontWeight:600,color:'#18170F'}}>Your Actual</th>
+                          <th style={{padding:'12px',textAlign:'right',fontWeight:600,color:'#18170F'}}>Ideal Target</th>
+                          <th style={{padding:'12px',textAlign:'center',fontWeight:600,color:'#18170F'}}>Status</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(component.details.allocation_by_class).map(([asset, data], i) => (
+                        {comparisonData.metrics.map((metric, i) => (
                           <tr key={i} style={{borderBottom:'1px solid #E5E4E0'}}>
-                            <td style={{padding:'10px',fontWeight:500,textTransform:'capitalize'}}>{asset.replace(/_/g, ' ')}</td>
-                            <td style={{padding:'10px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace"}}>{data.actual.toFixed(1)}%</td>
-                            <td style={{padding:'10px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'#6B6860'}}>{data.ideal}%</td>
-                            <td style={{padding:'10px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:data.deviation > 10 ? '#EF4444' : '#22C55E'}}>{data.deviation.toFixed(1)}%</td>
+                            <td style={{padding:'12px',fontWeight:500,color:'#18170F'}}>{metric.label}</td>
+                            <td style={{padding:'12px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color: metric.isGood ? '#22C55E' : '#F59E0B'}}>{metric.actual}</td>
+                            <td style={{padding:'12px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'#6B6860'}}>{metric.ideal}</td>
+                            <td style={{padding:'12px',textAlign:'center'}}>
+                              <span style={{
+                                display:'inline-block',
+                                padding:'4px 10px',
+                                borderRadius:'12px',
+                                fontSize:'10px',
+                                fontWeight:600,
+                                background: metric.isGood ? '#22C55E20' : '#F59E0B20',
+                                color: metric.isGood ? '#22C55E' : '#F59E0B'
+                              }}>
+                                {metric.isGood ? '✓ On Track' : '↑ Improve'}
+                              </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -1866,39 +1971,19 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                   </div>
                 )}
                 
-                {/* Financial Habits Breakdown */}
-                {component.component === 'Financial Habits' && component.details?.breakdown && (
-                  <div style={{marginBottom:'20px'}}>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Habit Checklist</h4>
-                    <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                      {component.details.breakdown.map((habit, i) => (
-                        <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 14px',background:'#F7F6F3',borderRadius:'8px'}}>
-                          <span style={{fontSize:'12px',textTransform:'capitalize',color:'#18170F'}}>{habit.question.replace(/_/g, ' ')}</span>
-                          <span style={{
-                            padding:'4px 10px',
-                            borderRadius:'12px',
-                            fontSize:'10px',
-                            fontWeight:600,
-                            background: habit.points > 0 ? '#22C55E20' : (habit.points < 0 ? '#EF444420' : '#F3F2EE'),
-                            color: habit.points > 0 ? '#22C55E' : (habit.points < 0 ? '#EF4444' : '#6B6860')
-                          }}>
-                            {habit.points > 0 ? `+${habit.points}` : habit.points} pts
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Tips Section */}
-                {PILLAR_DETAILS[component.component]?.tips && (
+                {/* How to Improve Section */}
+                {comparisonData.tips.length > 0 && (
                   <div>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>💡 Tips to Improve</h4>
-                    <ul className="pillar-tips">
-                      {PILLAR_DETAILS[component.component].tips.map((tip, i) => (
-                        <li key={i}>{tip}</li>
-                      ))}
-                    </ul>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F',display:'flex',alignItems:'center',gap:'8px'}}>
+                      <span>💡</span> How to Improve
+                    </h4>
+                    <div style={{background:'linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%)',borderRadius:'10px',padding:'16px'}}>
+                      <ul style={{margin:0,paddingLeft:'20px',display:'flex',flexDirection:'column',gap:'10px'}}>
+                        {comparisonData.tips.map((tip, i) => (
+                          <li key={i} style={{fontSize:'12px',color:'#374151',lineHeight:1.5}}>{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1907,8 +1992,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         );
       })()}
 
-      {/* LEGACY PILLAR DETAILS MODAL (fallback) */}
-      {selectedPillar && PILLAR_DETAILS[selectedPillar] && (
+      {/* LEGACY PILLAR DETAILS MODAL (fallback - only when 10-Factor data is not available) */}
+      {selectedPillar && !tenFactorData?.components && PILLAR_DETAILS[selectedPillar] && (
         <div className="pillar-modal-overlay" onClick={() => setSelectedPillar(null)}>
           <div className="pillar-modal" onClick={(e) => e.stopPropagation()}>
             <div className="pillar-modal-header">
