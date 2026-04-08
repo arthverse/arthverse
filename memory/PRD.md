@@ -5,6 +5,30 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### ✅ 10-Factor Financial Health Scoring System (Apr 8, 2026)
+- **Complete replacement** of 9-Pillar model with comprehensive 10-Factor analysis
+- **Total: 140 points normalized to 100** for easy understanding
+- **Backend API**: New `/api/reports/health-score-v2` endpoint with full calculation logic
+- **Frontend**: Updated ArthMitraReport.js with 5x2 grid display and detailed View Details modals
+
+**10 Components:**
+1. **Savings Rate** (25 pts) - Age-based targets (15-35% by age)
+2. **EMI Tolerance** (20 pts) - 8 debt levels with age-adjusted tolerance
+3. **Emergency Fund** (15 pts) - Fund adequacy + allocation quality
+4. **Investment Portfolio** (15 pts) - Discipline + Wealth accumulation
+5. **Net Worth** (15 pts) - Assets vs liabilities with age targets
+6. **Asset Allocation** (25 pts) - City-tier & age-based 4-asset model
+7. **Financial Habits** (10 pts) - 7-question checklist
+8. **Life Insurance** (5 pts) - Coverage ratio scoring
+9. **Health Insurance** (5 pts) - Family-based requirements
+10. **Vehicle Insurance** (5 pts) - Type-based scoring
+
+**New Questionnaire Fields Added:**
+- Profile & Demographics (City Tier, Family Situation)
+- Insurance Coverage Details (Life, Health, Vehicle)
+- EMI and Loan Outstanding breakdowns
+- Financial Habits mapping from Q1-Q7
+
 ### ✅ Blue & Orange Theme Update (Apr 7, 2026)
 - **Complete visual rebranding** from Gold/Yellow to Blue & Orange theme
 - Updated CSS variables: `--gold` remapped to `#2563EB` (blue), `--amb` set to `#F97316` (orange)

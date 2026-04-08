@@ -63,7 +63,66 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     cash_withdrawals: 0,
     foreign_transactions: 0,
     
-    // Predefined Assets
+    // === NEW FIELDS FOR 10-FACTOR SCORING ===
+    
+    // Profile & Demographics
+    city_tier: 'tier_2',
+    family_situation: 'single_stable',
+    
+    // EMI Details
+    home_loan_emi: 0,
+    car_loan_emi: 0,
+    education_loan_emi: 0,
+    personal_loan_emi: 0,
+    other_loan_emi: 0,
+    
+    // Loan Outstanding
+    home_loan_outstanding: 0,
+    car_loan_outstanding: 0,
+    education_loan_outstanding: 0,
+    personal_loan_outstanding: 0,
+    other_loan_outstanding: 0,
+    
+    // Detailed Assets
+    mutual_funds: 0,
+    stocks: 0,
+    debt_mf: 0,
+    pf_nps: 0,
+    fd: 0,
+    sweep_fd: 0,
+    bonds: 0,
+    real_estate: 0,
+    gold: 0,
+    silver: 0,
+    liquid_mf: 0,
+    
+    // Insurance Details
+    life_insurance_coverage: 0,
+    life_insurance_premium: 0,
+    health_insurance_coverage: 0,
+    health_insurance_premium: 0,
+    has_vehicle: false,
+    vehicle_insurance_type: 'none',
+    vehicle_insurance_premium: 0,
+    
+    // Investment
+    yearly_investment: 0,
+    
+    // Credit Card
+    has_credit_card: false,
+    credit_card_debt: 0,
+    
+    // Financial Habits mapping (from Q1-Q7)
+    habit_health_insurance: 'neutral',
+    habit_term_life: 'neutral',
+    habit_itr_filing: 'neutral',
+    habit_cc_balance: 'neutral',
+    habit_personal_loan: 'neutral',
+    habit_invest_beyond_fd: 'neutral',
+    
+    // === END NEW FIELDS ===
+    
+    // Predefined Assets (legacy)
     property_value: 0,  // Will be auto-calculated from properties list
     vehicles_value: 0,
     gold_value: 0,
@@ -390,6 +449,74 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
         files_itr_yearly: formData.files_itr_yearly,
         credit_cards: formData.credit_cards,
         monthly_investment: parseFloat(formData.monthly_investment) || 0,
+        
+        // === NEW 10-FACTOR SCORING FIELDS ===
+        
+        // Profile & Demographics
+        city_tier: formData.city_tier || 'tier_2',
+        family_situation: formData.family_situation || 'single_stable',
+        
+        // EMI Details
+        home_loan_emi: parseFloat(formData.home_loan_emi) || 0,
+        car_loan_emi: parseFloat(formData.car_loan_emi) || 0,
+        education_loan_emi: parseFloat(formData.education_loan_emi) || 0,
+        personal_loan_emi: parseFloat(formData.personal_loan_emi) || 0,
+        other_loan_emi: parseFloat(formData.other_loan_emi) || 0,
+        
+        // Loan Outstanding
+        home_loan_outstanding: parseFloat(formData.home_loan_outstanding) || 0,
+        car_loan_outstanding: parseFloat(formData.car_loan_outstanding) || 0,
+        education_loan_outstanding: parseFloat(formData.education_loan_outstanding) || 0,
+        personal_loan_outstanding: parseFloat(formData.personal_loan_outstanding) || 0,
+        other_loan_outstanding: parseFloat(formData.other_loan_outstanding) || 0,
+        
+        // Detailed Assets for 10-factor
+        mutual_funds: parseFloat(formData.mutual_funds_value) || parseFloat(formData.mutual_funds) || 0,
+        stocks: parseFloat(formData.stocks_value) || parseFloat(formData.stocks) || 0,
+        debt_mf: parseFloat(formData.debt_mf) || 0,
+        pf_nps: parseFloat(formData.pf_nps_value) || parseFloat(formData.pf_nps) || 0,
+        fd: parseFloat(formData.fd) || 0,
+        sweep_fd: parseFloat(formData.sweep_fd) || 0,
+        bonds: parseFloat(formData.bonds) || 0,
+        real_estate: totalPropertyValue || parseFloat(formData.real_estate) || 0,
+        gold: parseFloat(formData.gold_value) || parseFloat(formData.gold) || 0,
+        silver: parseFloat(formData.silver_value) || parseFloat(formData.silver) || 0,
+        liquid_mf: parseFloat(formData.liquid_mf) || 0,
+        
+        // Insurance Details
+        life_insurance_coverage: parseFloat(formData.life_insurance_coverage) || 0,
+        life_insurance_premium: parseFloat(formData.life_insurance_premium) || 0,
+        health_insurance_coverage: parseFloat(formData.health_insurance_coverage) || 0,
+        health_insurance_premium: parseFloat(formData.health_insurance_premium) || 0,
+        has_vehicle: formData.has_vehicle || false,
+        vehicle_insurance_type: formData.vehicle_insurance_type || 'none',
+        vehicle_insurance_premium: parseFloat(formData.vehicle_insurance_premium) || 0,
+        
+        // Investment
+        yearly_investment: parseFloat(formData.yearly_investment) || (parseFloat(formData.monthly_investment) || 0) * 12,
+        
+        // Credit Card
+        has_credit_card: formData.q4_credit_card === 'yes' || formData.has_credit_card || formData.credit_cards.length > 0,
+        credit_card_debt: parseFloat(formData.credit_card_outstanding) || parseFloat(formData.credit_card_debt) || 0,
+        
+        // Financial Habits mapping from Q1-Q7
+        habit_health_insurance: formData.q1_health_insurance === 'yes_personal' ? 'good' : (formData.q1_health_insurance === 'no_insurance' ? 'bad' : 'neutral'),
+        habit_term_life: formData.q2_term_insurance === 'yes_term' ? 'good' : (formData.q2_term_insurance === 'no_insurance' ? 'bad' : 'neutral'),
+        habit_itr_filing: formData.q3_itr_filing === 'yes_ontime' ? 'good' : (formData.q3_itr_filing === 'no_file' ? 'bad' : 'neutral'),
+        habit_cc_balance: formData.q5_cc_balance === 'no_always_full' ? 'good' : (formData.q5_cc_balance === 'yes_minimum' ? 'bad' : 'neutral'),
+        habit_personal_loan: formData.q6_personal_loan === 'no_loan' ? 'good' : (formData.q6_personal_loan === 'multiple_loans' ? 'bad' : 'neutral'),
+        habit_invest_beyond_fd: formData.q7_regular_investing === 'yes_regular' ? 'good' : (formData.q7_regular_investing === 'no_fd_only' ? 'bad' : 'neutral'),
+        
+        // Q1-Q7 raw answers (for reference)
+        q1_health_insurance: formData.q1_health_insurance,
+        q2_term_insurance: formData.q2_term_insurance,
+        q3_itr_filing: formData.q3_itr_filing,
+        q4_credit_card: formData.q4_credit_card,
+        q5_cc_balance: formData.q5_cc_balance,
+        q6_personal_loan: formData.q6_personal_loan,
+        q7_regular_investing: formData.q7_regular_investing,
+        
+        // === END NEW FIELDS ===
         
         // Credit Card Recommendation - Step 5
         redeem_free_flights: formData.redeem_free_flights,
@@ -2002,9 +2129,154 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
           {/* Step 4: Financial Stability & Credit Cards */}
           {step === 4 && (
             <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
-              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">4. Financial Stability & Credit Cards</h2>
+              <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">4. Financial Profile & Stability</h2>
               
               <div className="space-y-6">
+                {/* NEW: Profile & Demographics Section */}
+                <div>
+                  <h3 className="text-lg font-semibold text-brand-blue mb-4">Profile & Demographics</h3>
+                  <p className="text-sm text-slate-500 mb-4">This helps us customize benchmarks based on your location and family situation.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="block mb-2 font-medium">City Tier</Label>
+                      <Select value={formData.city_tier} onValueChange={(value) => setFormData({ ...formData, city_tier: value })}>
+                        <SelectTrigger className="bg-white">
+                          <SelectValue placeholder="Select city tier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="tier_1">Tier 1 (Mumbai, Delhi, Bangalore, etc.)</SelectItem>
+                          <SelectItem value="tier_2">Tier 2 (Pune, Jaipur, Lucknow, etc.)</SelectItem>
+                          <SelectItem value="tier_3">Tier 3 (Smaller cities)</SelectItem>
+                          <SelectItem value="tier_4">Tier 4 (District headquarters)</SelectItem>
+                          <SelectItem value="town">Town</SelectItem>
+                          <SelectItem value="village">Village</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label className="block mb-2 font-medium">Family Situation</Label>
+                      <Select value={formData.family_situation} onValueChange={(value) => setFormData({ ...formData, family_situation: value })}>
+                        <SelectTrigger className="bg-white">
+                          <SelectValue placeholder="Select family situation" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="single_stable">Single / Stable Job</SelectItem>
+                          <SelectItem value="married_children">Married / With Children</SelectItem>
+                          <SelectItem value="family_elderly">Family with Elderly Parents</SelectItem>
+                          <SelectItem value="entrepreneur">Entrepreneur / Variable Income</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* NEW: Insurance Coverage Section */}
+                <div>
+                  <h3 className="text-lg font-semibold text-brand-blue mb-4">Insurance Coverage Details</h3>
+                  <p className="text-sm text-slate-500 mb-4">Enter your insurance coverage amounts and annual premiums.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                      <h4 className="font-semibold text-blue-900 mb-3">Life Insurance</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-sm">Coverage Amount (₹)</Label>
+                          <Input
+                            type="number"
+                            value={formData.life_insurance_coverage || ''}
+                            onChange={(e) => setFormData({ ...formData, life_insurance_coverage: parseFloat(e.target.value) || 0 })}
+                            placeholder="e.g., 10000000"
+                            className="bg-white"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-sm">Annual Premium (₹)</Label>
+                          <Input
+                            type="number"
+                            value={formData.life_insurance_premium || ''}
+                            onChange={(e) => setFormData({ ...formData, life_insurance_premium: parseFloat(e.target.value) || 0 })}
+                            placeholder="e.g., 15000"
+                            className="bg-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                      <h4 className="font-semibold text-green-900 mb-3">Health Insurance</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-sm">Coverage Amount (₹)</Label>
+                          <Input
+                            type="number"
+                            value={formData.health_insurance_coverage || ''}
+                            onChange={(e) => setFormData({ ...formData, health_insurance_coverage: parseFloat(e.target.value) || 0 })}
+                            placeholder="e.g., 1000000"
+                            className="bg-white"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-sm">Annual Premium (₹)</Label>
+                          <Input
+                            type="number"
+                            value={formData.health_insurance_premium || ''}
+                            onChange={(e) => setFormData({ ...formData, health_insurance_premium: parseFloat(e.target.value) || 0 })}
+                            placeholder="e.g., 25000"
+                            className="bg-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 md:col-span-2">
+                      <h4 className="font-semibold text-amber-900 mb-3">Vehicle Insurance</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-sm">Do you own a vehicle?</Label>
+                          <Select value={formData.has_vehicle ? 'yes' : 'no'} onValueChange={(value) => setFormData({ ...formData, has_vehicle: value === 'yes' })}>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="yes">Yes</SelectItem>
+                              <SelectItem value="no">No</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {formData.has_vehicle && (
+                          <>
+                            <div>
+                              <Label className="text-sm">Insurance Type</Label>
+                              <Select value={formData.vehicle_insurance_type} onValueChange={(value) => setFormData({ ...formData, vehicle_insurance_type: value })}>
+                                <SelectTrigger className="bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="comprehensive">Comprehensive (Own Damage + TP)</SelectItem>
+                                  <SelectItem value="third_party">Third Party Only</SelectItem>
+                                  <SelectItem value="none">No Insurance</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label className="text-sm">Annual Premium (₹)</Label>
+                              <Input
+                                type="number"
+                                value={formData.vehicle_insurance_premium || ''}
+                                onChange={(e) => setFormData({ ...formData, vehicle_insurance_premium: parseFloat(e.target.value) || 0 })}
+                                placeholder="e.g., 8000"
+                                className="bg-white"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <h3 className="text-lg font-semibold text-brand-blue mb-4">Financial Stability Checkpoints</h3>
                   <p className="text-sm text-slate-500 mb-4">Answer these 7 questions to help us assess your financial discipline and stability.</p>

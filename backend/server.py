@@ -22,6 +22,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from services.setu_service import setu_service
 from services.financial_health_calculator import calculate_financial_health_score
+from services.financial_health_calculator_v2 import calculate_financial_health_score as calculate_10_factor_score
 from services.user_id_generator import generate_user_login_id_async, validate_date_of_birth
 from services.payment_service import payment_service, PLANS, PRICING, calculate_plan_price
 from services.report_generator import create_report
@@ -226,7 +227,66 @@ class FinancialQuestionnaire(BaseModel):
     cash_withdrawals: float = 0
     foreign_transactions: float = 0
     
-    # Predefined Assets
+    # === NEW FIELDS FOR 10-FACTOR SCORING ===
+    
+    # Profile & Demographics
+    city_tier: str = "tier_2"  # tier_1, tier_2, tier_3, tier_4, town, village
+    family_situation: str = "single_stable"  # single_stable, married_children, family_elderly, entrepreneur
+    
+    # EMI Details
+    home_loan_emi: float = 0
+    car_loan_emi: float = 0
+    education_loan_emi: float = 0
+    personal_loan_emi: float = 0
+    other_loan_emi: float = 0
+    
+    # Loan Outstanding
+    home_loan_outstanding: float = 0
+    car_loan_outstanding: float = 0
+    education_loan_outstanding: float = 0
+    personal_loan_outstanding: float = 0
+    other_loan_outstanding: float = 0
+    
+    # Detailed Assets
+    mutual_funds: float = 0
+    stocks: float = 0
+    debt_mf: float = 0
+    pf_nps: float = 0
+    fd: float = 0
+    sweep_fd: float = 0
+    bonds: float = 0
+    real_estate: float = 0
+    gold: float = 0
+    silver: float = 0
+    liquid_mf: float = 0
+    
+    # Insurance Details
+    life_insurance_coverage: float = 0
+    life_insurance_premium: float = 0
+    health_insurance_coverage: float = 0
+    health_insurance_premium: float = 0
+    has_vehicle: bool = False
+    vehicle_insurance_type: str = "none"  # comprehensive, third_party, none
+    vehicle_insurance_premium: float = 0
+    
+    # Investment
+    yearly_investment: float = 0
+    
+    # Credit Card
+    has_credit_card: bool = False
+    credit_card_debt: float = 0
+    
+    # Financial Habits (7 questions)
+    habit_health_insurance: str = "neutral"  # good, bad, neutral
+    habit_term_life: str = "neutral"
+    habit_itr_filing: str = "neutral"
+    habit_cc_balance: str = "neutral"  # good = pays full, bad = carries balance
+    habit_personal_loan: str = "neutral"  # good = no loans, bad = multiple
+    habit_invest_beyond_fd: str = "neutral"  # good = yes, bad = no
+    
+    # === END NEW FIELDS ===
+    
+    # Predefined Assets (legacy)
     property_value: float = 0  # Total property value (legacy, will be derived from properties list)
     vehicles_value: float = 0
     gold_value: float = 0
@@ -588,6 +648,131 @@ async def get_health_score(credentials: HTTPAuthorizationCredentials = Depends(s
     
     # Calculate comprehensive health score
     result = calculate_financial_health_score(questionnaire, user_age)
+    
+    return result
+
+@api_router.get("/reports/health-score-v2")
+async def get_health_score_v2(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Calculate comprehensive 10-Factor Financial Health Score (140 points normalized to 100)
+    Components: Savings Rate, EMI Tolerance, Emergency Fund, Investment Portfolio, Net Worth,
+    Asset Allocation, Financial Habits, Life Insurance, Health Insurance, Vehicle Insurance
+    """
+    user_id = await verify_token(credentials)
+    
+    # Get user data
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_age = user.get('age', 30)
+    family_members = 1 + user.get('major_members', 0) + user.get('minor_members', 0)
+    
+    # Get questionnaire data
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+    
+    if not questionnaire:
+        return {
+            "normalized_score": 0,
+            "raw_score": 0,
+            "max_points": 140,
+            "band": "NO DATA",
+            "band_description": "Please complete the financial questionnaire to calculate your health score",
+            "components": [],
+            "summary": {}
+        }
+    
+    # Prepare data for 10-factor calculation
+    monthly_income = (
+        questionnaire.get("salary_income", 0) +
+        questionnaire.get("business_income", 0) +
+        questionnaire.get("rental_property1", 0) +
+        questionnaire.get("rental_property2", 0) +
+        questionnaire.get("interest_income", 0) +
+        questionnaire.get("dividend_income", 0) +
+        questionnaire.get("capital_gains", 0) +
+        questionnaire.get("freelance_income", 0) +
+        questionnaire.get("other_income", 0)
+    )
+    
+    monthly_expenses = (
+        questionnaire.get("housing_emi_rent", 0) +
+        questionnaire.get("utilities", 0) +
+        questionnaire.get("groceries", 0) +
+        questionnaire.get("transportation", 0) +
+        questionnaire.get("healthcare", 0) +
+        questionnaire.get("education", 0) +
+        questionnaire.get("entertainment", 0) +
+        questionnaire.get("shopping", 0) +
+        questionnaire.get("insurance_premiums", 0) +
+        questionnaire.get("other_expenses", 0)
+    )
+    
+    # Build data dict for calculator
+    calc_data = {
+        "age": user_age,
+        "monthly_income": monthly_income,
+        "monthly_expenses": monthly_expenses,
+        "family_members": family_members,
+        
+        # City tier and family situation from questionnaire
+        "city_tier": questionnaire.get("city_tier", "tier_2"),
+        "family_situation": questionnaire.get("family_situation", "single_stable"),
+        "has_credit_card": questionnaire.get("has_credit_card", False),
+        
+        # EMI data
+        "home_loan_emi": questionnaire.get("home_loan_emi", 0),
+        "vehicle_loan_emi": questionnaire.get("car_loan_emi", 0),
+        "education_loan_emi": questionnaire.get("education_loan_emi", 0),
+        "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
+        
+        # Assets
+        "mutual_funds": questionnaire.get("mutual_funds", 0),
+        "stocks": questionnaire.get("stocks", 0),
+        "debt_mf": questionnaire.get("debt_mf", 0),
+        "pf_nps": questionnaire.get("pf_nps", 0),
+        "fd": questionnaire.get("fd", 0),
+        "sweep_fd": questionnaire.get("sweep_fd", 0),
+        "bonds": questionnaire.get("bonds", 0),
+        "real_estate": questionnaire.get("real_estate", 0),
+        "gold": questionnaire.get("gold", 0),
+        "silver": questionnaire.get("silver", 0),
+        "bank_balance": questionnaire.get("bank_balance", 0),
+        "liquid_mf": questionnaire.get("liquid_mf", 0),
+        
+        # Liabilities
+        "home_loan_outstanding": questionnaire.get("home_loan_outstanding", 0),
+        "vehicle_loan_outstanding": questionnaire.get("car_loan_outstanding", 0),
+        "education_loan_outstanding": questionnaire.get("education_loan_outstanding", 0),
+        "other_loan_outstanding": questionnaire.get("personal_loan_outstanding", 0) + questionnaire.get("other_loan_outstanding", 0),
+        "credit_card_debt": questionnaire.get("credit_card_debt", 0),
+        
+        # Insurance
+        "life_insurance_coverage": questionnaire.get("life_insurance_coverage", 0),
+        "life_insurance_premium": questionnaire.get("life_insurance_premium", 0),
+        "health_insurance_coverage": questionnaire.get("health_insurance_coverage", 0),
+        "health_insurance_premium": questionnaire.get("health_insurance_premium", 0),
+        "vehicle_insurance_type": questionnaire.get("vehicle_insurance_type", "none"),
+        "vehicle_insurance_premium": questionnaire.get("vehicle_insurance_premium", 0),
+        "has_vehicle": questionnaire.get("has_vehicle", False),
+        
+        # Investment
+        "yearly_investment": questionnaire.get("yearly_investment", 0),
+        
+        # Financial habits
+        "financial_habits": {
+            "health_insurance": questionnaire.get("habit_health_insurance", "neutral"),
+            "term_life_insurance": questionnaire.get("habit_term_life", "neutral"),
+            "itr_filing": questionnaire.get("habit_itr_filing", "neutral"),
+            "has_credit_card": questionnaire.get("has_credit_card", False),
+            "cc_balance": questionnaire.get("habit_cc_balance", "neutral"),
+            "personal_loan": questionnaire.get("habit_personal_loan", "neutral"),
+            "invest_beyond_fd": questionnaire.get("habit_invest_beyond_fd", "neutral"),
+        }
+    }
+    
+    # Calculate 10-factor score
+    result = calculate_10_factor_score(calc_data)
     
     return result
 

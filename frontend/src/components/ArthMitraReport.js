@@ -234,6 +234,23 @@ const PILLAR_DETAILS = {
       'Don\'t rely only on employer\'s group insurance'
     ],
     scoreLogic: 'Score = 100% if adequate cover, 0% if none. Max 5 points.'
+  },
+  'Vehicle Insurance': {
+    icon: '🚗',
+    description: 'Protection for your vehicle against damage and third-party liability',
+    benchmark: 'Target: Comprehensive insurance with OD + TP coverage',
+    factors: [
+      { label: 'Insurance Type', getValue: () => 'Comprehensive' },
+      { label: 'Coverage', getValue: () => 'Own Damage + Third Party' },
+      { label: 'Premium Benchmark', getValue: () => '< 1% of annual income' },
+    ],
+    tips: [
+      'Always choose comprehensive coverage over third-party only',
+      'Compare quotes from multiple insurers before renewal',
+      'Maintain NCB (No Claim Bonus) for premium discounts',
+      'Add personal accident cover for driver and passengers'
+    ],
+    scoreLogic: 'Comprehensive = 5 pts, Third Party = 3 pts, None = 0 pts. Max 5 points.'
   }
 };
 
@@ -509,13 +526,39 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [selectedPillar, setSelectedPillar] = useState(null);
   const [showInvestmentDetails, setShowInvestmentDetails] = useState(false);
   const [showAllocationDetails, setShowAllocationDetails] = useState(false);
+  const [tenFactorData, setTenFactorData] = useState(null);
+  const [loadingScore, setLoadingScore] = useState(true);
+
+  // Fetch 10-Factor Score
+  useEffect(() => {
+    const fetchTenFactorScore = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const API = process.env.REACT_APP_BACKEND_URL;
+        const response = await fetch(`${API}/api/reports/health-score-v2`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTenFactorData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching 10-factor score:', error);
+      } finally {
+        setLoadingScore(false);
+      }
+    };
+    fetchTenFactorScore();
+  }, []);
 
   // Calculate financial metrics
   const income = questionnaire?.monthly_income || userData?.monthlyIncome || 145000;
   const expenses = questionnaire?.monthly_expenses || userData?.monthlyExpenses || 63000;
   const savings = income - expenses;
   const savingsRate = ((savings / income) * 100).toFixed(1);
-  const score = healthScore?.score || healthScore?.overall_score || 80;
+  
+  // Use 10-factor score if available, fallback to legacy score
+  const score = tenFactorData?.normalized_score ?? healthScore?.score ?? healthScore?.overall_score ?? 80;
   
   // Assets breakdown
   const bankBalance = questionnaire?.bank_balance || healthScore?.financials?.bank_balance || 100000;
@@ -630,6 +673,9 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
     if (s >= 25) return 'POOR';
     return 'CRITICAL';
   };
+  
+  // Score band - use 10-factor band if available, otherwise calculate
+  const scoreBand = tenFactorData?.band ?? getScoreRating(score);
 
   // Toggle row expansion
   const toggleRow = (rowId) => {
@@ -1128,62 +1174,287 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         </div>
       </div>
 
-      {/* 2. 9-PILLAR FINANCIAL HEALTH OVERVIEW */}
-      <div className="sh an in"><div className="shn">4</div><div className="sht">9-Pillar Financial Health Overview</div><div className="shl"></div></div>
+      {/* 2. 10-FACTOR FINANCIAL HEALTH ANALYSIS */}
+      <div className="sh an in"><div className="shn">4</div><div className="sht">10-Factor Financial Health Analysis</div><div className="shl"></div></div>
       <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px'}}>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
-          {[
-            { name: 'Savings Rate', score: Math.min(100, (savings / income) * 100 * 3), max: 20, color: savings/income >= 0.3 ? 'var(--grn)' : 'var(--amb)' },
-            { name: 'EMI Tolerance', score: Math.min(100, 100 - (totalLiabilities > 0 ? (totalLiabilities / (income * 12)) * 100 : 0)), max: 20, color: 'var(--grn)' },
-            { name: 'Emergency Fund', score: Math.min(100, (emergencyFund / (expenses * 6)) * 100), max: 15, color: emergencyFund >= expenses * 6 ? 'var(--grn)' : 'var(--amb)' },
-            { name: 'Investment Portfolio', score: Math.min(100, ((mutualFunds + stocks + pfNps) / (income * 12 * 2.5)) * 100), max: 15, color: 'var(--grn)' },
-            { name: 'Net Worth', score: Math.min(100, (netWorth / (income * 12 * 3)) * 100), max: 15, color: 'var(--grn)' },
-            { name: 'Asset Allocation', score: 70, max: 10, color: 'var(--amb)' },
-            { name: 'Financial Habits', score: 60, max: 10, color: 'var(--amb)' },
-            { name: 'Life Insurance', score: 0, max: 5, color: 'var(--red)' },
-            { name: 'Health Insurance', score: 0, max: 5, color: 'var(--red)' },
-          ].map((pillar, idx) => (
-            <div key={idx} style={{padding:'16px 20px',borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',borderBottom: idx < 6 ? '1px solid var(--border)' : 'none'}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
-                <span style={{fontSize:'11px',fontWeight:700,color:'var(--t2)',letterSpacing:'.03em'}}>{pillar.name}</span>
-                <span style={{fontSize:'10px',color:'var(--t3)'}}>{pillar.max} pts</span>
+        {loadingScore ? (
+          <div style={{padding:'40px',textAlign:'center',color:'var(--t3)'}}>Loading 10-Factor Analysis...</div>
+        ) : tenFactorData?.components ? (
+          <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)'}}>
+            {tenFactorData.components.map((component, idx) => {
+              const percentage = component.max_points > 0 ? (component.score / component.max_points) * 100 : 0;
+              const color = percentage >= 70 ? 'var(--grn)' : (percentage >= 40 ? 'var(--amb)' : 'var(--red)');
+              const icons = ['💰', '🏦', '🛡️', '📈', '💎', '⚖️', '✅', '❤️', '🏥', '🚗'];
+              return (
+                <div key={idx} style={{
+                  padding:'14px 16px',
+                  borderRight: (idx % 5 !== 4) ? '1px solid var(--border)' : 'none',
+                  borderBottom: idx < 5 ? '1px solid var(--border)' : 'none'
+                }}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'6px'}}>
+                    <span style={{fontSize:'10px',fontWeight:700,color:'var(--t2)',letterSpacing:'.02em',display:'flex',alignItems:'center',gap:'4px'}}>
+                      <span style={{fontSize:'12px'}}>{icons[idx]}</span>
+                      {component.component}
+                    </span>
+                  </div>
+                  <div style={{display:'flex',alignItems:'baseline',gap:'6px',marginBottom:'6px'}}>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:color}}>{component.score.toFixed(1)}</span>
+                    <span style={{fontSize:'10px',color:'var(--t3)'}}>/ {component.max_points}</span>
+                  </div>
+                  <div style={{height:'3px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'8px'}}>
+                    <div style={{width:`${Math.min(100, percentage)}%`,height:'100%',background:color,borderRadius:'2px',transition:'width 0.5s'}}></div>
+                  </div>
+                  <div style={{fontSize:'10px',color:color,fontWeight:600,marginBottom:'8px'}}>
+                    {component.details?.status || (percentage >= 70 ? 'Good' : (percentage >= 40 ? 'Fair' : 'Needs Work'))}
+                  </div>
+                  <button
+                    onClick={() => setSelectedPillar(component.component)}
+                    style={{
+                      width:'100%',
+                      padding:'5px 8px',
+                      background:'transparent',
+                      border:'1px solid var(--border)',
+                      borderRadius:'5px',
+                      fontSize:'9px',
+                      fontWeight:600,
+                      color:'var(--blu)',
+                      cursor:'pointer',
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      gap:'3px',
+                      transition:'all .2s'
+                    }}
+                    onMouseOver={(e) => { e.target.style.background = 'var(--blubg)'; e.target.style.borderColor = 'var(--blu)'; }}
+                    onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'var(--border)'; }}
+                  >
+                    <span>View Details</span>
+                    <span style={{fontSize:'10px'}}>→</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
+            {[
+              { name: 'Savings Rate', score: Math.min(100, (savings / income) * 100 * 3), max: 25, color: savings/income >= 0.3 ? 'var(--grn)' : 'var(--amb)' },
+              { name: 'EMI Tolerance', score: Math.min(100, 100 - (totalLiabilities > 0 ? (totalLiabilities / (income * 12)) * 100 : 0)), max: 20, color: 'var(--grn)' },
+              { name: 'Emergency Fund', score: Math.min(100, (emergencyFund / (expenses * 6)) * 100), max: 15, color: emergencyFund >= expenses * 6 ? 'var(--grn)' : 'var(--amb)' },
+              { name: 'Investment Portfolio', score: Math.min(100, ((mutualFunds + stocks + pfNps) / (income * 12 * 2.5)) * 100), max: 15, color: 'var(--grn)' },
+              { name: 'Net Worth', score: Math.min(100, (netWorth / (income * 12 * 3)) * 100), max: 15, color: 'var(--grn)' },
+              { name: 'Asset Allocation', score: 70, max: 25, color: 'var(--amb)' },
+              { name: 'Financial Habits', score: 60, max: 10, color: 'var(--amb)' },
+              { name: 'Life Insurance', score: 0, max: 5, color: 'var(--red)' },
+              { name: 'Health Insurance', score: 0, max: 5, color: 'var(--red)' },
+              { name: 'Vehicle Insurance', score: 50, max: 5, color: 'var(--amb)' },
+            ].map((pillar, idx) => (
+              <div key={idx} style={{padding:'16px 20px',borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',borderBottom: idx < 9 ? '1px solid var(--border)' : 'none'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
+                  <span style={{fontSize:'11px',fontWeight:700,color:'var(--t2)',letterSpacing:'.03em'}}>{pillar.name}</span>
+                  <span style={{fontSize:'10px',color:'var(--t3)'}}>{pillar.max} pts</span>
+                </div>
+                <div style={{display:'flex',alignItems:'baseline',gap:'4px',marginBottom:'6px'}}>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:pillar.color}}>{Math.round(pillar.score)}%</span>
+                </div>
+                <div style={{height:'4px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'10px'}}>
+                  <div style={{width:`${pillar.score}%`,height:'100%',background:pillar.color,borderRadius:'2px'}}></div>
+                </div>
+                <button
+                  onClick={() => setSelectedPillar(pillar.name)}
+                  style={{
+                    width:'100%',
+                    padding:'6px 10px',
+                    background:'transparent',
+                    border:'1px solid var(--border)',
+                    borderRadius:'6px',
+                    fontSize:'10px',
+                    fontWeight:600,
+                    color:'var(--blu)',
+                    cursor:'pointer',
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center',
+                    gap:'4px',
+                    transition:'all .2s'
+                  }}
+                  onMouseOver={(e) => { e.target.style.background = 'var(--blubg)'; e.target.style.borderColor = 'var(--blu)'; }}
+                  onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'var(--border)'; }}
+                >
+                  <span>View Details</span>
+                  <span style={{fontSize:'12px'}}>→</span>
+                </button>
               </div>
-              <div style={{display:'flex',alignItems:'baseline',gap:'4px',marginBottom:'6px'}}>
-                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:pillar.color}}>{Math.round(pillar.score)}%</span>
-              </div>
-              <div style={{height:'4px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'10px'}}>
-                <div style={{width:`${pillar.score}%`,height:'100%',background:pillar.color,borderRadius:'2px'}}></div>
-              </div>
-              <button
-                onClick={() => setSelectedPillar(pillar.name)}
-                style={{
-                  width:'100%',
-                  padding:'6px 10px',
-                  background:'transparent',
-                  border:'1px solid var(--border)',
-                  borderRadius:'6px',
-                  fontSize:'10px',
-                  fontWeight:600,
-                  color:'var(--blu)',
-                  cursor:'pointer',
-                  display:'flex',
-                  alignItems:'center',
-                  justifyContent:'center',
-                  gap:'4px',
-                  transition:'all .2s'
-                }}
-                onMouseOver={(e) => { e.target.style.background = 'var(--blubg)'; e.target.style.borderColor = 'var(--blu)'; }}
-                onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'var(--border)'; }}
-              >
-                <span>View Details</span>
-                <span style={{fontSize:'12px'}}>→</span>
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* PILLAR DETAILS MODAL */}
+      {/* 10-FACTOR DETAILS MODAL */}
+      {selectedPillar && tenFactorData?.components && (() => {
+        const component = tenFactorData.components.find(c => c.component === selectedPillar);
+        if (!component) return null;
+        const percentage = component.max_points > 0 ? (component.score / component.max_points) * 100 : 0;
+        const color = percentage >= 70 ? '#22C55E' : (percentage >= 40 ? '#F59E0B' : '#EF4444');
+        const icons = { 'Savings Rate': '💰', 'EMI Tolerance': '🏦', 'Emergency Fund': '🛡️', 'Investment Portfolio': '📈', 
+                       'Net Worth': '💎', 'Asset Allocation': '⚖️', 'Financial Habits': '✅', 'Life Insurance': '❤️', 
+                       'Health Insurance': '🏥', 'Vehicle Insurance': '🚗' };
+        return (
+          <div className="pillar-modal-overlay" onClick={() => setSelectedPillar(null)}>
+            <div className="pillar-modal" onClick={(e) => e.stopPropagation()} style={{maxWidth:'600px'}}>
+              <div className="pillar-modal-header">
+                <div className="pillar-modal-icon">{icons[component.component] || '📊'}</div>
+                <div className="pillar-modal-title">
+                  <h3>{component.component}</h3>
+                  <p>Score: {component.score.toFixed(1)} / {component.max_points} points</p>
+                </div>
+                <button className="pillar-modal-close" onClick={() => setSelectedPillar(null)}>×</button>
+              </div>
+              <div className="pillar-modal-body" style={{maxHeight:'60vh',overflowY:'auto'}}>
+                {/* Score Bar */}
+                <div style={{marginBottom:'20px'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:'8px'}}>
+                    <span style={{fontWeight:600,color:'#18170F'}}>Achievement</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:color}}>{percentage.toFixed(1)}%</span>
+                  </div>
+                  <div style={{height:'10px',background:'#F3F2EE',borderRadius:'5px',overflow:'hidden'}}>
+                    <div style={{width:`${Math.min(100,percentage)}%`,height:'100%',background:color,borderRadius:'5px',transition:'width 0.5s'}}></div>
+                  </div>
+                  <div style={{marginTop:'8px',padding:'10px 14px',background:color+'20',borderRadius:'8px',fontSize:'13px',fontWeight:600,color:color}}>
+                    Status: {component.details?.status || 'Calculating...'}
+                  </div>
+                </div>
+                
+                {/* Details Table */}
+                {component.details && (
+                  <div style={{marginBottom:'20px'}}>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Detailed Analysis</h4>
+                    <div style={{background:'#F7F6F3',borderRadius:'10px',padding:'16px',fontSize:'12px'}}>
+                      <table style={{width:'100%',borderCollapse:'collapse'}}>
+                        <tbody>
+                          {Object.entries(component.details).filter(([key]) => 
+                            !['status', 'breakdown', 'allocation', 'fund_breakdown', 'emi_breakdown', 'allocation_by_class', 'ideal_allocation'].includes(key)
+                          ).map(([key, value], i) => (
+                            <tr key={i} style={{borderBottom:'1px solid #E5E4E0'}}>
+                              <td style={{padding:'8px 4px',fontWeight:500,color:'#6B6860',textTransform:'capitalize'}}>
+                                {key.replace(/_/g, ' ')}
+                              </td>
+                              <td style={{padding:'8px 4px',fontFamily:"'JetBrains Mono',monospace",fontWeight:600,textAlign:'right',color:'#18170F'}}>
+                                {typeof value === 'number' ? (
+                                  key.includes('ratio') || key.includes('rate') || key.includes('achievement') || key.includes('deviation') || key.includes('percentage')
+                                    ? `${value.toFixed(1)}%`
+                                    : value >= 100000 ? `₹${(value/100000).toFixed(2)}L` : `₹${value.toLocaleString('en-IN')}`
+                                ) : typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                
+                {/* EMI Breakdown for EMI Tolerance */}
+                {component.component === 'EMI Tolerance' && component.details?.emi_breakdown && (
+                  <div style={{marginBottom:'20px'}}>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>EMI Breakdown</h4>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'10px'}}>
+                      {Object.entries(component.details.emi_breakdown).map(([loan, emi], i) => (
+                        <div key={i} style={{background:'#F7F6F3',borderRadius:'8px',padding:'12px'}}>
+                          <div style={{fontSize:'10px',color:'#6B6860',textTransform:'capitalize'}}>{loan.replace(/_/g, ' ')}</div>
+                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#18170F'}}>₹{emi.toLocaleString('en-IN')}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Emergency Fund Breakdown */}
+                {component.component === 'Emergency Fund' && component.details?.fund_breakdown && (
+                  <div style={{marginBottom:'20px'}}>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Fund Allocation</h4>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
+                      {Object.entries(component.details.fund_breakdown).map(([source, amount], i) => (
+                        <div key={i} style={{background:'#F7F6F3',borderRadius:'8px',padding:'12px',textAlign:'center'}}>
+                          <div style={{fontSize:'10px',color:'#6B6860',textTransform:'capitalize',marginBottom:'4px'}}>{source.replace(/_/g, ' ')}</div>
+                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'#18170F'}}>
+                            ₹{amount >= 100000 ? `${(amount/100000).toFixed(1)}L` : amount.toLocaleString('en-IN')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Asset Allocation Breakdown */}
+                {component.component === 'Asset Allocation' && component.details?.allocation_by_class && (
+                  <div style={{marginBottom:'20px'}}>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Asset Class Comparison</h4>
+                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',background:'#F7F6F3',borderRadius:'10px',overflow:'hidden'}}>
+                      <thead>
+                        <tr style={{background:'#E5E4E0'}}>
+                          <th style={{padding:'10px',textAlign:'left',fontWeight:600}}>Asset Class</th>
+                          <th style={{padding:'10px',textAlign:'right',fontWeight:600}}>Actual</th>
+                          <th style={{padding:'10px',textAlign:'right',fontWeight:600}}>Ideal</th>
+                          <th style={{padding:'10px',textAlign:'right',fontWeight:600}}>Deviation</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(component.details.allocation_by_class).map(([asset, data], i) => (
+                          <tr key={i} style={{borderBottom:'1px solid #E5E4E0'}}>
+                            <td style={{padding:'10px',fontWeight:500,textTransform:'capitalize'}}>{asset.replace(/_/g, ' ')}</td>
+                            <td style={{padding:'10px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace"}}>{data.actual.toFixed(1)}%</td>
+                            <td style={{padding:'10px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'#6B6860'}}>{data.ideal}%</td>
+                            <td style={{padding:'10px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:data.deviation > 10 ? '#EF4444' : '#22C55E'}}>{data.deviation.toFixed(1)}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                
+                {/* Financial Habits Breakdown */}
+                {component.component === 'Financial Habits' && component.details?.breakdown && (
+                  <div style={{marginBottom:'20px'}}>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>Habit Checklist</h4>
+                    <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                      {component.details.breakdown.map((habit, i) => (
+                        <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 14px',background:'#F7F6F3',borderRadius:'8px'}}>
+                          <span style={{fontSize:'12px',textTransform:'capitalize',color:'#18170F'}}>{habit.question.replace(/_/g, ' ')}</span>
+                          <span style={{
+                            padding:'4px 10px',
+                            borderRadius:'12px',
+                            fontSize:'10px',
+                            fontWeight:600,
+                            background: habit.points > 0 ? '#22C55E20' : (habit.points < 0 ? '#EF444420' : '#F3F2EE'),
+                            color: habit.points > 0 ? '#22C55E' : (habit.points < 0 ? '#EF4444' : '#6B6860')
+                          }}>
+                            {habit.points > 0 ? `+${habit.points}` : habit.points} pts
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Tips Section */}
+                {PILLAR_DETAILS[component.component]?.tips && (
+                  <div>
+                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F'}}>💡 Tips to Improve</h4>
+                    <ul className="pillar-tips">
+                      {PILLAR_DETAILS[component.component].tips.map((tip, i) => (
+                        <li key={i}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* LEGACY PILLAR DETAILS MODAL (fallback) */}
       {selectedPillar && PILLAR_DETAILS[selectedPillar] && (
         <div className="pillar-modal-overlay" onClick={() => setSelectedPillar(null)}>
           <div className="pillar-modal" onClick={(e) => e.stopPropagation()}>
