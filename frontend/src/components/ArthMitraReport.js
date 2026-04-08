@@ -533,6 +533,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [opportunityTab, setOpportunityTab] = useState('savings'); // 'savings' or 'risks'
   const [expandedOpportunity, setExpandedOpportunity] = useState(null); // Track which opportunity is expanded
   const [allocationViewMode, setAllocationViewMode] = useState('percent'); // 'percent' or 'rupee'
+  const [showIncomeDetails, setShowIncomeDetails] = useState(false);
+  const [showExpenseDetails, setShowExpenseDetails] = useState(false);
 
   // Fetch 10-Factor Score and Opportunity Analysis
   useEffect(() => {
@@ -2403,50 +2405,194 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       {/* 3. INCOME & EXPENSE BREAKDOWN */}
       <div className="sh an in"><div className="shn">5</div><div className="sht">Income & Expense Breakdown</div><div className="shl"></div></div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
+        {/* INCOME SOURCES */}
         <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
-          <div style={{background:'var(--t0)',padding:'12px 16px'}}>
+          <div style={{background:'var(--t0)',padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>💰 INCOME SOURCES</span>
+            <button
+              onClick={() => setShowIncomeDetails(!showIncomeDetails)}
+              style={{
+                padding:'4px 10px',borderRadius:'12px',fontSize:'9px',fontWeight:600,
+                background:'rgba(255,255,255,0.15)',color:'#fff',border:'none',cursor:'pointer'
+              }}
+            >
+              {showIncomeDetails ? '▲ Hide' : '▼ View Details'}
+            </button>
           </div>
           <div style={{padding:'16px'}}>
+            {/* Summary View */}
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Salary/Business</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(income)}/mo</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(questionnaire?.salary_income || income)}/mo</span>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Rental Income</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>₹0/mo</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR((questionnaire?.rental_property1 || 0) + (questionnaire?.rental_property2 || 0))}/mo</span>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Investment Returns</span>
               <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(Math.round((mutualFunds + stocks) * 0.12 / 12))}/mo</span>
             </div>
+            
+            {/* Detailed View */}
+            {showIncomeDetails && (
+              <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'2px solid var(--border)'}}>
+                <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'10px'}}>DETAILED BREAKDOWN</div>
+                <div style={{background:'var(--bg3)',borderRadius:'var(--r8)',padding:'12px'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Base Salary</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.salary_income || income)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Bonus/Variable (Est.)</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(Math.round((questionnaire?.salary_income || income) * 0.1))}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px',borderTop:'1px dashed var(--border)',marginTop:'6px',paddingTop:'8px'}}>
+                    <span style={{color:'var(--t2)'}}>Rental Property 1</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.rental_property1 || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Rental Property 2</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.rental_property2 || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px',borderTop:'1px dashed var(--border)',marginTop:'6px',paddingTop:'8px'}}>
+                    <span style={{color:'var(--t2)'}}>MF Returns (12% p.a.)</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(Math.round(mutualFunds * 0.12 / 12))}/mo</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Stock Dividends (Est.)</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(Math.round(stocks * 0.02 / 12))}/mo</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>FD Interest (6% p.a.)</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(Math.round(fd * 0.06 / 12))}/mo</span>
+                  </div>
+                </div>
+                <div style={{marginTop:'10px',padding:'10px',background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r8)'}}>
+                  <div style={{fontSize:'10px',fontWeight:700,color:'#166534',marginBottom:'4px'}}>💡 Income Optimization Tips</div>
+                  <div style={{fontSize:'10px',color:'#15803D',lineHeight:1.5}}>
+                    • Consider dividend-paying stocks for passive income<br/>
+                    • Move low-interest savings to liquid MF for better returns<br/>
+                    • Explore freelance/consulting for additional income
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div style={{display:'flex',justifyContent:'space-between',padding:'12px 0',fontWeight:700}}>
               <span style={{fontSize:'13px',color:'var(--t1)'}}>TOTAL INCOME</span>
               <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',color:'var(--grn)'}}>{formatINR(income)}/mo</span>
             </div>
           </div>
         </div>
+        
+        {/* EXPENSE CATEGORIES */}
         <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
-          <div style={{background:'var(--t0)',padding:'12px 16px'}}>
+          <div style={{background:'var(--t0)',padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>💸 EXPENSE CATEGORIES</span>
+            <button
+              onClick={() => setShowExpenseDetails(!showExpenseDetails)}
+              style={{
+                padding:'4px 10px',borderRadius:'12px',fontSize:'9px',fontWeight:600,
+                background:'rgba(255,255,255,0.15)',color:'#fff',border:'none',cursor:'pointer'
+              }}
+            >
+              {showExpenseDetails ? '▲ Hide' : '▼ View Details'}
+            </button>
           </div>
           <div style={{padding:'16px'}}>
+            {/* Summary View */}
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Housing & Utilities</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.35))}/mo</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR((questionnaire?.rent_expense || 0) + (questionnaire?.telecom_utilities || 0))}/mo</span>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Food & Groceries</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.25))}/mo</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(questionnaire?.food_groceries || Math.round(expenses * 0.25))}/mo</span>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Transport & Fuel</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.15))}/mo</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(questionnaire?.transport_fuel || Math.round(expenses * 0.15))}/mo</span>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Lifestyle & Others</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(Math.round(expenses * 0.25))}/mo</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR((questionnaire?.entertainment || 0) + (questionnaire?.shopping || 0) + (questionnaire?.other_expenses || 0))}/mo</span>
             </div>
+            
+            {/* Detailed View */}
+            {showExpenseDetails && (
+              <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'2px solid var(--border)'}}>
+                <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'10px'}}>DETAILED BREAKDOWN</div>
+                <div style={{background:'var(--bg3)',borderRadius:'var(--r8)',padding:'12px'}}>
+                  {/* Housing */}
+                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginBottom:'6px'}}>🏠 HOUSING</div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Rent/EMI</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.rent_expense || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Utilities (Electricity, Water, Gas)</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.telecom_utilities || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Maintenance/Society</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.maintenance || 0)}</span>
+                  </div>
+                  
+                  {/* Daily Needs */}
+                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🛒 DAILY NEEDS</div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Groceries & Household</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.food_groceries || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Healthcare & Medical</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.healthcare || 0)}</span>
+                  </div>
+                  
+                  {/* Transport */}
+                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🚗 TRANSPORT</div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Fuel/Commute</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.transport_fuel || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Vehicle EMI</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.vehicle_emi || 0)}</span>
+                  </div>
+                  
+                  {/* Lifestyle */}
+                  <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🎯 LIFESTYLE</div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Entertainment & Dining</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.entertainment || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Shopping & Personal</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.shopping || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Education & Learning</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.education || 0)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                    <span style={{color:'var(--t2)'}}>Other Expenses</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.other_expenses || 0)}</span>
+                  </div>
+                </div>
+                
+                {/* Expense Analysis */}
+                <div style={{marginTop:'10px',padding:'10px',background:'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',borderRadius:'var(--r8)'}}>
+                  <div style={{fontSize:'10px',fontWeight:700,color:'#92400E',marginBottom:'4px'}}>📊 Expense Analysis</div>
+                  <div style={{fontSize:'10px',color:'#B45309',lineHeight:1.5}}>
+                    • Savings Rate: <strong>{((income - expenses) / income * 100).toFixed(1)}%</strong> ({(income - expenses) / income >= 0.2 ? '✅ Good' : '⚠️ Below 20% target'})<br/>
+                    • Housing-to-Income: <strong>{(((questionnaire?.rent_expense || 0) / income) * 100).toFixed(1)}%</strong> ({(questionnaire?.rent_expense || 0) / income <= 0.3 ? '✅ Within 30%' : '⚠️ Above 30%'})<br/>
+                    • Monthly Surplus: <strong>{formatINR(income - expenses)}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div style={{display:'flex',justifyContent:'space-between',padding:'12px 0',fontWeight:700}}>
               <span style={{fontSize:'13px',color:'var(--t1)'}}>TOTAL EXPENSES</span>
               <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',color:'var(--amb)'}}>{formatINR(expenses)}/mo</span>
