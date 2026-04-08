@@ -1289,58 +1289,132 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                   opp.component.includes('Emergency Fund')
                 ) || [];
                 
+                // Calculate totals
+                const totalAnnualSavings = emergencyOpps.reduce((sum, opp) => sum + (opp.annual_impact || 0), 0);
+                const excessFund = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation')?.excess || 0;
+                const actualFund = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation')?.actual || emergencyFund;
+                const idealFund = emergencyOpps.find(o => o.component === 'Emergency Fund Reallocation')?.ideal || (expenses * 6);
+                
                 return emergencyOpps.length > 0 ? (
-                  <div style={{display:'grid',gap:'12px'}}>
-                    {emergencyOpps.map((opp, idx) => (
-                      <div key={idx} style={{
-                        background:'var(--bg3)',
-                        borderRadius:'var(--r12)',
-                        padding:'16px',
-                        borderLeft: opp.priority === 'high' ? '4px solid var(--amb)' : '4px solid var(--t3)'
-                      }}>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
-                          <div>
-                            <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
-                            <span style={{
-                              display:'inline-block',
-                              padding:'2px 8px',
-                              borderRadius:'20px',
-                              fontSize:'9px',
-                              fontWeight:700,
-                              textTransform:'uppercase',
-                              background: opp.priority === 'high' ? 'var(--ambbg)' : 'var(--bg4)',
-                              color: opp.priority === 'high' ? 'var(--amb)' : 'var(--t2)',
-                              border: `1px solid ${opp.priority === 'high' ? 'var(--ambbr)' : 'var(--border)'}`
-                            }}>{opp.priority} priority</span>
+                  <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+                    {/* Summary Hero Card */}
+                    <div style={{background:'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',borderRadius:'var(--r12)',padding:'20px',border:'1px solid #F59E0B40'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
+                        <div style={{width:'48px',height:'48px',borderRadius:'50%',background:'#F59E0B',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                          <span style={{fontSize:'24px'}}>💰</span>
+                        </div>
+                        <div>
+                          <div style={{fontSize:'11px',fontWeight:600,color:'#92400E',textTransform:'uppercase',letterSpacing:'.05em'}}>Opportunity Found!</div>
+                          <div style={{fontSize:'14px',fontWeight:700,color:'#78350F'}}>Your emergency fund has surplus money</div>
+                        </div>
+                      </div>
+                      
+                      {/* Visual Comparison */}
+                      <div style={{background:'#FFFFFF90',borderRadius:'var(--r8)',padding:'16px',marginBottom:'16px'}}>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:'12px',alignItems:'center'}}>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'10px',fontWeight:600,color:'#92400E',marginBottom:'4px'}}>YOU HAVE</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:800,color:'#D97706'}}>{formatINR2(actualFund)}</div>
                           </div>
-                          <div style={{textAlign:'right'}}>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
-                              +{formatINR(opp.annual_impact || opp.gap || 0)}
-                            </div>
-                            <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
+                          <div style={{width:'40px',height:'40px',borderRadius:'50%',background:'#F59E0B',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <span style={{fontSize:'18px'}}>→</span>
+                          </div>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'10px',fontWeight:600,color:'#92400E',marginBottom:'4px'}}>YOU NEED</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:800,color:'#16A34A'}}>{formatINR2(idealFund)}</div>
                           </div>
                         </div>
-                        <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
-                        {(opp.actual !== undefined && opp.ideal !== undefined) && (
-                          <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
-                            <div>
-                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{formatINR(opp.actual)}</div>
-                            </div>
-                            <div>
-                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{formatINR(opp.ideal)}</div>
-                            </div>
-                            {opp.excess !== undefined && (
-                              <div>
-                                <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>EXCESS</div>
-                                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--blu)'}}>{formatINR(opp.excess)}</div>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        <div style={{textAlign:'center',marginTop:'12px',padding:'10px',background:'#16A34A20',borderRadius:'var(--r8)'}}>
+                          <div style={{fontSize:'11px',color:'#15803D',marginBottom:'4px'}}>EXCESS AMOUNT YOU CAN INVEST</div>
+                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:800,color:'#16A34A'}}>{formatINR2(excessFund)}</div>
+                        </div>
                       </div>
-                    ))}
+                      
+                      {/* Total Potential Earnings */}
+                      <div style={{textAlign:'center',padding:'12px',background:'#16A34A',borderRadius:'var(--r8)'}}>
+                        <div style={{fontSize:'11px',color:'#FFFFFF90',marginBottom:'4px'}}>TOTAL EXTRA EARNINGS POSSIBLE</div>
+                        <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'28px',fontWeight:800,color:'#fff'}}>+{formatINR(totalAnnualSavings)}<span style={{fontSize:'14px',fontWeight:400}}>/year</span></div>
+                      </div>
+                    </div>
+                    
+                    {/* Action Items */}
+                    <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'-8px',display:'flex',alignItems:'center',gap:'8px'}}>
+                      <span>🎯</span> Recommended Actions
+                    </div>
+                    
+                    {emergencyOpps.map((opp, idx) => {
+                      const isReallocation = opp.component === 'Emergency Fund Reallocation';
+                      const isSavingsAccount = opp.component.includes('Savings Account');
+                      const isLiquidMF = opp.component.includes('Liquid MF');
+                      
+                      const icon = isReallocation ? '🔄' : (isSavingsAccount ? '🏦' : (isLiquidMF ? '📊' : '💡'));
+                      const actionTitle = isReallocation ? 'Reallocate Excess Fund' : (isSavingsAccount ? 'Move from Savings Account' : (isLiquidMF ? 'Invest in Liquid Mutual Funds' : opp.component));
+                      const fromLabel = isSavingsAccount ? 'Savings Account (3-4% returns)' : (isReallocation ? 'Idle Emergency Fund' : 'Current Allocation');
+                      const toLabel = isSavingsAccount ? 'Liquid MF / Sweep FD (6-7% returns)' : (isLiquidMF ? 'Liquid Mutual Funds (6-7% returns)' : 'Higher Return Instruments');
+                      
+                      return (
+                        <div key={idx} style={{
+                          background:'var(--bg3)',
+                          borderRadius:'var(--r12)',
+                          padding:'16px',
+                          borderLeft:'4px solid var(--grn)'
+                        }}>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'12px'}}>
+                            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                              <div style={{width:'36px',height:'36px',borderRadius:'50%',background:'var(--grnbg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                <span style={{fontSize:'18px'}}>{icon}</span>
+                              </div>
+                              <div>
+                                <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)'}}>{actionTitle}</div>
+                                <div style={{fontSize:'11px',color:'var(--t3)'}}>Low effort • High impact</div>
+                              </div>
+                            </div>
+                            <div style={{textAlign:'right',background:'var(--grnbg)',padding:'6px 12px',borderRadius:'20px'}}>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',fontWeight:700,color:'var(--grn)'}}>
+                                +{formatINR(opp.annual_impact || 0)}/yr
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Simple Visual Flow */}
+                          <div style={{background:'var(--bg2)',borderRadius:'var(--r8)',padding:'12px',marginBottom:'12px'}}>
+                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'8px'}}>
+                              <div style={{flex:1,padding:'10px',background:'var(--redbg)',borderRadius:'var(--r8)',textAlign:'center'}}>
+                                <div style={{fontSize:'9px',fontWeight:600,color:'var(--t3)',marginBottom:'4px'}}>FROM</div>
+                                <div style={{fontSize:'11px',fontWeight:600,color:'var(--red)'}}>{fromLabel}</div>
+                              </div>
+                              <div style={{fontSize:'20px',color:'var(--grn)'}}>→</div>
+                              <div style={{flex:1,padding:'10px',background:'var(--grnbg)',borderRadius:'var(--r8)',textAlign:'center'}}>
+                                <div style={{fontSize:'9px',fontWeight:600,color:'var(--t3)',marginBottom:'4px'}}>TO</div>
+                                <div style={{fontSize:'11px',fontWeight:600,color:'var(--grn)'}}>{toLabel}</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Amount to Move */}
+                          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',padding:'10px',background:'var(--blubg)',borderRadius:'var(--r8)'}}>
+                            <span style={{fontSize:'12px',color:'var(--blu)'}}>Amount to move:</span>
+                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',fontWeight:700,color:'var(--blu)'}}>
+                              {formatINR2(opp.amount_to_move || opp.excess || opp.gap || 0)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Pro Tip */}
+                    <div style={{background:'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',borderRadius:'var(--r12)',padding:'16px',border:'1px solid #3B82F620'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'12px'}}>
+                        <span style={{fontSize:'20px'}}>💡</span>
+                        <div>
+                          <div style={{fontSize:'12px',fontWeight:700,color:'#1E40AF',marginBottom:'6px'}}>Pro Tip</div>
+                          <div style={{fontSize:'12px',color:'#1E3A8A',lineHeight:1.5}}>
+                            Keep only 3-6 months of expenses as emergency fund. Split it: 40% in savings account (instant access), 
+                            30% in sweep FD (auto-sweep), 30% in liquid MF (1-day redemption). This way you earn more while staying liquid!
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
