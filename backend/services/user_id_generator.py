@@ -4,7 +4,7 @@ Format: [FirstInitial][LastInitial][Random][DDMM]
 Example: Rahul Sharma, DOB 14-09-1996 -> RSX1409
 """
 
-import random
+import secrets
 import string
 from datetime import datetime
 from typing import Optional
@@ -65,7 +65,7 @@ def generate_user_login_id_sync(name: str, date_of_birth: str, existing_ids: set
     
     # Try to generate unique ID (max 50 attempts)
     for _ in range(50):
-        random_char = random.choice(random_chars)
+        random_char = secrets.choice(random_chars)
         login_id = f"{first_initial}{last_initial}{random_char}{ddmm}"
         
         # Check if ID already exists
@@ -73,8 +73,8 @@ def generate_user_login_id_sync(name: str, date_of_birth: str, existing_ids: set
             return login_id
     
     # If still not unique after 50 attempts, add an extra random character
-    random_char1 = random.choice(random_chars)
-    random_char2 = random.choice(random_chars)
+    random_char1 = secrets.choice(random_chars)
+    random_char2 = secrets.choice(random_chars)
     login_id = f"{first_initial}{last_initial}{random_char1}{random_char2}{ddmm[2:]}"
     
     return login_id
@@ -129,17 +129,17 @@ async def generate_user_login_id_async(name: str, date_of_birth: str, db_collect
     
     # Try to generate unique ID (max 50 attempts)
     for _ in range(50):
-        random_char = random.choice(random_chars)
+        random_char = secrets.choice(random_chars)
         login_id = f"{first_initial}{last_initial}{random_char}{ddmm}"
         
         # Check if ID already exists in database
         existing = await db_collection.find_one({"client_id": login_id}, {"_id": 0})
-        if existing is None:
+        if not existing:
             return login_id
     
     # If still not unique after 50 attempts, add an extra random character
-    random_char1 = random.choice(random_chars)
-    random_char2 = random.choice(random_chars)
+    random_char1 = secrets.choice(random_chars)
+    random_char2 = secrets.choice(random_chars)
     login_id = f"{first_initial}{last_initial}{random_char1}{random_char2}{ddmm[2:]}"
     
     return login_id
@@ -173,5 +173,5 @@ def validate_date_of_birth(dob_str: str) -> bool:
         else:
             return False
         return True
-    except:
+    except Exception:
         return False

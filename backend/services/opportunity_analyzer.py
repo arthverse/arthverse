@@ -544,6 +544,10 @@ def analyze_financial_habits(habits: Dict[str, Any]) -> Dict[str, Any]:
     
     count = len(unadapted_habits)
     
+    # Initialize default values
+    risk_level = "none"
+    priority = "none"
+    
     if count >= 5:
         risk_level = "high"
         priority = "high"

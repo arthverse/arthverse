@@ -712,10 +712,10 @@ def calculate_financial_habits_score(habits: Dict[str, Any]) -> Dict[str, Any]:
     
     for q in questions:
         answer = habits.get(q["key"], "neutral")
-        if answer == "good" or answer == True or answer == "yes":
+        if answer == "good" or answer is True or answer == "yes":
             points = q["good"]
             status = "Good"
-        elif answer == "bad" or answer == False or answer == "no":
+        elif answer == "bad" or answer is False or answer == "no":
             points = q["bad"]
             status = "Needs Improvement"
         else:

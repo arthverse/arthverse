@@ -24,7 +24,7 @@ try:
     FONT_REGULAR = "DV"
     FONT_BOLD = "DVB"
     FONT_ITALIC = "DVI"
-except:
+except Exception:
     FONT_REGULAR = "Helvetica"
     FONT_BOLD = "Helvetica-Bold"
     FONT_ITALIC = "Helvetica-Oblique"

@@ -38,8 +38,7 @@ export default function ArthVersePortal({ token, user, onLogout }) {
       });
       setNetWorth(response.data.net_worth || 0);
     } catch (error) {
-      // User might not have completed questionnaire yet
-      console.log('Balance sheet not available');
+      // User might not have completed questionnaire yet - silently ignore
     }
   };
 
