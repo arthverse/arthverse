@@ -1217,68 +1217,167 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
 
               {/* Asset Allocation Sub-Tab */}
               {savingsSubTab === 'allocation' && (() => {
-                const allocationOpps = opportunityData.saving_opportunities?.filter(opp => 
-                  opp.component.includes('Asset Allocation')
-                ) || [];
+                // Get the single consolidated asset allocation opportunity
+                const allocationOpp = opportunityData.saving_opportunities?.find(opp => 
+                  opp.component === 'Asset Allocation'
+                ) || opportunityData.risk_reductions?.find(opp => 
+                  opp.component === 'Asset Allocation'
+                );
                 
-                return allocationOpps.length > 0 ? (
-                  <div style={{display:'grid',gap:'12px'}}>
-                    {allocationOpps.map((opp, idx) => (
-                      <div key={idx} style={{
-                        background:'var(--bg3)',
-                        borderRadius:'var(--r12)',
-                        padding:'16px',
-                        borderLeft: opp.priority === 'high' ? '4px solid var(--blu)' : (opp.priority === 'medium' ? '4px solid var(--amb)' : '4px solid var(--t3)')
-                      }}>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
-                          <div>
-                            <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{opp.component}</div>
-                            <span style={{
-                              display:'inline-block',
-                              padding:'2px 8px',
-                              borderRadius:'20px',
-                              fontSize:'9px',
-                              fontWeight:700,
-                              textTransform:'uppercase',
-                              background: opp.priority === 'high' ? 'var(--blubg)' : (opp.priority === 'medium' ? 'var(--ambbg)' : 'var(--bg4)'),
-                              color: opp.priority === 'high' ? 'var(--blu)' : (opp.priority === 'medium' ? 'var(--amb)' : 'var(--t2)'),
-                              border: `1px solid ${opp.priority === 'high' ? 'var(--blubr)' : (opp.priority === 'medium' ? 'var(--ambbr)' : 'var(--border)')}`
-                            }}>{opp.priority} priority</span>
+                if (!allocationOpp) {
+                  return (
+                    <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                      Great job! Your asset allocation is well balanced!
+                    </div>
+                  );
+                }
+                
+                const isSavingOpportunity = allocationOpp.type === 'saving_opportunity';
+                const breakdown = allocationOpp.allocation_breakdown || [];
+                
+                return (
+                  <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+                    {/* Return Comparison Hero */}
+                    <div style={{
+                      background: isSavingOpportunity 
+                        ? 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)' 
+                        : 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                      borderRadius:'var(--r12)',
+                      padding:'20px',
+                      border: isSavingOpportunity ? '1px solid var(--grnbr)' : '1px solid #F59E0B40'
+                    }}>
+                      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
+                        <div style={{
+                          width:'48px',height:'48px',borderRadius:'50%',
+                          background: isSavingOpportunity ? 'var(--grn)' : '#F59E0B',
+                          display:'flex',alignItems:'center',justifyContent:'center'
+                        }}>
+                          <span style={{fontSize:'24px'}}>{isSavingOpportunity ? '📈' : '⚠️'}</span>
+                        </div>
+                        <div>
+                          <div style={{fontSize:'11px',fontWeight:600,color: isSavingOpportunity ? '#166534' : '#92400E',textTransform:'uppercase',letterSpacing:'.05em'}}>
+                            {isSavingOpportunity ? 'Saving Opportunity' : 'Risk Reduction Needed'}
                           </div>
-                          <div style={{textAlign:'right'}}>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--grn)'}}>
-                              +{formatINR(opp.annual_impact || opp.gap || 0)}
-                            </div>
-                            <div style={{fontSize:'10px',color:'var(--t3)'}}>per year</div>
+                          <div style={{fontSize:'14px',fontWeight:700,color: isSavingOpportunity ? '#15803D' : '#78350F'}}>
+                            {isSavingOpportunity 
+                              ? 'Optimize allocation to earn more' 
+                              : 'Rebalance to reduce risk'}
                           </div>
                         </div>
-                        <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{opp.message}</div>
-                        {(opp.actual_pct !== undefined && opp.ideal_pct !== undefined) && (
-                          <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
-                            <div>
-                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>ACTUAL</div>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{opp.actual_pct}%</div>
+                      </div>
+                      
+                      {/* Return Comparison */}
+                      <div style={{background:'#FFFFFF90',borderRadius:'var(--r8)',padding:'16px',marginBottom:'16px'}}>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:'12px',alignItems:'center'}}>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'10px',fontWeight:600,color:'var(--t3)',marginBottom:'4px'}}>CURRENT RETURN</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:800,color: isSavingOpportunity ? '#D97706' : 'var(--grn)'}}>
+                              {allocationOpp.current_return_pct}%
                             </div>
-                            <div>
-                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>IDEAL</div>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{opp.ideal_pct}%</div>
-                            </div>
-                            <div>
-                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>DEVIATION</div>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--red)'}}>{opp.gap_pct}%</div>
-                            </div>
-                            <div>
-                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>AMOUNT</div>
-                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--blu)'}}>{formatINR(opp.gap)}</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'var(--t2)',marginTop:'4px'}}>
+                              {formatINR2(allocationOpp.current_annual_return)}/yr
                             </div>
                           </div>
-                        )}
+                          <div style={{width:'40px',height:'40px',borderRadius:'50%',background: isSavingOpportunity ? 'var(--grn)' : '#F59E0B',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <span style={{fontSize:'18px',color:'#fff'}}>→</span>
+                          </div>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'10px',fontWeight:600,color:'var(--t3)',marginBottom:'4px'}}>IDEAL RETURN</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:800,color: isSavingOpportunity ? 'var(--grn)' : '#D97706'}}>
+                              {allocationOpp.ideal_return_pct}%
+                            </div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'var(--t2)',marginTop:'4px'}}>
+                              {formatINR2(allocationOpp.ideal_annual_return)}/yr
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Difference */}
+                        <div style={{
+                          textAlign:'center',marginTop:'12px',padding:'12px',
+                          background: isSavingOpportunity ? 'var(--grnbg)' : 'var(--ambbg)',
+                          borderRadius:'var(--r8)'
+                        }}>
+                          <div style={{fontSize:'11px',color: isSavingOpportunity ? 'var(--grn)' : '#92400E',marginBottom:'4px'}}>
+                            {isSavingOpportunity ? 'EXTRA EARNINGS POSSIBLE' : 'RETURNS REDUCTION FOR SAFETY'}
+                          </div>
+                          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'28px',fontWeight:800,color: isSavingOpportunity ? 'var(--grn)' : '#D97706'}}>
+                            {isSavingOpportunity ? '+' : '-'}{formatINR(allocationOpp.annual_impact)}<span style={{fontSize:'14px',fontWeight:400}}>/year</span>
+                          </div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
-                    Great job! Your asset allocation is well balanced!
+                    </div>
+                    
+                    {/* Allocation Breakdown Table */}
+                    <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'-8px',display:'flex',alignItems:'center',gap:'8px'}}>
+                      <span>⚖️</span> Allocation Breakdown (Total Assets: {formatINR2(allocationOpp.total_assets)})
+                    </div>
+                    
+                    <div style={{background:'var(--bg3)',borderRadius:'var(--r12)',overflow:'hidden'}}>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
+                        <thead>
+                          <tr style={{background:'var(--bg2)'}}>
+                            <th style={{padding:'12px',textAlign:'left',fontWeight:700,color:'var(--t1)'}}>Asset Class</th>
+                            <th style={{padding:'12px',textAlign:'center',fontWeight:700,color:'var(--t1)'}}>Current</th>
+                            <th style={{padding:'12px',textAlign:'center',fontWeight:700,color:'var(--t1)'}}>Ideal</th>
+                            <th style={{padding:'12px',textAlign:'center',fontWeight:700,color:'var(--t1)'}}>Expected Return</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {breakdown.map((item, idx) => {
+                            const diff = item.ideal_pct - item.actual_pct;
+                            return (
+                              <tr key={idx} style={{borderBottom:'1px solid var(--border)',background: idx % 2 === 1 ? 'var(--bg2)' : 'transparent'}}>
+                                <td style={{padding:'12px',fontWeight:600,color:'var(--t0)'}}>
+                                  {item.asset_class === 'Equity (Stocks + MF)' && '📈 '}
+                                  {item.asset_class === 'Debt (FDs + Bonds)' && '🏦 '}
+                                  {item.asset_class === 'Real Estate' && '🏠 '}
+                                  {item.asset_class === 'Gold & Silver' && '🥇 '}
+                                  {item.asset_class}
+                                </td>
+                                <td style={{padding:'12px',textAlign:'center'}}>
+                                  <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'var(--t1)'}}>{item.actual_pct}%</div>
+                                  <div style={{fontSize:'10px',color:'var(--t3)'}}>{formatINR2(item.actual_amount)}</div>
+                                </td>
+                                <td style={{padding:'12px',textAlign:'center'}}>
+                                  <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:'var(--blu)'}}>{item.ideal_pct}%</div>
+                                  <div style={{fontSize:'10px',color:'var(--t3)'}}>{formatINR2(item.ideal_amount)}</div>
+                                </td>
+                                <td style={{padding:'12px',textAlign:'center'}}>
+                                  <span style={{
+                                    display:'inline-block',
+                                    padding:'4px 10px',
+                                    borderRadius:'12px',
+                                    fontSize:'11px',
+                                    fontWeight:600,
+                                    background: diff > 0 ? 'var(--grnbg)' : (diff < 0 ? 'var(--redbg)' : 'var(--bg4)'),
+                                    color: diff > 0 ? 'var(--grn)' : (diff < 0 ? 'var(--red)' : 'var(--t2)')
+                                  }}>
+                                    {diff > 0 ? `↑ Add ${Math.abs(diff).toFixed(0)}%` : (diff < 0 ? `↓ Reduce ${Math.abs(diff).toFixed(0)}%` : '✓ OK')}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {/* Pro Tip */}
+                    <div style={{background:'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',borderRadius:'var(--r12)',padding:'16px',border:'1px solid #3B82F620'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'12px'}}>
+                        <span style={{fontSize:'20px'}}>💡</span>
+                        <div>
+                          <div style={{fontSize:'12px',fontWeight:700,color:'#1E40AF',marginBottom:'6px'}}>Pro Tip</div>
+                          <div style={{fontSize:'12px',color:'#1E3A8A',lineHeight:1.5}}>
+                            {isSavingOpportunity 
+                              ? `Rebalancing your portfolio to the ideal allocation can earn you an extra ₹${allocationOpp.annual_impact?.toLocaleString('en-IN')} per year. Use your emergency fund excess or monthly savings to gradually shift towards the ideal allocation.`
+                              : `Your current allocation may be too aggressive for your age/risk profile. Consider gradually moving some investments to safer options to protect your wealth during market downturns.`
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 );
               })()}

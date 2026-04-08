@@ -455,47 +455,73 @@ def analyze_asset_allocation_gap(
         "metals": 0.08
     }
     
-    opportunities = []
+    # Calculate current portfolio return
+    current_return = 0
+    ideal_return = 0
     
     for asset_class in ["equity", "debt", "real_estate", "metals"]:
-        gap_pct = ideal[asset_class] - actual[asset_class]
-        
-        if abs(gap_pct) > 5:  # Only report significant gaps
-            gap_amount = (gap_pct / 100) * total_assets
-            potential_gain = abs(gap_amount) * expected_returns[asset_class]
-            
-            asset_labels = {
-                "equity": "Equity (Stocks + MF)",
-                "debt": "Debt (FDs + Bonds)",
-                "real_estate": "Real Estate",
-                "metals": "Gold & Silver"
-            }
-            
-            if gap_pct > 0:
-                opportunities.append({
-                    "component": f"Asset Allocation - {asset_labels[asset_class]}",
-                    "type": "saving_opportunity",
-                    "gap": round(abs(gap_amount), 0),
-                    "gap_pct": round(gap_pct, 1),
-                    "annual_impact": round(potential_gain, 0),
-                    "actual_pct": round(actual[asset_class], 1),
-                    "ideal_pct": ideal[asset_class],
-                    "message": f"Increase {asset_labels[asset_class]} allocation by {abs(gap_pct):.1f}% to potentially earn ₹{int(potential_gain):,} more annually",
-                    "priority": "medium" if asset_class == "equity" else "low"
-                })
-            else:
-                opportunities.append({
-                    "component": f"Asset Allocation - {asset_labels[asset_class]}",
-                    "type": "risk_reduction",
-                    "gap": round(abs(gap_amount), 0),
-                    "gap_pct": round(abs(gap_pct), 1),
-                    "actual_pct": round(actual[asset_class], 1),
-                    "ideal_pct": ideal[asset_class],
-                    "message": f"Reduce {asset_labels[asset_class]} by {abs(gap_pct):.1f}% to align with age-appropriate risk tolerance",
-                    "priority": "low"
-                })
+        current_return += (actual[asset_class] / 100) * expected_returns[asset_class]
+        ideal_return += (ideal[asset_class] / 100) * expected_returns[asset_class]
     
-    return opportunities
+    # Calculate annual returns in rupees
+    current_annual_return = total_assets * current_return
+    ideal_annual_return = total_assets * ideal_return
+    return_difference = ideal_annual_return - current_annual_return
+    
+    # Build allocation breakdown for display
+    allocation_breakdown = []
+    for asset_class in ["equity", "debt", "real_estate", "metals"]:
+        asset_labels = {
+            "equity": "Equity (Stocks + MF)",
+            "debt": "Debt (FDs + Bonds)",
+            "real_estate": "Real Estate",
+            "metals": "Gold & Silver"
+        }
+        allocation_breakdown.append({
+            "asset_class": asset_labels[asset_class],
+            "actual_pct": round(actual[asset_class], 1),
+            "ideal_pct": ideal[asset_class],
+            "actual_amount": round((actual[asset_class] / 100) * total_assets, 0),
+            "ideal_amount": round((ideal[asset_class] / 100) * total_assets, 0),
+            "expected_return": expected_returns[asset_class] * 100
+        })
+    
+    # Single consolidated asset allocation opportunity
+    if return_difference > 0:
+        # Ideal allocation gives better returns - it's a Saving Opportunity
+        return [{
+            "component": "Asset Allocation",
+            "type": "saving_opportunity",
+            "current_return_pct": round(current_return * 100, 1),
+            "ideal_return_pct": round(ideal_return * 100, 1),
+            "current_annual_return": round(current_annual_return, 0),
+            "ideal_annual_return": round(ideal_annual_return, 0),
+            "annual_impact": round(abs(return_difference), 0),
+            "gap": round(abs(return_difference), 0),
+            "total_assets": round(total_assets, 0),
+            "allocation_breakdown": allocation_breakdown,
+            "message": f"Optimizing your asset allocation can earn you ₹{int(abs(return_difference)):,} more annually ({round(ideal_return * 100, 1)}% vs {round(current_return * 100, 1)}% returns)",
+            "priority": "high" if abs(return_difference) > 50000 else "medium"
+        }]
+    elif return_difference < 0:
+        # Current allocation gives better returns but may be too risky - it's a Risk Reduction
+        return [{
+            "component": "Asset Allocation",
+            "type": "risk_reduction",
+            "current_return_pct": round(current_return * 100, 1),
+            "ideal_return_pct": round(ideal_return * 100, 1),
+            "current_annual_return": round(current_annual_return, 0),
+            "ideal_annual_return": round(ideal_annual_return, 0),
+            "annual_impact": round(abs(return_difference), 0),
+            "gap": round(abs(return_difference), 0),
+            "total_assets": round(total_assets, 0),
+            "allocation_breakdown": allocation_breakdown,
+            "message": f"Your allocation is too aggressive. Rebalancing will reduce risk but also reduce returns by ₹{int(abs(return_difference)):,} annually ({round(current_return * 100, 1)}% vs {round(ideal_return * 100, 1)}% returns)",
+            "priority": "medium"
+        }]
+    else:
+        # Allocation is optimal
+        return []
 
 def analyze_financial_habits(habits: Dict[str, Any]) -> Dict[str, Any]:
     """Component 7: Financial Habits Gap"""
