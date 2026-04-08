@@ -2718,7 +2718,6 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT</th>
                 <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>5Y PROJECTION</th>
                 <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>10Y PROJECTION</th>
-                <th style={{textAlign:'center',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>IDEAL %</th>
               </tr>
             </thead>
             <tbody>
@@ -2727,35 +2726,30 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(mutualFunds + stocks)}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(Math.round((mutualFunds + stocks) * Math.pow(1.12, 5)))}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(Math.round((mutualFunds + stocks) * Math.pow(1.12, 10)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>40-50%</td>
               </tr>
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏦 Debt (FD + PPF + NPS)</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(fd + pfNps)}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round((fd + pfNps) * Math.pow(1.07, 5)))}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round((fd + pfNps) * Math.pow(1.07, 10)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>25-30%</td>
               </tr>
               <tr style={{borderBottom:'1px solid var(--border)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏠 Real Estate</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(realEstate)}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(Math.round(realEstate * Math.pow(1.05, 5)))}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(Math.round(realEstate * Math.pow(1.05, 10)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>15-20%</td>
               </tr>
               <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
                 <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🥇 Gold / Metals</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(gold)}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round(gold * Math.pow(1.08, 5)))}</td>
                 <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round(gold * Math.pow(1.08, 10)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'center',color:'var(--t2)'}}>5-10%</td>
               </tr>
               <tr style={{background:'var(--bg2)'}}>
                 <td style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL NET WORTH</td>
                 <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(netWorth)}</td>
                 <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(Math.round(netWorth * Math.pow(1.10, 5)))}</td>
                 <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(Math.round(netWorth * Math.pow(1.10, 10)))}</td>
-                <td style={{padding:'14px 8px',textAlign:'center',color:'var(--t2)',fontWeight:700}}>100%</td>
               </tr>
             </tbody>
           </table>
