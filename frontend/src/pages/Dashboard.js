@@ -79,7 +79,7 @@ export default function Dashboard({ token, user, onLogout }) {
       }
 
       const [scoreRes, transactionsRes] = await Promise.all([
-        axios.get(`${API}/reports/health-score`, {
+        axios.get(`${API}/reports/health-score-v2`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get(`${API}/transactions?limit=5`, {
@@ -87,7 +87,23 @@ export default function Dashboard({ token, user, onLogout }) {
         })
       ]);
 
-      setHealthScore(scoreRes.data);
+      // Transform v2 response to match expected dashboard format
+      const v2Data = scoreRes.data;
+      const normalizedScore = Math.round(v2Data.normalized_score || 0);
+      const transformedHealthScore = {
+        score: normalizedScore,
+        rating: v2Data.band || (normalizedScore >= 85 ? 'EXCELLENT' : normalizedScore >= 70 ? 'VERY GOOD' : normalizedScore >= 50 ? 'FAIR' : 'NEEDS IMPROVEMENT'),
+        message: normalizedScore >= 85 ? 'Aapki ArthSthithi strong hai. Keep it up!' :
+                 normalizedScore >= 70 ? 'Aapki ArthSthithi strong hai. Kuch improvements se excellent ban sakti hai.' :
+                 normalizedScore >= 50 ? 'Your financial health needs some attention.' :
+                 'Critical areas need immediate focus.',
+        financials: {
+          monthly_income: v2Data.summary?.monthly_income || 0,
+          monthly_expenses: v2Data.summary?.monthly_expenses || 0,
+          monthly_savings: v2Data.summary?.monthly_savings || 0,
+        }
+      };
+      setHealthScore(transformedHealthScore);
       setRecentTransactions(transactionsRes.data);
     } catch (error) {
       toast.error('Failed to load dashboard data');
