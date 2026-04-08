@@ -2812,10 +2812,6 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               <span style={{fontSize:'12px',color:'var(--t2)'}}>Gap to Fill</span>
               <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--red)'}}>₹{(Math.max(0, (expenses * 12 * 25) - netWorth) / 10000000).toFixed(2)} Cr</span>
             </div>
-            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'12px',color:'var(--t2)'}}>Monthly SIP Required</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--amb)'}}>{formatINR(Math.round(savings * 0.5))}/mo</span>
-            </div>
           </div>
         </div>
       </div>
