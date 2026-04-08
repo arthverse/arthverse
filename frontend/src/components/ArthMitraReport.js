@@ -2154,8 +2154,9 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             case 'Life Insurance':
               return {
                 metrics: [
-                  { label: 'Current Coverage', actual: `₹${((d.current_coverage || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.recommended_coverage || 0)/10000000).toFixed(2)} Cr`, isGood: (d.current_coverage || 0) >= (d.recommended_coverage || 0) },
-                  { label: 'Coverage Multiple', actual: `${d.coverage_multiple?.toFixed(1)}x income`, ideal: `${d.recommended_multiple || 15}x income`, isGood: (d.coverage_multiple || 0) >= (d.recommended_multiple || 15) }
+                  { label: 'Current Coverage', actual: `₹${((d.coverage || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.required_coverage || 0)/10000000).toFixed(2)} Cr`, isGood: (d.coverage || 0) >= (d.required_coverage || 0) },
+                  { label: 'Coverage Gap', actual: d.coverage > 0 ? '—' : `₹${((d.required_coverage || 0)/10000000).toFixed(2)} Cr`, ideal: '₹0', isGood: (d.coverage || 0) >= (d.required_coverage || 0) },
+                  { label: 'Coverage Ratio', actual: `${(d.coverage_ratio || 0).toFixed(0)}%`, ideal: '100%', isGood: d.coverage_ratio >= 100 }
                 ],
                 tips: [
                   'Get pure term insurance (not ULIP or endowment)',
@@ -2167,8 +2168,10 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             case 'Health Insurance':
               return {
                 metrics: [
-                  { label: 'Current Coverage', actual: `₹${((d.current_coverage || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.recommended_coverage || 0)/100000).toFixed(2)}L`, isGood: (d.current_coverage || 0) >= (d.recommended_coverage || 0) },
-                  { label: 'Family Members Covered', actual: d.members_covered || 'Unknown', ideal: `${d.family_members || 1} members`, isGood: true }
+                  { label: 'Current Coverage', actual: `₹${((d.coverage || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.required_coverage || 0)/100000).toFixed(2)}L`, isGood: (d.coverage || 0) >= (d.required_coverage || 0) },
+                  { label: 'Coverage Gap', actual: d.coverage > 0 ? '—' : `₹${((d.required_coverage || 0)/100000).toFixed(2)}L`, ideal: '₹0', isGood: (d.coverage || 0) >= (d.required_coverage || 0) },
+                  { label: 'Coverage Ratio', actual: `${(d.coverage_ratio || 0).toFixed(0)}%`, ideal: '100%', isGood: d.coverage_ratio >= 100 },
+                  { label: 'Family Members', actual: `${d.family_members || 1}`, ideal: `${d.family_members || 1} covered`, isGood: true }
                 ],
                 tips: [
                   'Get family floater policy for better value',
