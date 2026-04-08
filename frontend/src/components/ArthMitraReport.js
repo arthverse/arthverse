@@ -2085,12 +2085,14 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 ]
               };
             case 'Investment Portfolio':
+              const idealYearlyInvestment = (d.discipline?.target_rate || 20) / 100 * income * 12;
+              const idealMonthlyInvestment = idealYearlyInvestment / 12;
               return {
                 metrics: [
                   { label: 'Portfolio Value', actual: `₹${((d.total_investment_value || d.discipline?.actual_value || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.wealth?.target_value || d.target_value || (income * 12 * (d.wealth?.target_multiple || 1)))/100000).toFixed(2)}L`, isGood: (d.wealth?.achievement || 0) >= 100 },
                   { label: 'Wealth Multiple', actual: `${(d.wealth?.actual_multiple || d.actual_multiple || 0).toFixed(2)}x`, ideal: `${(d.wealth?.target_multiple || d.target_multiple || 1).toFixed(1)}x annual income`, isGood: (d.wealth?.actual_multiple || 0) >= (d.wealth?.target_multiple || 0) },
-                  { label: 'Investment Rate', actual: `${(d.discipline?.actual_rate || 0).toFixed(1)}%`, ideal: `${(d.discipline?.target_rate || 20).toFixed(0)}%`, isGood: (d.discipline?.achievement || 0) >= 100 },
-                  { label: 'Annual Investment Target', actual: `₹${((d.discipline?.actual_rate || 0) / 100 * income * 12 / 100000).toFixed(2)}L/yr`, ideal: `₹${((d.discipline?.target_rate || 20) / 100 * income * 12 / 100000).toFixed(2)}L/yr`, isGood: (d.discipline?.actual_rate || 0) >= (d.discipline?.target_rate || 20) }
+                  { label: 'Ideal Yearly Investment', actual: '-', ideal: `₹${(idealYearlyInvestment / 100000).toFixed(2)}L/year`, isGood: true },
+                  { label: 'Ideal Monthly Investment', actual: '-', ideal: `₹${formatINR2(idealMonthlyInvestment)}/month`, isGood: true }
                 ],
                 tips: [
                   'Start SIPs in diversified equity mutual funds',
