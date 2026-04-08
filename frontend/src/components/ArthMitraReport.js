@@ -884,7 +884,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           <span style={{fontSize:'14px'}}>📊</span>
           <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Yearly Financial Snapshot</span>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
           {/* Row 1 */}
           <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Income</div>
@@ -896,21 +896,31 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(savings * 12)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>{savingsRate}% rate</div>
           </div>
-          <div style={{padding:'20px',borderBottom:'1px solid var(--border)'}}>
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Total Expenses</div>
             <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{formatINR2(expenses * 12)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>{((expenses/income)*100).toFixed(2)}% income</div>
           </div>
-          {/* Row 2 */}
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
+          <div style={{padding:'20px',borderBottom:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Net Worth</div>
             <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--gold)',marginBottom:'6px'}}>{formatINR2(netWorth)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>{(netWorth / (income * 12)).toFixed(2)}× income</div>
           </div>
+          {/* Row 2 */}
           <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Free Surplus</div>
             <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(savings * 12)}</div>
             <div style={{fontSize:'11px',color:'var(--t3)'}}>After all outflows</div>
+          </div>
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Maximum EMI</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--blu)',marginBottom:'6px'}}>{formatINR2(Math.round(income * 0.4))}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>40% of income</div>
+          </div>
+          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
+            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Ideal Monthly Investment</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--blu)',marginBottom:'6px'}}>{formatINR2(Math.round(income * 0.2))}</div>
+            <div style={{fontSize:'11px',color:'var(--t3)'}}>20% of income</div>
           </div>
           <div style={{padding:'20px'}}>
             <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Score</div>
