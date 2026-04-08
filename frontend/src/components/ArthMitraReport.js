@@ -1889,12 +1889,11 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             const coverageGap = lifeIns.details?.coverage_gap || (income * 12 * 15);
             actions.push({
               priority: 1,
-              icon: '🛡️',
               title: 'Get Term Life Insurance',
               subtitle: `Coverage gap: ₹${(coverageGap / 10000000).toFixed(2)} Cr`,
               description: 'Protect your family with pure term insurance of 15× annual income',
               impact: 'Critical',
-              impactColor: 'var(--red)',
+              impactColor: 'var(--amb)',
               scoreGain: '+5 pts'
             });
           }
@@ -1903,12 +1902,11 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             const coverageGap = healthIns.details?.coverage_gap || 500000;
             actions.push({
               priority: 2,
-              icon: '🏥',
               title: 'Get Health Insurance',
               subtitle: `Coverage needed: ₹${(coverageGap / 100000).toFixed(0)}L`,
               description: 'Personal/family floater policy of minimum ₹5L cover',
               impact: 'Critical',
-              impactColor: 'var(--red)',
+              impactColor: 'var(--amb)',
               scoreGain: '+5 pts'
             });
           }
@@ -1929,16 +1927,11 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             const d = comp.details || {};
             let actionItem = {
               priority: 3,
-              icon: comp.component === 'Savings Rate' ? '💰' : 
-                    comp.component === 'Emergency Fund' ? '🛡️' :
-                    comp.component === 'Investment Portfolio' ? '📈' :
-                    comp.component === 'Financial Habits' ? '✅' :
-                    comp.component === 'Asset Allocation' ? '⚖️' : '📊',
               title: '',
               subtitle: '',
               description: '',
               impact: comp.percentage < 40 ? 'High' : 'Medium',
-              impactColor: comp.percentage < 40 ? 'var(--amb)' : 'var(--blu)',
+              impactColor: comp.percentage < 40 ? 'var(--grn)' : 'var(--blu)',
               scoreGain: `+${(comp.max_points - comp.score).toFixed(1)} pts`
             };
             
@@ -1993,14 +1986,13 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             if (!actions.find(a => a.title.toLowerCase().includes(opp.component.toLowerCase().split(' ')[0]))) {
               actions.push({
                 priority: 4,
-                icon: opp.type === 'risk' ? '🛡️' : '💰',
                 title: opp.action || opp.component,
                 subtitle: opp.type === 'risk' 
                   ? `Gap: ₹${((opp.coverage_gap || 0) / 10000000).toFixed(2)} Cr`
                   : `Save: ₹${((opp.annual_value || 0) / 1000).toFixed(0)}K/year`,
                 description: opp.message || 'Take action to optimize your finances',
                 impact: opp.type === 'risk' ? 'High' : 'Medium',
-                impactColor: opp.type === 'risk' ? 'var(--amb)' : 'var(--grn)',
+                impactColor: opp.type === 'risk' ? 'var(--grn)' : 'var(--blu)',
                 scoreGain: opp.potential_points ? `+${opp.potential_points.toFixed(1)} pts` : ''
               });
             }
@@ -2046,7 +2038,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                     {action.impact}
                   </div>
                   
-                  {/* Icon and number */}
+                  {/* Priority number */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -2067,7 +2059,6 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                     }}>
                       {idx + 1}
                     </div>
-                    <span style={{fontSize: '20px'}}>{action.icon}</span>
                   </div>
                   
                   {/* Title */}
