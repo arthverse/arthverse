@@ -532,6 +532,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [loadingOpportunity, setLoadingOpportunity] = useState(true);
   const [opportunityTab, setOpportunityTab] = useState('savings'); // 'savings' or 'risks'
   const [expandedOpportunity, setExpandedOpportunity] = useState(null); // Track which opportunity is expanded
+  const [allocationViewMode, setAllocationViewMode] = useState('percent'); // 'percent' or 'rupee'
 
   // Fetch 10-Factor Score and Opportunity Analysis
   useEffect(() => {
@@ -1359,6 +1360,33 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                               {/* Allocation Breakdown */}
                               {allocationOpp.allocation_breakdown && (
                                 <div style={{background:'var(--bg2)',borderRadius:'var(--r8)',overflow:'hidden'}}>
+                                  {/* Toggle Button */}
+                                  <div style={{display:'flex',justifyContent:'flex-end',padding:'8px 8px 0 8px'}}>
+                                    <div style={{display:'flex',background:'var(--bg3)',borderRadius:'20px',padding:'2px'}}>
+                                      <button
+                                        onClick={() => setAllocationViewMode('percent')}
+                                        style={{
+                                          padding:'4px 12px',borderRadius:'18px',fontSize:'9px',fontWeight:600,
+                                          border:'none',cursor:'pointer',transition:'all .2s',
+                                          background: allocationViewMode === 'percent' ? 'var(--blu)' : 'transparent',
+                                          color: allocationViewMode === 'percent' ? '#fff' : 'var(--t3)'
+                                        }}
+                                      >
+                                        %
+                                      </button>
+                                      <button
+                                        onClick={() => setAllocationViewMode('rupee')}
+                                        style={{
+                                          padding:'4px 12px',borderRadius:'18px',fontSize:'9px',fontWeight:600,
+                                          border:'none',cursor:'pointer',transition:'all .2s',
+                                          background: allocationViewMode === 'rupee' ? 'var(--blu)' : 'transparent',
+                                          color: allocationViewMode === 'rupee' ? '#fff' : 'var(--t3)'
+                                        }}
+                                      >
+                                        ₹
+                                      </button>
+                                    </div>
+                                  </div>
                                   <table style={{width:'100%',borderCollapse:'collapse',fontSize:'10px'}}>
                                     <thead>
                                       <tr style={{background:'var(--bg3)'}}>
@@ -1371,18 +1399,28 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                                     <tbody>
                                       {allocationOpp.allocation_breakdown.map((item, idx) => {
                                         const diff = item.ideal_pct - item.actual_pct;
+                                        const actualAmount = (item.actual_pct / 100) * totalAssets;
+                                        const idealAmount = (item.ideal_pct / 100) * totalAssets;
+                                        const diffAmount = idealAmount - actualAmount;
                                         return (
                                           <tr key={idx} style={{borderBottom:'1px solid var(--border)'}}>
                                             <td style={{padding:'8px',fontWeight:500}}>{item.asset_class}</td>
-                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace"}}>{item.actual_pct}%</td>
-                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--blu)'}}>{item.ideal_pct}%</td>
+                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace"}}>
+                                              {allocationViewMode === 'percent' ? `${item.actual_pct}%` : formatINR2(actualAmount)}
+                                            </td>
+                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--blu)'}}>
+                                              {allocationViewMode === 'percent' ? `${item.ideal_pct}%` : formatINR2(idealAmount)}
+                                            </td>
                                             <td style={{padding:'8px',textAlign:'center'}}>
                                               <span style={{
                                                 padding:'2px 6px',borderRadius:'10px',fontSize:'9px',fontWeight:600,
                                                 background: diff > 0 ? 'var(--grnbg)' : (diff < 0 ? 'var(--redbg)' : 'var(--bg3)'),
                                                 color: diff > 0 ? 'var(--grn)' : (diff < 0 ? 'var(--red)' : 'var(--t2)')
                                               }}>
-                                                {diff > 0 ? `+${Math.abs(diff).toFixed(0)}%` : (diff < 0 ? `-${Math.abs(diff).toFixed(0)}%` : 'OK')}
+                                                {allocationViewMode === 'percent' 
+                                                  ? (diff > 0 ? `+${Math.abs(diff).toFixed(0)}%` : (diff < 0 ? `-${Math.abs(diff).toFixed(0)}%` : 'OK'))
+                                                  : (diffAmount > 0 ? `+${formatINR2(Math.abs(diffAmount))}` : (diffAmount < 0 ? `-${formatINR2(Math.abs(diffAmount))}` : 'OK'))
+                                                }
                                               </span>
                                             </td>
                                           </tr>
@@ -1501,6 +1539,33 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                               {/* Allocation Breakdown */}
                               {assetAllocationRisk.allocation_breakdown && (
                                 <div style={{background:'var(--bg2)',borderRadius:'var(--r8)',overflow:'hidden'}}>
+                                  {/* Toggle Button */}
+                                  <div style={{display:'flex',justifyContent:'flex-end',padding:'8px 8px 0 8px'}}>
+                                    <div style={{display:'flex',background:'var(--bg3)',borderRadius:'20px',padding:'2px'}}>
+                                      <button
+                                        onClick={() => setAllocationViewMode('percent')}
+                                        style={{
+                                          padding:'4px 12px',borderRadius:'18px',fontSize:'9px',fontWeight:600,
+                                          border:'none',cursor:'pointer',transition:'all .2s',
+                                          background: allocationViewMode === 'percent' ? 'var(--blu)' : 'transparent',
+                                          color: allocationViewMode === 'percent' ? '#fff' : 'var(--t3)'
+                                        }}
+                                      >
+                                        %
+                                      </button>
+                                      <button
+                                        onClick={() => setAllocationViewMode('rupee')}
+                                        style={{
+                                          padding:'4px 12px',borderRadius:'18px',fontSize:'9px',fontWeight:600,
+                                          border:'none',cursor:'pointer',transition:'all .2s',
+                                          background: allocationViewMode === 'rupee' ? 'var(--blu)' : 'transparent',
+                                          color: allocationViewMode === 'rupee' ? '#fff' : 'var(--t3)'
+                                        }}
+                                      >
+                                        ₹
+                                      </button>
+                                    </div>
+                                  </div>
                                   <table style={{width:'100%',borderCollapse:'collapse',fontSize:'10px'}}>
                                     <thead>
                                       <tr style={{background:'var(--bg3)'}}>
@@ -1513,18 +1578,28 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                                     <tbody>
                                       {assetAllocationRisk.allocation_breakdown.map((item, idx) => {
                                         const diff = item.ideal_pct - item.actual_pct;
+                                        const actualAmount = (item.actual_pct / 100) * totalAssets;
+                                        const idealAmount = (item.ideal_pct / 100) * totalAssets;
+                                        const diffAmount = idealAmount - actualAmount;
                                         return (
                                           <tr key={idx} style={{borderBottom:'1px solid var(--border)'}}>
                                             <td style={{padding:'8px',fontWeight:500}}>{item.asset_class}</td>
-                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace"}}>{item.actual_pct}%</td>
-                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--blu)'}}>{item.ideal_pct}%</td>
+                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace"}}>
+                                              {allocationViewMode === 'percent' ? `${item.actual_pct}%` : formatINR2(actualAmount)}
+                                            </td>
+                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--blu)'}}>
+                                              {allocationViewMode === 'percent' ? `${item.ideal_pct}%` : formatINR2(idealAmount)}
+                                            </td>
                                             <td style={{padding:'8px',textAlign:'center'}}>
                                               <span style={{
                                                 padding:'2px 6px',borderRadius:'10px',fontSize:'9px',fontWeight:600,
                                                 background: diff > 0 ? 'var(--grnbg)' : (diff < 0 ? 'var(--redbg)' : 'var(--bg3)'),
                                                 color: diff > 0 ? 'var(--grn)' : (diff < 0 ? 'var(--red)' : 'var(--t2)')
                                               }}>
-                                                {diff > 0 ? `+${Math.abs(diff).toFixed(0)}%` : (diff < 0 ? `-${Math.abs(diff).toFixed(0)}%` : 'OK')}
+                                                {allocationViewMode === 'percent' 
+                                                  ? (diff > 0 ? `+${Math.abs(diff).toFixed(0)}%` : (diff < 0 ? `-${Math.abs(diff).toFixed(0)}%` : 'OK'))
+                                                  : (diffAmount > 0 ? `+${formatINR2(Math.abs(diffAmount))}` : (diffAmount < 0 ? `-${formatINR2(Math.abs(diffAmount))}` : 'OK'))
+                                                }
                                               </span>
                                             </td>
                                           </tr>
