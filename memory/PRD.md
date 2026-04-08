@@ -5,20 +5,19 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### ✅ Asset Allocation Double-Count Fix (Apr 8, 2026)
+- **Fixed Bug**: Asset Allocation was appearing in BOTH Saving Opportunities and Risk Reduction tabs
+- **Logic**: Asset Allocation now shows in exactly ONE section based on return comparison:
+  - If **Current Return > Ideal Return** → Shows ONLY in **Risk Reduction** tab (aggressive allocation)
+  - If **Current Return < Ideal Return** → Shows ONLY in **Saving Opportunities** tab (optimization opportunity)
+- **Implementation**: Updated frontend filtering logic in `ArthMitraReport.js` to prevent double-counting
+- **UI**: Asset Allocation card in Risk Reduction tab now has "View Details" toggle with full breakdown
+
 ### ✅ Financial Opportunity Analyzer UI (Apr 8, 2026)
 - **Complete UI Integration** of gap analysis in ArthMitra Report
 - **Hero Section**: Two gradient cards showing Saving Opportunities (green) and Risk Reduction Gaps (red)
 - **Tabbed Interface**: Switch between Saving Opportunities and Risk Reduction views
-- **Sub-Tabs for Saving Opportunities**:
-  - **Investment Tab**: Shows Investment Portfolio (At Cost) breakdown with all asset classes
-    - Equity MF (Investment amount, not current NAV)
-    - Stocks (Purchase price of all holdings)
-    - Debt MF / Bonds / FD (Amount invested at face value)
-    - PPF / NPS (Total contributions made)
-    - Gold / Silver (Purchase cost, not current price)
-    - Real Estate (Down payment + EMI principal paid)
-  - **Asset Allocation Tab**: Shows allocation optimization opportunities
-  - **Emergency Fund Tab**: Shows emergency fund reallocation opportunities
+- **List View UI**: Each opportunity shown as expandable card with "View Details" toggle
 - **Opportunity Cards**: Display priority badges, annual impact amounts, ACTUAL/IDEAL/GAP breakdowns
 - **Risk Cards**: Display coverage gaps, CURRENT/REQUIRED breakdowns
 - **Backend API**: `/api/reports/opportunity-analysis` returns structured data

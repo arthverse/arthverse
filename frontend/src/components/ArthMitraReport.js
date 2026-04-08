@@ -1079,9 +1079,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 const emergencyOpps = opportunityData.saving_opportunities?.filter(opp => 
                   opp.component.includes('Emergency Fund')
                 ) || [];
+                // Only show Asset Allocation in Savings tab if it's a saving_opportunity type
                 const allocationOpp = opportunityData.saving_opportunities?.find(opp => 
-                  opp.component === 'Asset Allocation'
-                ) || opportunityData.risk_reductions?.find(opp => 
                   opp.component === 'Asset Allocation'
                 );
                 
@@ -1374,81 +1373,193 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               </div>
             </div>
             <div style={{padding:'16px'}}>
-              {opportunityData.risk_reductions?.length > 0 ? (
-                <div style={{display:'grid',gap:'12px'}}>
-                  {opportunityData.risk_reductions.map((risk, idx) => (
-                    <div key={idx} style={{
-                      background:'var(--bg3)',
-                      borderRadius:'var(--r12)',
-                      padding:'16px',
-                      borderLeft: risk.priority === 'high' || risk.priority === 'critical' ? '4px solid var(--red)' : '4px solid var(--amb)'
-                    }}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
-                        <div>
-                          <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{risk.component}</div>
-                          <span style={{
-                            display:'inline-block',
-                            padding:'2px 8px',
-                            borderRadius:'20px',
-                            fontSize:'9px',
-                            fontWeight:700,
-                            textTransform:'uppercase',
-                            background: risk.priority === 'high' || risk.priority === 'critical' ? 'var(--redbg)' : 'var(--ambbg)',
-                            color: risk.priority === 'high' || risk.priority === 'critical' ? 'var(--red)' : 'var(--amb)',
-                            border: `1px solid ${risk.priority === 'high' || risk.priority === 'critical' ? 'var(--redbr)' : 'var(--ambbr)'}`
-                          }}>{risk.priority} priority</span>
-                        </div>
-                        {typeof risk.gap === 'number' && risk.gap > 1 && (
-                          <div style={{textAlign:'right'}}>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--red)'}}>
-                              ₹{risk.gap >= 10000000 ? ((risk.gap / 10000000).toFixed(2) + ' Cr') : (risk.gap >= 100000 ? ((risk.gap / 100000).toFixed(1) + 'L') : risk.gap.toLocaleString('en-IN'))}
+              {(() => {
+                const assetAllocationRisk = opportunityData.risk_reductions?.find(r => r.component === 'Asset Allocation');
+                const otherRisks = opportunityData.risk_reductions?.filter(r => r.component !== 'Asset Allocation') || [];
+                const hasItems = otherRisks.length > 0 || assetAllocationRisk;
+                
+                if (!hasItems) {
+                  return (
+                    <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
+                      Great news! No major risk gaps identified - you're well protected!
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div style={{display:'grid',gap:'12px'}}>
+                    {/* Asset Allocation Risk Card with View Details */}
+                    {assetAllocationRisk && (
+                      <div style={{background:'var(--bg3)',borderRadius:'var(--r12)',overflow:'hidden'}}>
+                        <div 
+                          onClick={() => setExpandedOpportunity(expandedOpportunity === 'riskAllocation' ? null : 'riskAllocation')}
+                          style={{
+                            display:'flex',justifyContent:'space-between',alignItems:'center',
+                            padding:'16px',cursor:'pointer',
+                            borderLeft:'4px solid var(--amb)'
+                          }}
+                        >
+                          <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                            <div style={{width:'40px',height:'40px',borderRadius:'50%',background:'var(--ambbg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              <span style={{fontSize:'20px'}}>⚖️</span>
                             </div>
-                            <div style={{fontSize:'10px',color:'var(--t3)'}}>coverage gap</div>
+                            <div>
+                              <div style={{fontSize:'14px',fontWeight:700,color:'var(--t0)'}}>Asset Allocation</div>
+                              <div style={{fontSize:'11px',color:'var(--t3)'}}>
+                                Current {assetAllocationRisk.current_return_pct}% is aggressive, ideal {assetAllocationRisk.ideal_return_pct}%
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                            <div style={{textAlign:'right'}}>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--amb)'}}>
+                                ₹{formatINR(assetAllocationRisk.annual_impact || 0)}
+                              </div>
+                              <div style={{fontSize:'10px',color:'var(--t3)'}}>risk trade-off</div>
+                            </div>
+                            <div style={{
+                              padding:'6px 12px',borderRadius:'20px',fontSize:'11px',fontWeight:600,
+                              background:'var(--ambbg)',color:'var(--amb)',border:'1px solid var(--ambbr)'
+                            }}>
+                              {expandedOpportunity === 'riskAllocation' ? '▲ Hide' : '▼ View Details'}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Expanded Asset Allocation Details */}
+                        {expandedOpportunity === 'riskAllocation' && (
+                          <div style={{padding:'0 16px 16px 16px',borderTop:'1px solid var(--border)'}}>
+                            <div style={{marginTop:'12px'}}>
+                              {/* Return Comparison */}
+                              <div style={{background:'var(--bg2)',borderRadius:'var(--r8)',padding:'12px',marginBottom:'12px'}}>
+                                <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:'12px',alignItems:'center'}}>
+                                  <div style={{textAlign:'center'}}>
+                                    <div style={{fontSize:'9px',fontWeight:600,color:'var(--t3)'}}>CURRENT</div>
+                                    <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:800,color:'var(--grn)'}}>{assetAllocationRisk.current_return_pct}%</div>
+                                    <div style={{fontSize:'10px',color:'var(--t3)'}}>{formatINR2(assetAllocationRisk.current_annual_return)}/yr</div>
+                                  </div>
+                                  <div style={{fontSize:'18px',color:'var(--t3)'}}>→</div>
+                                  <div style={{textAlign:'center'}}>
+                                    <div style={{fontSize:'9px',fontWeight:600,color:'var(--t3)'}}>IDEAL</div>
+                                    <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:800,color:'var(--amb)'}}>{assetAllocationRisk.ideal_return_pct}%</div>
+                                    <div style={{fontSize:'10px',color:'var(--t3)'}}>{formatINR2(assetAllocationRisk.ideal_annual_return)}/yr</div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Allocation Breakdown */}
+                              {assetAllocationRisk.allocation_breakdown && (
+                                <div style={{background:'var(--bg2)',borderRadius:'var(--r8)',overflow:'hidden'}}>
+                                  <table style={{width:'100%',borderCollapse:'collapse',fontSize:'10px'}}>
+                                    <thead>
+                                      <tr style={{background:'var(--bg3)'}}>
+                                        <th style={{padding:'8px',textAlign:'left',fontWeight:600}}>Asset</th>
+                                        <th style={{padding:'8px',textAlign:'center',fontWeight:600}}>Current</th>
+                                        <th style={{padding:'8px',textAlign:'center',fontWeight:600}}>Ideal</th>
+                                        <th style={{padding:'8px',textAlign:'center',fontWeight:600}}>Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {assetAllocationRisk.allocation_breakdown.map((item, idx) => {
+                                        const diff = item.ideal_pct - item.actual_pct;
+                                        return (
+                                          <tr key={idx} style={{borderBottom:'1px solid var(--border)'}}>
+                                            <td style={{padding:'8px',fontWeight:500}}>{item.asset_class}</td>
+                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace"}}>{item.actual_pct}%</td>
+                                            <td style={{padding:'8px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",color:'var(--blu)'}}>{item.ideal_pct}%</td>
+                                            <td style={{padding:'8px',textAlign:'center'}}>
+                                              <span style={{
+                                                padding:'2px 6px',borderRadius:'10px',fontSize:'9px',fontWeight:600,
+                                                background: diff > 0 ? 'var(--grnbg)' : (diff < 0 ? 'var(--redbg)' : 'var(--bg3)'),
+                                                color: diff > 0 ? 'var(--grn)' : (diff < 0 ? 'var(--red)' : 'var(--t2)')
+                                              }}>
+                                                {diff > 0 ? `+${Math.abs(diff).toFixed(0)}%` : (diff < 0 ? `-${Math.abs(diff).toFixed(0)}%` : 'OK')}
+                                              </span>
+                                            </td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
-                      <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{risk.message}</div>
-                      {(risk.actual !== undefined && risk.required !== undefined) && (
-                        <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                    )}
+                    
+                    {/* Other Risk Items */}
+                    {otherRisks.map((risk, idx) => (
+                      <div key={idx} style={{
+                        background:'var(--bg3)',
+                        borderRadius:'var(--r12)',
+                        padding:'16px',
+                        borderLeft: risk.priority === 'high' || risk.priority === 'critical' ? '4px solid var(--red)' : '4px solid var(--amb)'
+                      }}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px'}}>
                           <div>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>CURRENT</div>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>
-                              {typeof risk.actual === 'string' ? risk.actual : formatINR(risk.actual)}
+                            <div style={{fontSize:'13px',fontWeight:700,color:'var(--t0)',marginBottom:'4px'}}>{risk.component}</div>
+                            <span style={{
+                              display:'inline-block',
+                              padding:'2px 8px',
+                              borderRadius:'20px',
+                              fontSize:'9px',
+                              fontWeight:700,
+                              textTransform:'uppercase',
+                              background: risk.priority === 'high' || risk.priority === 'critical' ? 'var(--redbg)' : 'var(--ambbg)',
+                              color: risk.priority === 'high' || risk.priority === 'critical' ? 'var(--red)' : 'var(--amb)',
+                              border: `1px solid ${risk.priority === 'high' || risk.priority === 'critical' ? 'var(--redbr)' : 'var(--ambbr)'}`
+                            }}>{risk.priority} priority</span>
+                          </div>
+                          {typeof risk.gap === 'number' && risk.gap > 1 && (
+                            <div style={{textAlign:'right'}}>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'16px',fontWeight:700,color:'var(--red)'}}>
+                                ₹{risk.gap >= 10000000 ? ((risk.gap / 10000000).toFixed(2) + ' Cr') : (risk.gap >= 100000 ? ((risk.gap / 100000).toFixed(1) + 'L') : risk.gap.toLocaleString('en-IN'))}
+                              </div>
+                              <div style={{fontSize:'10px',color:'var(--t3)'}}>coverage gap</div>
+                            </div>
+                          )}
+                        </div>
+                        <div style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.5}}>{risk.message}</div>
+                        {(risk.actual !== undefined && risk.required !== undefined) && (
+                          <div style={{display:'flex',gap:'16px',marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>CURRENT</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>
+                                {typeof risk.actual === 'string' ? risk.actual : formatINR(risk.actual)}
+                              </div>
+                            </div>
+                            <div>
+                              <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>REQUIRED</div>
+                              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>
+                                {typeof risk.required === 'string' ? risk.required : (risk.required >= 10000000 ? '₹' + (risk.required / 10000000).toFixed(2) + ' Cr' : formatINR(risk.required))}
+                              </div>
                             </div>
                           </div>
-                          <div>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'2px'}}>REQUIRED</div>
-                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>
-                              {typeof risk.required === 'string' ? risk.required : (risk.required >= 10000000 ? '₹' + (risk.required / 10000000).toFixed(2) + ' Cr' : formatINR(risk.required))}
+                        )}
+                        {risk.unadapted_habits && (
+                          <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
+                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'8px'}}>HABITS TO IMPROVE</div>
+                            <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
+                              {risk.unadapted_habits.map((habit, hIdx) => (
+                                <span key={hIdx} style={{
+                                  padding:'4px 10px',
+                                  background:'var(--redbg)',
+                                  border:'1px solid var(--redbr)',
+                                  borderRadius:'20px',
+                                  fontSize:'10px',
+                                  color:'var(--red)'
+                                }}>{habit}</span>
+                              ))}
                             </div>
                           </div>
-                        </div>
-                      )}
-                      {risk.unadapted_habits && (
-                        <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'1px solid var(--border)'}}>
-                          <div style={{fontSize:'9px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'8px'}}>HABITS TO IMPROVE</div>
-                          <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                            {risk.unadapted_habits.map((habit, hIdx) => (
-                              <span key={hIdx} style={{
-                                padding:'4px 10px',
-                                background:'var(--redbg)',
-                                border:'1px solid var(--redbr)',
-                                borderRadius:'20px',
-                                fontSize:'10px',
-                                color:'var(--red)'
-                              }}>{habit}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{padding:'20px',textAlign:'center',color:'var(--t3)'}}>
-                  Great news! No major risk gaps identified - you're well protected!
-                </div>
-              )}
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
