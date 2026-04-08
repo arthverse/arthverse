@@ -23,6 +23,7 @@ import asyncio
 from services.setu_service import setu_service
 from services.financial_health_calculator import calculate_financial_health_score
 from services.financial_health_calculator_v2 import calculate_financial_health_score as calculate_10_factor_score
+from services.opportunity_analyzer import analyze_financial_opportunities
 from services.user_id_generator import generate_user_login_id_async, validate_date_of_birth
 from services.payment_service import payment_service, PLANS, PRICING, calculate_plan_price
 from services.report_generator import create_report
@@ -773,6 +774,128 @@ async def get_health_score_v2(credentials: HTTPAuthorizationCredentials = Depend
     
     # Calculate 10-factor score
     result = calculate_10_factor_score(calc_data)
+    
+    return result
+
+@api_router.get("/reports/opportunity-analysis")
+async def get_opportunity_analysis(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Analyze financial opportunities and risks using gap analysis.
+    Returns saving opportunities and risk reduction needs with actionable recommendations.
+    """
+    user_id = await verify_token(credentials)
+    
+    # Get user data
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_age = user.get('age', 30)
+    family_members = 1 + user.get('major_members', 0) + user.get('minor_members', 0)
+    
+    # Get questionnaire data
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+    
+    if not questionnaire:
+        return {
+            "summary": {
+                "total_saving_opportunities": 0,
+                "total_annual_savings_potential": 0,
+                "total_risk_reduction_opportunities": 0,
+                "total_coverage_gap": 0
+            },
+            "saving_opportunities": [],
+            "risk_reductions": [],
+            "action_plan": {"high": [], "medium": [], "low": []},
+            "metadata": {"age": user_age, "annual_income": 0, "net_worth": 0, "total_assets": 0}
+        }
+    
+    # Build data dict for analyzer
+    monthly_income = (
+        questionnaire.get("salary_income", 0) +
+        questionnaire.get("business_income", 0) +
+        questionnaire.get("rental_property1", 0) +
+        questionnaire.get("rental_property2", 0) +
+        questionnaire.get("interest_income", 0) +
+        questionnaire.get("dividend_income", 0) +
+        questionnaire.get("capital_gains", 0) +
+        questionnaire.get("freelance_income", 0) +
+        questionnaire.get("other_income", 0)
+    )
+    
+    monthly_expenses = (
+        questionnaire.get("housing_emi_rent", 0) +
+        questionnaire.get("utilities", 0) +
+        questionnaire.get("groceries", 0) +
+        questionnaire.get("transportation", 0) +
+        questionnaire.get("healthcare", 0) +
+        questionnaire.get("education", 0) +
+        questionnaire.get("entertainment", 0) +
+        questionnaire.get("shopping", 0) +
+        questionnaire.get("insurance_premiums", 0) +
+        questionnaire.get("other_expenses", 0)
+    )
+    
+    calc_data = {
+        "age": user_age,
+        "monthly_income": monthly_income,
+        "monthly_expenses": monthly_expenses,
+        "family_members": family_members,
+        
+        # Profile
+        "city_tier": questionnaire.get("city_tier", "tier_2"),
+        "family_situation": questionnaire.get("family_situation", "single_stable"),
+        "has_credit_card": questionnaire.get("has_credit_card", False),
+        
+        # EMI data
+        "home_loan_emi": questionnaire.get("home_loan_emi", 0),
+        "vehicle_loan_emi": questionnaire.get("car_loan_emi", 0),
+        "education_loan_emi": questionnaire.get("education_loan_emi", 0),
+        "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
+        
+        # Assets
+        "bank_balance": questionnaire.get("bank_balance", 0),
+        "sweep_fd": questionnaire.get("sweep_fd", 0),
+        "liquid_mf": questionnaire.get("liquid_mf", 0),
+        "mutual_funds": questionnaire.get("mutual_funds", 0),
+        "stocks": questionnaire.get("stocks", 0),
+        "debt_mf": questionnaire.get("debt_mf", 0),
+        "pf_nps": questionnaire.get("pf_nps", 0),
+        "fd": questionnaire.get("fd", 0),
+        "real_estate": questionnaire.get("real_estate", 0),
+        "gold": questionnaire.get("gold", 0),
+        "silver": questionnaire.get("silver", 0),
+        
+        # Liabilities
+        "home_loan_outstanding": questionnaire.get("home_loan_outstanding", 0),
+        "vehicle_loan_outstanding": questionnaire.get("car_loan_outstanding", 0),
+        "education_loan_outstanding": questionnaire.get("education_loan_outstanding", 0),
+        "other_loan_outstanding": questionnaire.get("personal_loan_outstanding", 0) + questionnaire.get("other_loan_outstanding", 0),
+        "credit_card_debt": questionnaire.get("credit_card_debt", 0),
+        
+        # Insurance
+        "life_insurance_coverage": questionnaire.get("life_insurance_coverage", 0),
+        "health_insurance_coverage": questionnaire.get("health_insurance_coverage", 0),
+        "vehicle_insurance_type": questionnaire.get("vehicle_insurance_type", "none"),
+        "has_vehicle": questionnaire.get("has_vehicle", False),
+        
+        # Investment
+        "yearly_investment": questionnaire.get("yearly_investment", 0),
+        
+        # Financial habits
+        "financial_habits": {
+            "health_insurance": questionnaire.get("habit_health_insurance", "neutral"),
+            "term_life_insurance": questionnaire.get("habit_term_life", "neutral"),
+            "itr_filing": questionnaire.get("habit_itr_filing", "neutral"),
+            "has_credit_card": questionnaire.get("has_credit_card", False),
+            "cc_balance": questionnaire.get("habit_cc_balance", "neutral"),
+            "personal_loan": questionnaire.get("habit_personal_loan", "neutral"),
+            "invest_beyond_fd": questionnaire.get("habit_invest_beyond_fd", "neutral"),
+        }
+    }
+    
+    # Analyze opportunities
+    result = analyze_financial_opportunities(calc_data)
     
     return result
 

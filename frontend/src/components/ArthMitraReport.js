@@ -528,27 +528,41 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const [showAllocationDetails, setShowAllocationDetails] = useState(false);
   const [tenFactorData, setTenFactorData] = useState(null);
   const [loadingScore, setLoadingScore] = useState(true);
+  const [opportunityData, setOpportunityData] = useState(null);
+  const [loadingOpportunity, setLoadingOpportunity] = useState(true);
 
-  // Fetch 10-Factor Score
+  // Fetch 10-Factor Score and Opportunity Analysis
   useEffect(() => {
-    const fetchTenFactorScore = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
         const API = process.env.REACT_APP_BACKEND_URL;
-        const response = await fetch(`${API}/api/reports/health-score-v2`, {
+        
+        // Fetch 10-Factor Score
+        const scoreResponse = await fetch(`${API}/api/reports/health-score-v2`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (response.ok) {
-          const data = await response.json();
+        if (scoreResponse.ok) {
+          const data = await scoreResponse.json();
           setTenFactorData(data);
         }
+        
+        // Fetch Opportunity Analysis
+        const oppResponse = await fetch(`${API}/api/reports/opportunity-analysis`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (oppResponse.ok) {
+          const oppData = await oppResponse.json();
+          setOpportunityData(oppData);
+        }
       } catch (error) {
-        console.error('Error fetching 10-factor score:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoadingScore(false);
+        setLoadingOpportunity(false);
       }
     };
-    fetchTenFactorScore();
+    fetchData();
   }, []);
 
   // Calculate financial metrics
