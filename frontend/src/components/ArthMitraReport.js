@@ -1884,6 +1884,29 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               const percentage = component.max_points > 0 ? (component.score / component.max_points) * 100 : 0;
               const color = percentage >= 70 ? 'var(--grn)' : (percentage >= 40 ? 'var(--amb)' : 'var(--red)');
               const icons = ['💰', '🏦', '🛡️', '📈', '💎', '⚖️', '✅', '❤️', '🏥', '🚗'];
+              const d = component.details || {};
+              
+              // Get key metric for each component
+              const getKeyMetric = () => {
+                switch(component.component) {
+                  case 'Savings Rate':
+                    return { label: 'Target Savings', value: `₹${((d.target_savings_rate/100) * (income || 0)).toLocaleString('en-IN')}` };
+                  case 'EMI Tolerance':
+                    return { label: 'Max EMI', value: `₹${((d.tolerance_limit/100) * (income || 0)).toLocaleString('en-IN')}` };
+                  case 'Emergency Fund':
+                    return { label: 'Required', value: `₹${((d.required_fund || 0)/100000).toFixed(2)}L` };
+                  case 'Investment Portfolio':
+                    return { label: 'Portfolio', value: `₹${((d.total_investment_value || 0)/100000).toFixed(2)}L` };
+                  case 'Net Worth':
+                    return { label: 'Multiple', value: `${d.actual_multiple?.toFixed(2) || (netWorth / (income * 12)).toFixed(2)}x` };
+                  case 'Financial Habits':
+                    return { label: 'Score', value: `${d.raw_score || 0}/7` };
+                  default:
+                    return null;
+                }
+              };
+              const keyMetric = getKeyMetric();
+              
               return (
                 <div key={idx} style={{
                   padding:'14px 16px',
@@ -1900,12 +1923,17 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                     <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:color}}>{component.score.toFixed(1)}</span>
                     <span style={{fontSize:'10px',color:'var(--t3)'}}>/ {component.max_points}</span>
                   </div>
-                  <div style={{height:'3px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'8px'}}>
+                  <div style={{height:'3px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'6px'}}>
                     <div style={{width:`${Math.min(100, percentage)}%`,height:'100%',background:color,borderRadius:'2px',transition:'width 0.5s'}}></div>
                   </div>
-                  <div style={{fontSize:'10px',color:color,fontWeight:600,marginBottom:'8px'}}>
+                  <div style={{fontSize:'10px',color:color,fontWeight:600,marginBottom:'4px'}}>
                     {component.details?.status || (percentage >= 70 ? 'Good' : (percentage >= 40 ? 'Fair' : 'Needs Work'))}
                   </div>
+                  {keyMetric && (
+                    <div style={{fontSize:'9px',color:'var(--t3)',marginBottom:'6px'}}>
+                      {keyMetric.label}: <span style={{fontWeight:600,color:'var(--t1)'}}>{keyMetric.value}</span>
+                    </div>
+                  )}
                   <button
                     onClick={() => setSelectedPillar(component.component)}
                     style={{
@@ -2008,7 +2036,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               return {
                 metrics: [
                   { label: 'Savings Rate', actual: `${d.actual_savings_rate?.toFixed(1)}%`, ideal: `${d.target_savings_rate?.toFixed(1)}%`, isGood: d.actual_savings_rate >= d.target_savings_rate },
-                  { label: 'Monthly Savings', actual: `₹${(d.monthly_savings || 0).toLocaleString('en-IN')}`, ideal: `₹${((d.target_savings_rate/100) * (income || 0)).toLocaleString('en-IN')}`, isGood: d.achievement_percentage >= 100 }
+                  { label: 'Monthly Savings', actual: `₹${(d.monthly_savings || 0).toLocaleString('en-IN')}`, ideal: '-', isGood: true },
+                  { label: 'Target Savings', actual: '-', ideal: `₹${Math.round((d.target_savings_rate/100) * (income || 0)).toLocaleString('en-IN')}/mo`, isGood: d.achievement_percentage >= 100 }
                 ],
                 tips: [
                   'Track all expenses using an app or spreadsheet',
@@ -2021,7 +2050,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
               return {
                 metrics: [
                   { label: 'EMI to Income Ratio', actual: `${d.actual_dti_ratio?.toFixed(1)}%`, ideal: `< ${d.tolerance_limit?.toFixed(0)}%`, isGood: d.actual_dti_ratio <= d.tolerance_limit },
-                  { label: 'Total EMI', actual: `₹${(d.total_emi || 0).toLocaleString('en-IN')}`, ideal: `< ₹${((d.tolerance_limit/100) * (income || 0)).toLocaleString('en-IN')}`, isGood: d.actual_dti_ratio <= d.tolerance_limit }
+                  { label: 'Total EMI', actual: `₹${(d.total_emi || 0).toLocaleString('en-IN')}`, ideal: '-', isGood: true },
+                  { label: 'Maximum EMI Allowed', actual: '-', ideal: `₹${Math.round((d.tolerance_limit/100) * (income || 0)).toLocaleString('en-IN')}/mo`, isGood: d.actual_dti_ratio <= d.tolerance_limit }
                 ],
                 tips: d.actual_dti_ratio > 0 ? [
                   'Consider prepaying high-interest loans first',
@@ -2037,7 +2067,8 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             case 'Emergency Fund':
               return {
                 metrics: [
-                  { label: 'Emergency Fund', actual: `₹${((d.actual_fund || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.required_fund || 0)/100000).toFixed(2)}L (${d.required_months || 6} months)`, isGood: d.adequacy_ratio >= 100 },
+                  { label: 'Current Fund', actual: `₹${((d.actual_fund || 0)/100000).toFixed(2)}L`, ideal: '-', isGood: true },
+                  { label: 'Required Fund', actual: '-', ideal: `₹${((d.required_fund || 0)/100000).toFixed(2)}L (${d.required_months || 6} mo)`, isGood: d.adequacy_ratio >= 100 },
                   { label: 'Fund Adequacy', actual: `${d.adequacy_ratio?.toFixed(0)}%`, ideal: '100%', isGood: d.adequacy_ratio >= 100 }
                 ],
                 tips: d.adequacy_ratio < 100 ? [
@@ -2054,8 +2085,9 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             case 'Investment Portfolio':
               return {
                 metrics: [
-                  { label: 'Portfolio Value', actual: `₹${((d.actual_value || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.target_value || 0)/100000).toFixed(2)}L (${d.target_multiple?.toFixed(1)}x income)`, isGood: (d.actual_value || 0) >= (d.target_value || 0) },
-                  { label: 'Wealth Multiple', actual: `${d.actual_multiple?.toFixed(2)}x`, ideal: `${d.target_multiple?.toFixed(1)}x annual income`, isGood: (d.actual_multiple || 0) >= (d.target_multiple || 0) }
+                  { label: 'Portfolio Value', actual: `₹${((d.total_investment_value || d.discipline?.actual_value || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.wealth?.target_value || d.target_value || (income * 12 * (d.wealth?.target_multiple || 1)))/100000).toFixed(2)}L`, isGood: (d.wealth?.achievement || 0) >= 100 },
+                  { label: 'Wealth Multiple', actual: `${(d.wealth?.actual_multiple || d.actual_multiple || 0).toFixed(2)}x`, ideal: `${(d.wealth?.target_multiple || d.target_multiple || 1).toFixed(1)}x annual income`, isGood: (d.wealth?.actual_multiple || 0) >= (d.wealth?.target_multiple || 0) },
+                  { label: 'Investment Rate', actual: `${(d.discipline?.actual_rate || 0).toFixed(1)}%`, ideal: `${(d.discipline?.target_rate || 20).toFixed(0)}%`, isGood: (d.discipline?.achievement || 0) >= 100 }
                 ],
                 tips: [
                   'Start SIPs in diversified equity mutual funds',
@@ -2067,8 +2099,10 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
             case 'Net Worth':
               return {
                 metrics: [
-                  { label: 'Net Worth', actual: `₹${((d.actual_net_worth || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.target_net_worth || 0)/100000).toFixed(2)}L`, isGood: (d.actual_net_worth || 0) >= (d.target_net_worth || 0) },
-                  { label: 'Net Worth Multiple', actual: `${d.net_worth_multiple?.toFixed(2)}x`, ideal: `${d.target_multiple?.toFixed(1)}x annual income`, isGood: (d.net_worth_multiple || 0) >= (d.target_multiple || 0) }
+                  { label: 'Net Worth', actual: `₹${((d.net_worth || d.actual_net_worth || netWorth || 0)/100000).toFixed(2)}L`, ideal: `₹${((d.target_net_worth || (income * 12 * (d.target_multiple || 1.5)))/100000).toFixed(2)}L`, isGood: (d.achievement || 0) >= 100 },
+                  { label: 'Net Worth Multiple', actual: `${(d.actual_multiple || d.net_worth_multiple || 0).toFixed(2)}x`, ideal: `${(d.target_multiple || 1.5).toFixed(1)}x annual income`, isGood: (d.actual_multiple || 0) >= (d.target_multiple || 0) },
+                  { label: 'Total Assets', actual: `₹${((d.total_assets || totalAssets || 0)/100000).toFixed(2)}L`, ideal: '-', isGood: true },
+                  { label: 'Total Liabilities', actual: `₹${((d.total_liabilities || totalLiabilities || 0)/100000).toFixed(2)}L`, ideal: '₹0', isGood: (d.total_liabilities || 0) === 0 }
                 ],
                 tips: [
                   'Focus on increasing assets while reducing liabilities',
@@ -2094,11 +2128,20 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                 ]
               };
             case 'Financial Habits':
+              const habitLabels = {
+                'health_insurance': 'Health Insurance',
+                'term_life_insurance': 'Term Life Insurance',
+                'itr_filing': 'ITR Filing',
+                'has_credit_card': 'Has Credit Card',
+                'cc_balance': 'Credit Card Balance',
+                'personal_loan': 'Personal Loan Status',
+                'invest_beyond_fd': 'Invests Beyond FD'
+              };
               return {
                 metrics: (d.breakdown || []).map(habit => ({
-                  label: habit.question?.replace(/_/g, ' ').replace(/habit /gi, ''),
-                  actual: habit.response === 'yes' ? '✅ Yes' : (habit.response === 'no' ? '❌ No' : '➖ Neutral'),
-                  ideal: '✅ Yes',
+                  label: habitLabels[habit.question] || habit.question?.replace(/_/g, ' '),
+                  actual: habit.status === 'Good' ? '✅ Good' : (habit.status === 'Poor' ? '❌ Poor' : '➖ Fair'),
+                  ideal: '✅ Good',
                   isGood: habit.points > 0
                 })),
                 tips: [
