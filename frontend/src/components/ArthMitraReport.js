@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HighestImpactActions, ScoreJourney, FinancialSnapshot } from "./report";
+import { HighestImpactActions, ScoreJourney, FinancialSnapshot, NetWorthProjection, CIBILScore, RetirementAge } from "./report";
 
 // Pillar Details Data
 const PILLAR_DETAILS = {
@@ -2919,113 +2919,22 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       </div>
 
       {/* 6. WHERE YOU'RE HEADED — NET WORTH BY ASSET CLASS */}
-      <div className="sh an in"><div className="shn">8</div><div className="sht">Where You're Headed — Net Worth by Asset Class</div><div className="shl"></div></div>
-      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px'}}>
-        <div style={{padding:'20px'}}>
-          <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px'}}>
-            <thead>
-              <tr style={{borderBottom:'2px solid var(--border)'}}>
-                <th style={{textAlign:'left',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>ASSET CLASS</th>
-                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>CURRENT</th>
-                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>5Y PROJECTION</th>
-                <th style={{textAlign:'right',padding:'10px 8px',fontWeight:700,color:'var(--t2)',fontSize:'10px',letterSpacing:'.05em'}}>10Y PROJECTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>📈 Equity (MF + Stocks)</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(mutualFunds + stocks)}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(Math.round((mutualFunds + stocks) * Math.pow(1.12, 5)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)'}}>{formatINR2(Math.round((mutualFunds + stocks) * Math.pow(1.12, 10)))}</td>
-              </tr>
-              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏦 Debt (FD + PPF + NPS)</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(fd + pfNps)}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round((fd + pfNps) * Math.pow(1.07, 5)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round((fd + pfNps) * Math.pow(1.07, 10)))}</td>
-              </tr>
-              <tr style={{borderBottom:'1px solid var(--border)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🏠 Real Estate</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(realEstate)}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(Math.round(realEstate * Math.pow(1.05, 5)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--amb)'}}>{formatINR2(Math.round(realEstate * Math.pow(1.05, 10)))}</td>
-              </tr>
-              <tr style={{borderBottom:'1px solid var(--border)',background:'var(--bg3)'}}>
-                <td style={{padding:'12px 8px',fontWeight:600,color:'var(--t1)'}}>🥇 Gold / Metals</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(gold)}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round(gold * Math.pow(1.08, 5)))}</td>
-                <td style={{padding:'12px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--gold)'}}>{formatINR2(Math.round(gold * Math.pow(1.08, 10)))}</td>
-              </tr>
-              <tr style={{background:'var(--bg2)'}}>
-                <td style={{padding:'14px 8px',fontWeight:700,color:'var(--t0)',fontSize:'13px'}}>TOTAL NET WORTH</td>
-                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(netWorth)}</td>
-                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(Math.round(netWorth * Math.pow(1.10, 5)))}</td>
-                <td style={{padding:'14px 8px',textAlign:'right',fontFamily:"'JetBrains Mono',monospace",color:'var(--grn)',fontWeight:700,fontSize:'14px'}}>{formatINR2(Math.round(netWorth * Math.pow(1.10, 10)))}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <NetWorthProjection 
+        mutualFunds={mutualFunds}
+        stocks={stocks}
+        fd={fd}
+        pfNps={pfNps}
+        realEstate={realEstate}
+        gold={gold}
+        netWorth={netWorth}
+        formatINR2={formatINR2}
+      />
 
       {/* 7. CURRENT CIBIL SCORE */}
-      <div className="sh an in"><div className="shn">9</div><div className="sht">Current CIBIL Score & How to Improve</div><div className="shl"></div></div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 2fr',gap:'16px',marginBottom:'20px'}} className="an in">
-        <div style={{background:'linear-gradient(135deg,#1e3a5f,#2d5a87)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'24px',textAlign:'center'}}>
-          <div style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',color:'rgba(255,255,255,.5)',marginBottom:'8px'}}>ESTIMATED CIBIL SCORE</div>
-          <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'48px',fontWeight:700,color:'#fff'}}>{totalLiabilities === 0 ? 750 : 720}</div>
-          <div style={{fontSize:'13px',color:'rgba(255,255,255,.7)',marginTop:'8px'}}>{totalLiabilities === 0 ? 'GOOD' : 'FAIR'}</div>
-          <div style={{fontSize:'11px',color:'rgba(255,255,255,.5)',marginTop:'4px'}}>Range: 300-900</div>
-        </div>
-        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'20px'}}>
-          <div style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',marginBottom:'12px'}}>📈 HOW TO IMPROVE YOUR CIBIL SCORE</div>
-          <div style={{display:'grid',gap:'10px'}}>
-            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'16px'}}>✅</span>
-              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Pay bills on time</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Set auto-pay for all EMIs and credit cards</div></div>
-            </div>
-            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'16px'}}>💳</span>
-              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Keep utilization below 30%</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Use less than 30% of your credit limit</div></div>
-            </div>
-            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'16px'}}>🚫</span>
-              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Avoid multiple loan applications</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Each hard inquiry reduces score by 5-10 points</div></div>
-            </div>
-            <div style={{display:'flex',alignItems:'flex-start',gap:'10px',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'16px'}}>📊</span>
-              <div><strong style={{fontSize:'12px',color:'var(--t1)'}}>Maintain credit mix</strong><div style={{fontSize:'11px',color:'var(--t3)'}}>Have a mix of secured and unsecured credit</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CIBILScore totalLiabilities={totalLiabilities} />
 
       {/* 8. KNOW YOUR RETIREMENT AGE */}
-      <div className="sh an in"><div className="shn">10</div><div className="sht">Know Your Retirement Age</div><div className="shl"></div></div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
-        <div style={{background:'linear-gradient(135deg,#166534,#15803d)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'24px',textAlign:'center'}}>
-          <div style={{fontSize:'11px',fontWeight:700,letterSpacing:'.1em',color:'rgba(255,255,255,.5)',marginBottom:'8px'}}>PROJECTED RETIREMENT AGE</div>
-          <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'48px',fontWeight:700,color:'#fff'}}>{Math.max(55, 60 - Math.floor(netWorth / (expenses * 12 * 25) * 10))}</div>
-          <div style={{fontSize:'13px',color:'rgba(255,255,255,.7)',marginTop:'8px'}}>years old</div>
-          <div style={{fontSize:'11px',color:'rgba(255,255,255,.5)',marginTop:'4px'}}>Based on current savings rate</div>
-        </div>
-        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',padding:'20px'}}>
-          <div style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',marginBottom:'12px'}}>🎯 RETIREMENT TARGETS</div>
-          <div style={{display:'grid',gap:'8px'}}>
-            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'12px',color:'var(--t2)'}}>Retirement Corpus Target</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--gold)'}}>₹{((expenses * 12 * 25) / 10000000).toFixed(1)} Cr</span>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'12px',color:'var(--t2)'}}>Current Net Worth</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--grn)'}}>{formatINR2(netWorth)}</span>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg3)',borderRadius:'8px'}}>
-              <span style={{fontSize:'12px',color:'var(--t2)'}}>Gap to Fill</span>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:700,color:'var(--red)'}}>₹{(Math.max(0, (expenses * 12 * 25) - netWorth) / 10000000).toFixed(2)} Cr</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RetirementAge netWorth={netWorth} expenses={expenses} formatINR2={formatINR2} />
 
       {/* 9. WHAT TO TRACK MONTHLY */}
       <div className="sh an in"><div className="shn">11</div><div className="sht">What to Track Monthly</div><div className="shl"></div></div>
