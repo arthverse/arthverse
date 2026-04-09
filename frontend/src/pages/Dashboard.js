@@ -79,6 +79,7 @@ export default function Dashboard({ token, user, onLogout }) {
             setHealthScore({
               score: scoreRes.data.normalized_score,
               overall_score: scoreRes.data.normalized_score,
+              financials: scoreRes.data.summary,
               ...scoreRes.data
             });
           } catch (error) {
