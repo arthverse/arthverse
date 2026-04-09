@@ -30,86 +30,82 @@ export default function Dashboard({ token, user, onLogout }) {
   const isDemo = urlParams.get('demo') === 'true';
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch user data if not provided
+        if (!userData) {
+          try {
+            const userRes = await axios.get(`${API}/auth/me`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserData(userRes.data);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        }
+
+        // Check if questionnaire is completed
+        let questionnaireData = null;
+        try {
+          const qResponse = await axios.get(`${API}/questionnaire`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          questionnaireData = qResponse.data;
+          setQuestionnaire(questionnaireData);
+        } catch (error) {
+          // Questionnaire not completed, redirect to setup
+          if (error.response?.status === 404) {
+            navigate('/arthvyay/questionnaire');
+            return;
+          }
+        }
+
+        // Check payment status for premium access
+        try {
+          const paymentRes = await axios.get(`${API}/payment/status`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setHasPremiumAccess(paymentRes.data.has_premium);
+        } catch (error) {
+          console.error('Error checking payment status:', error);
+        }
+
+        // Use v2 health score API for consistency
+        if (questionnaireData) {
+          try {
+            const scoreRes = await axios.get(`${API}/reports/health-score-v2`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setHealthScore({
+              score: scoreRes.data.normalized_score,
+              overall_score: scoreRes.data.normalized_score,
+              ...scoreRes.data
+            });
+          } catch (error) {
+            console.error('Error fetching health score:', error);
+          }
+        }
+
+        // Get recent transactions summary
+        try {
+          const transRes = await axios.get(`${API}/transactions/recent`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setRecentTransactions(transRes.data.slice(0, 5));
+        } catch (error) {
+          // Transactions not available yet
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  }, []);
+  }, [token, userData, navigate]);
 
   const handleConsentApproved = (consentId) => {
     setShowBankData(true);
     toast.success('Bank accounts linked! Your financial data is now available.');
-  };
-
-  const fetchData = async () => {
-    try {
-      // Fetch user data if not provided
-      if (!userData) {
-        try {
-          const userRes = await axios.get(`${API}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setUserData(userRes.data);
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      }
-
-      // Check if questionnaire is completed
-      let questionnaireData = null;
-      try {
-        const qResponse = await axios.get(`${API}/questionnaire`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        questionnaireData = qResponse.data;
-        setQuestionnaire(questionnaireData);
-      } catch (error) {
-        // Questionnaire not completed, redirect to setup
-        if (error.response?.status === 404) {
-          navigate('/arthvyay/questionnaire');
-          return;
-        }
-      }
-
-      // Check payment status for premium access
-      try {
-        const paymentRes = await axios.get(`${API}/payment/status`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setHasPremiumAccess(paymentRes.data.has_premium);
-      } catch (error) {
-        console.error('Error checking payment status:', error);
-      }
-
-      const [scoreRes, transactionsRes] = await Promise.all([
-        axios.get(`${API}/reports/health-score-v2`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(`${API}/transactions?limit=5`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      // Transform v2 response to match expected dashboard format
-      const v2Data = scoreRes.data;
-      const normalizedScore = Math.round(v2Data.normalized_score || 0);
-      const transformedHealthScore = {
-        score: normalizedScore,
-        rating: v2Data.band || (normalizedScore >= 85 ? 'EXCELLENT' : normalizedScore >= 70 ? 'VERY GOOD' : normalizedScore >= 50 ? 'FAIR' : 'NEEDS IMPROVEMENT'),
-        message: normalizedScore >= 85 ? 'Aapki ArthSthithi strong hai. Keep it up!' :
-                 normalizedScore >= 70 ? 'Aapki ArthSthithi strong hai. Kuch improvements se excellent ban sakti hai.' :
-                 normalizedScore >= 50 ? 'Your financial health needs some attention.' :
-                 'Critical areas need immediate focus.',
-        financials: {
-          monthly_income: v2Data.summary?.monthly_income || 0,
-          monthly_expenses: v2Data.summary?.monthly_expenses || 0,
-          monthly_savings: v2Data.summary?.monthly_savings || 0,
-        }
-      };
-      setHealthScore(transformedHealthScore);
-      setRecentTransactions(transactionsRes.data);
-    } catch (error) {
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handlePaymentSuccess = (planType) => {

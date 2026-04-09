@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { HighestImpactActions, ScoreJourney, FinancialSnapshot } from "./report";
 
 // Pillar Details Data
 const PILLAR_DETAILS = {
@@ -879,56 +880,15 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       </div>
 
       {/* YEARLY FINANCIAL SNAPSHOT */}
-      <div className="an in" style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden',marginBottom:'20px',animationDelay:'.15s'}}>
-        <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-          <span style={{fontSize:'14px'}}>📊</span>
-          <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Yearly Financial Snapshot</span>
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
-          {/* Row 1 */}
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Income</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(income * 12)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>Gross salary</div>
-          </div>
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Annual Savings</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(savings * 12)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>{savingsRate}% rate</div>
-          </div>
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Total Expenses</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{formatINR2(expenses * 12)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>{((expenses/income)*100).toFixed(2)}% income</div>
-          </div>
-          <div style={{padding:'20px',borderBottom:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Net Worth</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--gold)',marginBottom:'6px'}}>{formatINR2(netWorth)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>{(netWorth / (income * 12)).toFixed(2)}× income</div>
-          </div>
-          {/* Row 2 */}
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Free Surplus</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--grn)',marginBottom:'6px'}}>{formatINR2(savings * 12)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>After all outflows</div>
-          </div>
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Maximum EMI</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--blu)',marginBottom:'6px'}}>{formatINR2(Math.round(income * 0.4))}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>40% of income</div>
-          </div>
-          <div style={{padding:'20px',borderRight:'1px solid var(--border)'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Ideal Monthly Investment</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--blu)',marginBottom:'6px'}}>{formatINR2(Math.round(income * 0.2))}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>20% of income</div>
-          </div>
-          <div style={{padding:'20px'}}>
-            <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'10px'}}>Score</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'24px',fontWeight:700,color:'var(--amb)',marginBottom:'6px'}}>{score.toFixed(2)}</div>
-            <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: 80+</div>
-          </div>
-        </div>
-      </div>
+      <FinancialSnapshot 
+        income={income}
+        expenses={expenses}
+        savings={savings}
+        savingsRate={savingsRate}
+        netWorth={netWorth}
+        score={score}
+        formatINR2={formatINR2}
+      />
 
       {/* 3. FINANCIAL OPPORTUNITY ANALYZER */}
       <div className="sh an in" style={{animationDelay:'.24s'}}>

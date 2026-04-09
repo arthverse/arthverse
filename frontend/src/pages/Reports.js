@@ -63,21 +63,18 @@ export default function Reports({ token, onLogout }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchReports();
-  }, []);
+    const fetchReports = async () => {
+      try {
+        const [plRes, bsRes] = await Promise.all([
+          axios.get(`${API}/reports/pl`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get(`${API}/reports/balance-sheet`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
 
-  const fetchReports = async () => {
-    try {
-      const [plRes, bsRes] = await Promise.all([
-        axios.get(`${API}/reports/pl`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(`${API}/reports/balance-sheet`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      setPlData(plRes.data);
+        setPlData(plRes.data);
       setBalanceSheet(bsRes.data);
     } catch (error) {
       toast.error('Failed to load reports');
@@ -85,6 +82,9 @@ export default function Reports({ token, onLogout }) {
       setLoading(false);
     }
   };
+
+    fetchReports();
+  }, [token]);
 
   if (loading) {
     return (

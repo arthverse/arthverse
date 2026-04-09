@@ -25,19 +25,19 @@ export default function Transactions({ token, onLogout }) {
   });
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get(`${API}/transactions?limit=100`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setTransactions(response.data);
+      } catch (error) {
+        toast.error('Failed to load transactions');
+      }
+    };
 
-  const fetchTransactions = async () => {
-    try {
-      const response = await axios.get(`${API}/transactions?limit=100`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTransactions(response.data);
-    } catch (error) {
-      toast.error('Failed to load transactions');
-    }
-  };
+    fetchTransactions();
+  }, [token]);
 
   const handleAICategorize = async () => {
     if (!formData.description || !formData.amount) {
