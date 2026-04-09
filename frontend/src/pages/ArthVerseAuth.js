@@ -17,19 +17,21 @@ export default function ArthVerseAuth({ onAuth }) {
   const [isLogin, setIsLogin] = useState(searchParams.get('mode') === 'login');
   const [loading, setLoading] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+  const [showPasswordSetup, setShowPasswordSetup] = useState(false);
   const [generatedLoginId, setGeneratedLoginId] = useState('');
+  const [passwordData, setPasswordData] = useState({
+    password: '',
+    confirm_password: ''
+  });
   const [formData, setFormData] = useState({
     client_id: '',
     password: '',
     name: '',
     email: '',
     mobile_number: '',
+    pan_number: '',
     date_of_birth: '',
-    age: '',
     city: '',
-    marital_status: '',
-    major_members: 0,
-    minor_members: 0,
     data_privacy_consent: false
   });
 
@@ -54,15 +56,11 @@ export default function ArthVerseAuth({ onAuth }) {
         ? { client_id: formData.client_id, password: formData.password }
         : {
             email: formData.email,
-            password: formData.password,
             name: formData.name,
             mobile_number: formData.mobile_number,
+            pan_number: formData.pan_number,
             date_of_birth: formData.date_of_birth,
-            age: parseInt(formData.age) || 0,
             city: formData.city,
-            marital_status: formData.marital_status,
-            major_members: parseInt(formData.major_members) || 0,
-            minor_members: parseInt(formData.minor_members) || 0,
             data_privacy_consent: formData.data_privacy_consent
           };
 
@@ -107,27 +105,93 @@ export default function ArthVerseAuth({ onAuth }) {
             <Button
               onClick={() => {
                 setShowSuccessScreen(false);
-                setIsLogin(true);
-                setFormData({
-                  client_id: '',
-                  password: '',
-                  name: '',
-                  email: '',
-                  mobile_number: '',
-                  date_of_birth: '',
-                  age: '',
-                  city: '',
-                  marital_status: '',
-                  major_members: 0,
-                  minor_members: 0,
-                  data_privacy_consent: false
-                });
+                setShowPasswordSetup(true);
               }}
               className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-3"
             >
-              Continue to Login
+              Set Password
             </Button>
           </div>
+        </Card>
+      ) : showPasswordSetup ? (
+        <Card className="w-full max-w-md p-8 bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-brand-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800">Create Password</h2>
+            <p className="text-slate-600 mt-2">Set a secure password for your account</p>
+            <p className="text-sm text-brand-blue font-medium mt-1">Client ID: {generatedLoginId}</p>
+          </div>
+          
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            if (passwordData.password !== passwordData.confirm_password) {
+              toast.error('Passwords do not match');
+              return;
+            }
+            if (passwordData.password.length < 6) {
+              toast.error('Password must be at least 6 characters');
+              return;
+            }
+            
+            setLoading(true);
+            try {
+              const response = await axios.post(`${API}/auth/set-password`, {
+                client_id: generatedLoginId,
+                password: passwordData.password,
+                confirm_password: passwordData.confirm_password
+              });
+              
+              localStorage.setItem('token', response.data.token);
+              localStorage.setItem('user', JSON.stringify(response.data.user));
+              toast.success('Password set successfully!');
+              onAuth(response.data.token, response.data.user);
+              navigate('/arthverse');
+            } catch (error) {
+              toast.error(error.response?.data?.detail || 'Failed to set password');
+            } finally {
+              setLoading(false);
+            }
+          }} className="space-y-4">
+            <div>
+              <Label htmlFor="new_password" className="font-semibold">Password *</Label>
+              <Input
+                id="new_password"
+                type="password"
+                value={passwordData.password}
+                onChange={(e) => setPasswordData({ ...passwordData, password: e.target.value })}
+                required
+                minLength={6}
+                placeholder="Minimum 6 characters"
+                className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="confirm_password" className="font-semibold">Confirm Password *</Label>
+              <Input
+                id="confirm_password"
+                type="password"
+                value={passwordData.confirm_password}
+                onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
+                required
+                minLength={6}
+                placeholder="Re-enter password"
+                className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+              />
+            </div>
+            
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-full py-3 mt-4"
+            >
+              {loading ? 'Setting Password...' : 'Set Password & Login'}
+            </Button>
+          </form>
         </Card>
       ) : (
         <Card className="w-full max-w-2xl p-8 bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl" data-testid="arthverse-auth-card">
@@ -238,28 +302,30 @@ export default function ArthVerseAuth({ onAuth }) {
                   />
                 </div>
 
-                <div data-testid="password-signup-container">
-                  <Label htmlFor="password_signup" className="font-semibold">Password *</Label>
+                <div data-testid="pan-container">
+                  <Label htmlFor="pan_number" className="font-semibold">PAN Number *</Label>
                   <Input
-                    id="password_signup"
-                    data-testid="password-signup-input"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    id="pan_number"
+                    data-testid="pan-input"
+                    type="text"
+                    placeholder="ABCDE1234F"
+                    value={formData.pan_number}
+                    onChange={(e) => setFormData({ ...formData, pan_number: e.target.value.toUpperCase() })}
                     required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
+                    maxLength={10}
+                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl uppercase"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div data-testid="age-container">
-                    <Label htmlFor="age" className="font-semibold">Age *</Label>
+                  <div data-testid="dob-container">
+                    <Label htmlFor="date_of_birth" className="font-semibold">Date of Birth *</Label>
                     <Input
-                      id="age"
-                      data-testid="age-input"
-                      type="number"
-                      value={formData.age}
-                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                      id="date_of_birth"
+                      data-testid="dob-input"
+                      type="date"
+                      value={formData.date_of_birth}
+                      onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
                       required
                       className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
                     />
@@ -273,65 +339,6 @@ export default function ArthVerseAuth({ onAuth }) {
                       type="text"
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      required
-                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                    />
-                  </div>
-                </div>
-
-                <div data-testid="dob-container">
-                  <Label htmlFor="date_of_birth" className="font-semibold">Date of Birth *</Label>
-                  <Input
-                    id="date_of_birth"
-                    data-testid="dob-input"
-                    type="date"
-                    value={formData.date_of_birth}
-                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                    required
-                    className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                  />
-                </div>
-
-                <div data-testid="marital-status-container">
-                  <Label className="font-semibold">Marital Status *</Label>
-                  <Select value={formData.marital_status} onValueChange={(value) => setFormData({ ...formData, marital_status: value })} required>
-                    <SelectTrigger className="mt-1 h-12 bg-slate-50" data-testid="marital-status-select">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="single">Single</SelectItem>
-                      <SelectItem value="married">Married</SelectItem>
-                      <SelectItem value="divorced">Divorced</SelectItem>
-                      <SelectItem value="widowed">Widowed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div data-testid="major-members-container">
-                    <Label htmlFor="major_members" className="font-semibold">Major Members (Adults 18+) *</Label>
-                    <Input
-                      id="major_members"
-                      data-testid="major-members-input"
-                      type="number"
-                      min="0"
-                      value={formData.major_members}
-                      onChange={(e) => setFormData({ ...formData, major_members: e.target.value })}
-                      required
-                      placeholder="Excluding yourself"
-                      className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
-                    />
-                  </div>
-
-                  <div data-testid="minor-members-container">
-                    <Label htmlFor="minor_members" className="font-semibold">Minor Members (Below 18) *</Label>
-                    <Input
-                      id="minor_members"
-                      data-testid="minor-members-input"
-                      type="number"
-                      min="0"
-                      value={formData.minor_members}
-                      onChange={(e) => setFormData({ ...formData, minor_members: e.target.value })}
                       required
                       className="mt-1 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue rounded-xl"
                     />

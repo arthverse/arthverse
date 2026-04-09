@@ -57,15 +57,11 @@ api_router = APIRouter(prefix="/api")
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
     name: str
     mobile_number: str
+    pan_number: str = ""
     date_of_birth: str  # Required for login ID generation (YYYY-MM-DD or DD-MM-YYYY)
-    age: int
     city: str
-    marital_status: str
-    major_members: int = 0  # Adults >18, excluding user
-    minor_members: int = 0  # Below 18
     data_privacy_consent: bool
 
 class UserLogin(BaseModel):
@@ -79,14 +75,12 @@ class UserResponse(BaseModel):
     email: str
     name: str
     mobile_number: str
+    pan_number: str = ""
     date_of_birth: str
-    age: int
     city: str
-    marital_status: str
-    major_members: int = 0
-    minor_members: int = 0
     created_at: str
     networth: float = 0
+    needs_password_setup: bool = False
 
 class AuthResponse(BaseModel):
     token: str
@@ -409,6 +403,12 @@ async def register(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Check if PAN already exists
+    if user_data.pan_number:
+        existing_pan = await db.users.find_one({"pan_number": user_data.pan_number}, {"_id": 0})
+        if existing_pan:
+            raise HTTPException(status_code=400, detail="PAN number already registered")
+    
     # Generate unique User Login ID
     client_id = await generate_user_login_id_async(
         name=user_data.name,
@@ -416,23 +416,21 @@ async def register(user_data: UserCreate):
         db_collection=db.users
     )
     
-    # Create user
+    # Create user without password (user will set it later)
     user_id = str(uuid.uuid4())
     user_doc = {
         "id": user_id,
         "client_id": client_id,  # This is now the User Login ID
         "email": user_data.email,
-        "password_hash": hash_password(user_data.password),
+        "password_hash": "",  # Empty - user will set password later
         "name": user_data.name,
         "mobile_number": user_data.mobile_number,
+        "pan_number": user_data.pan_number,
         "date_of_birth": user_data.date_of_birth,
-        "age": user_data.age,
         "city": user_data.city,
-        "marital_status": user_data.marital_status,
-        "major_members": user_data.major_members,
-        "minor_members": user_data.minor_members,
         "data_privacy_consent": user_data.data_privacy_consent,
         "networth": 0,
+        "needs_password_setup": True,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
@@ -447,14 +445,12 @@ async def register(user_data: UserCreate):
         email=user_data.email,
         name=user_data.name,
         mobile_number=user_data.mobile_number,
+        pan_number=user_data.pan_number,
         date_of_birth=user_data.date_of_birth,
-        age=user_data.age,
         city=user_data.city,
-        marital_status=user_data.marital_status,
-        major_members=user_data.major_members,
-        minor_members=user_data.minor_members,
         created_at=user_doc['created_at'],
-        networth=0
+        networth=0,
+        needs_password_setup=True
     )
     
     return AuthResponse(token=token, user=user_response)
@@ -462,7 +458,14 @@ async def register(user_data: UserCreate):
 @api_router.post("/auth/login", response_model=AuthResponse)
 async def login(credentials: UserLogin):
     user = await db.users.find_one({"client_id": credentials.client_id}, {"_id": 0})
-    if not user or not verify_password(credentials.password, user['password_hash']):
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Check if user needs password setup
+    if user.get('needs_password_setup', False) or not user.get('password_hash'):
+        raise HTTPException(status_code=403, detail="Please set up your password first")
+    
+    if not verify_password(credentials.password, user['password_hash']):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token = create_token(user['id'])
@@ -473,14 +476,54 @@ async def login(credentials: UserLogin):
         email=user['email'],
         name=user['name'],
         mobile_number=user['mobile_number'],
+        pan_number=user.get('pan_number', ''),
         date_of_birth=user.get('date_of_birth', ''),
-        age=user['age'],
         city=user['city'],
-        marital_status=user['marital_status'],
-        major_members=user.get('major_members', 0),
-        minor_members=user.get('minor_members', 0),
         created_at=user['created_at'],
-        networth=user.get('networth', 0)
+        networth=user.get('networth', 0),
+        needs_password_setup=False
+    )
+    
+    return AuthResponse(token=token, user=user_response)
+
+class SetPasswordRequest(BaseModel):
+    client_id: str
+    password: str
+    confirm_password: str
+
+@api_router.post("/auth/set-password")
+async def set_password(request: SetPasswordRequest):
+    if request.password != request.confirm_password:
+        raise HTTPException(status_code=400, detail="Passwords do not match")
+    
+    if len(request.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    user = await db.users.find_one({"client_id": request.client_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update password
+    await db.users.update_one(
+        {"client_id": request.client_id},
+        {"$set": {"password_hash": hash_password(request.password), "needs_password_setup": False}}
+    )
+    
+    # Create token for auto-login
+    token = create_token(user['id'])
+    
+    user_response = UserResponse(
+        id=user['id'],
+        client_id=user['client_id'],
+        email=user['email'],
+        name=user['name'],
+        mobile_number=user['mobile_number'],
+        pan_number=user.get('pan_number', ''),
+        date_of_birth=user.get('date_of_birth', ''),
+        city=user['city'],
+        created_at=user['created_at'],
+        networth=user.get('networth', 0),
+        needs_password_setup=False
     )
     
     return AuthResponse(token=token, user=user_response)
@@ -498,14 +541,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         email=user['email'],
         name=user['name'],
         mobile_number=user['mobile_number'],
+        pan_number=user.get('pan_number', ''),
         date_of_birth=user.get('date_of_birth', ''),
-        age=user['age'],
         city=user['city'],
-        marital_status=user['marital_status'],
-        major_members=user.get('major_members', 0),
-        minor_members=user.get('minor_members', 0),
         created_at=user['created_at'],
-        networth=user.get('networth', 0)
+        networth=user.get('networth', 0),
+        needs_password_setup=user.get('needs_password_setup', False)
     )
 
 # ============= Transaction Routes =============
