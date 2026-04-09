@@ -223,8 +223,8 @@ Check your score too! 👇
                 <div className={`text-6xl font-semibold font-heading tracking-tight mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="arthsthithi-value">
                   {healthScore?.score || 0}<span className="text-3xl text-slate-400"> / 100</span>
                 </div>
-                <p className="text-lg font-medium text-slate-700 mb-4">
-                  {healthScore?.rating || 'Not Available'} - {healthScore?.message || 'Complete questionnaire to see score'}
+                <p className="text-lg font-medium text-slate-700 mb-4" data-testid="arthsthithi-status">
+                  {healthScore?.band || healthScore?.rating || 'FAIR'} — {healthScore?.band_description || 'Your financial health score'}
                 </p>
                 
                 {/* Disclaimer */}
