@@ -275,7 +275,7 @@ export default function Transactions({ token, onLogout }) {
                     </Button>
                   </div>
                 </div>
-              ))}\
+              ))}
             </div>
           )}
         </Card>
