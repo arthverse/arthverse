@@ -830,7 +830,7 @@ def create_report_v6(filename, user_data, health_score, questionnaire, plan_type
             f"Start SIP of {inr(mo_sip)}/month in Nifty 50 Index Fund",
             "Review and organize existing investments",
             "Open NPS account if not already done",
-            f"Invest in ELSS for tax saving"
+            "Invest in ELSS for tax saving"
         ]),
         ("WEEK 4", "Goals & Review", OR, [
             "Write 3 SMART financial goals with timelines",

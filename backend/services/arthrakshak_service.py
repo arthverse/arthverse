@@ -423,7 +423,7 @@ def evaluate_vehicle_insurance(profile: RiskProfile, policies: List[InsurancePol
     
     # Check coverage types (simplified for MVP)
     # In real implementation, we'd check policy details
-    has_comprehensive = True  # Assume if they have vehicle policy, check details later
+    # has_comprehensive = True  # TODO: Check actual policy details later
     
     return RiskCategory(
         category="Vehicle Insurance",

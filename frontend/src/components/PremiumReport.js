@@ -765,7 +765,7 @@ export default function PremiumReport({ token, user, healthScore, questionnaire 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {financialTools.map((tool, idx) => (
             <div 
-              key={idx}
+              key={tool.title || `tool-${idx}`}
               className="p-5 rounded-2xl border-2"
               style={{ borderColor: `${tool.color}40`, backgroundColor: `${tool.color}08` }}
             >
@@ -843,7 +843,7 @@ export default function PremiumReport({ token, user, healthScore, questionnaire 
                   <h4 className="font-medium text-slate-700 mb-2">📊 Key Numbers</h4>
                   <ul className="space-y-1 text-sm text-slate-600">
                     {detail.keyNumbers.map((num, i) => (
-                      <li key={i}>• {num}</li>
+                      <li key={`num-${i}-${num.substring(0, 10)}`}>• {num}</li>
                     ))}
                   </ul>
                 </div>
@@ -851,7 +851,7 @@ export default function PremiumReport({ token, user, healthScore, questionnaire 
                   <h4 className="font-medium text-slate-700 mb-2">✅ Action Steps</h4>
                   <ul className="space-y-1 text-sm text-slate-600">
                     {detail.actions.map((action, i) => (
-                      <li key={i}>• {action}</li>
+                      <li key={`action-${i}-${action.substring(0, 10)}`}>• {action}</li>
                     ))}
                   </ul>
                 </div>
@@ -926,7 +926,7 @@ export default function PremiumReport({ token, user, healthScore, questionnaire 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {actionPlan.map((week, idx) => (
             <div 
-              key={idx}
+              key={week.week || `week-${idx}`}
               className="p-5 rounded-2xl border-2"
               style={{ borderColor: week.color, backgroundColor: `${week.color}08` }}
             >
@@ -941,7 +941,7 @@ export default function PremiumReport({ token, user, healthScore, questionnaire 
               </div>
               <ul className="space-y-2">
                 {week.tasks.map((task, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                  <li key={`${week.week}-task-${i}`} className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: week.color }} />
                     {task}
                   </li>

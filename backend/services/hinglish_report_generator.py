@@ -364,7 +364,7 @@ def create_hinglish_report(filename, data, plan_type="individual"):
     expenses = data.get('expenses', {})
     assets = data.get('assets', {})
     liabilities = data.get('liabilities', {})
-    insurance = data.get('insurance', {})
+    _insurance = data.get('insurance', {})  # Reserved for future insurance section
     
     overall_score = health_score.get('overall', 0)
     component_scores = health_score.get('components', {})
@@ -574,8 +574,8 @@ def create_hinglish_report(filename, data, plan_type="individual"):
         
         monthly_tasks = [
             f"☐ {section['actions'][0]}",
-            f"☐ Progress track karo weekly",
-            f"☐ Next month ka target set karo"
+            "☐ Progress track karo weekly",
+            "☐ Next month ka target set karo"
         ]
         
         for task in monthly_tasks:

@@ -255,7 +255,8 @@ def calculate_financial_health_score(questionnaire: Dict[str, Any], user_age: in
     has_health_insurance = questionnaire.get('has_health_insurance', False) or health_insurance_cover > 0
     has_life_insurance = questionnaire.get('has_term_insurance', False) or life_insurance_cover > 0
     files_itr = questionnaire.get('files_itr_yearly', False)
-    has_credit_cards = len(questionnaire.get('credit_cards', [])) > 0
+    # Note: has_credit_cards can be used for financial habits scoring in future
+    _ = len(questionnaire.get('credit_cards', []))  # Track for potential future use
     invests_regularly = total_investments > 0 or float(questionnaire.get('monthly_investment', 0) or 0) > 0
     
     # Asset Allocation

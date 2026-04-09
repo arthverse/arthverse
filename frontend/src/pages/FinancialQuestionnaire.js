@@ -577,11 +577,13 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   };
 
   // Helper functions for dynamic entries
+  const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
   const addEntry = (type) => {
     const key = `${type}_entries`;
     setFormData({
       ...formData,
-      [key]: [...formData[key], { type: '', amount: 0, frequency: 'monthly' }]
+      [key]: [...formData[key], { id: generateId(), type: '', amount: 0, frequency: 'monthly' }]
     });
   };
 
@@ -607,7 +609,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
   const addProperty = () => {
     setFormData({
       ...formData,
-      properties: [...formData.properties, { name: '', estimated_value: 0, area_sqft: 0 }]
+      properties: [...formData.properties, { id: generateId(), name: '', estimated_value: 0, area_sqft: 0 }]
     });
   };
 
@@ -629,6 +631,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     setFormData({
       ...formData,
       vehicles: [...formData.vehicles, { 
+        id: generateId(),
         vehicle_type: vehicleType,
         name: '', 
         registration_number: '', 
@@ -658,6 +661,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
       setFormData({
         ...formData,
         vehicles: [...formData.vehicles, {
+          id: generateId(),
           vehicle_type: vehicleData.vehicle_type,
           name: vehicleData.name,
           registration_number: vehicleData.vehicle_number,
@@ -674,6 +678,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     setFormData({
       ...formData,
       loans: [...formData.loans, { 
+        id: generateId(),
         loan_type: 'Home', 
         name: '', 
         principal_amount: 0, 
@@ -701,6 +706,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
     setFormData({
       ...formData,
       interest_investments: [...formData.interest_investments, {
+        id: generateId(),
         name: '',
         investment_type: 'FD',
         principal_amount: 0,
@@ -1099,7 +1105,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   {formData.income_entries.length > 0 && (
                     <div className="space-y-3">
                       {formData.income_entries.map((entry, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`income-entry-${index}`}>
+                        <div key={entry.id || `income-${index}`} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`income-entry-${index}`}>
                           <div className="col-span-5">
                             <Label className="text-xs">Type/Source</Label>
                             <Input
@@ -1181,7 +1187,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         <div className="col-span-1"></div>
                       </div>
                       {formData.interest_investments.map((inv, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                        <div key={inv.id || `inv-${index}`} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
                           <div className="col-span-3">
                             <Input
                               placeholder="e.g., SBI FD"
@@ -1509,7 +1515,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   {formData.expense_entries.length > 0 && (
                     <div className="space-y-3">
                       {formData.expense_entries.map((entry, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`expense-entry-${index}`}>
+                        <div key={entry.id || `expense-${index}`} className="grid grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl" data-testid={`expense-entry-${index}`}>
                           <div className="col-span-5">
                             <Label className="text-xs">Type/Category</Label>
                             <Input
@@ -1592,7 +1598,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         <div className="col-span-1"></div>
                       </div>
                       {formData.loans.map((loan, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                        <div key={loan.id || `loan-${index}`} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
                           <div className="col-span-2">
                             <Select
                               value={loan.loan_type}
@@ -1737,7 +1743,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         <div className="col-span-1"></div>
                       </div>
                       {formData.properties.map((prop, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
+                        <div key={prop.id || `prop-${index}`} className="grid grid-cols-12 gap-2 p-3 bg-white rounded-lg border">
                           <div className="col-span-4">
                             <Input
                               placeholder="e.g., Flat in Mumbai"
@@ -1822,7 +1828,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         </div>
                         {formData.vehicles.map((vehicle, index) => (
                           vehicle.vehicle_type === '2-Wheeler' && (
-                            <div key={index} className="grid grid-cols-12 gap-2 p-2 bg-white rounded-lg border">
+                            <div key={vehicle.id || `2w-${index}`} className="grid grid-cols-12 gap-2 p-2 bg-white rounded-lg border">
                               <div className="col-span-3">
                                 <Input
                                   placeholder="e.g., Honda Activa"
@@ -1905,7 +1911,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                         </div>
                         {formData.vehicles.map((vehicle, index) => (
                           vehicle.vehicle_type === '4-Wheeler' && (
-                            <div key={index} className="grid grid-cols-12 gap-2 p-2 bg-white rounded-lg border">
+                            <div key={vehicle.id || `4w-${index}`} className="grid grid-cols-12 gap-2 p-2 bg-white rounded-lg border">
                               <div className="col-span-3">
                                 <Input
                                   placeholder="e.g., Maruti Swift"
@@ -2066,7 +2072,7 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
                   {formData.loans.length > 0 ? (
                     <div className="space-y-2">
                       {formData.loans.map((loan, index) => (
-                        <div key={index} className="flex justify-between items-center p-3 bg-white rounded-lg border">
+                        <div key={loan.id || `loan-summary-${index}`} className="flex justify-between items-center p-3 bg-white rounded-lg border">
                           <div>
                             <span className="font-medium">{loan.name || loan.loan_type + ' Loan'}</span>
                             <span className="text-sm text-slate-500 ml-2">({loan.loan_type})</span>

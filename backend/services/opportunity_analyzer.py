@@ -315,7 +315,7 @@ def analyze_emergency_fund_allocation(
     ideal_allocation = EMERGENCY_FUND_ALLOCATION[situation][cc_key]
     
     actual_savings_pct = (savings_account / total_fund) * 100
-    actual_fd_pct = (sweep_fd / total_fund) * 100
+    _actual_fd_pct = (sweep_fd / total_fund) * 100  # Reserved for FD allocation analysis
     actual_liquid_pct = (liquid_mf / total_fund) * 100
     
     opportunities = []

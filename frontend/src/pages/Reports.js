@@ -360,7 +360,7 @@ export default function Reports({ token, onLogout }) {
                     {incomeChartData.map((item, idx) => {
                       const color = INCOME_COLORS[idx % INCOME_COLORS.length];
                       return (
-                        <div key={idx} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: `${color}15` }}>
+                        <div key={item.name || `income-${idx}`} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: `${color}15` }}>
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
                             <span className="text-slate-700">{item.name}</span>
@@ -384,7 +384,7 @@ export default function Reports({ token, onLogout }) {
                     {expenseChartData.map((item, idx) => {
                       const color = EXPENSE_COLORS[idx % EXPENSE_COLORS.length];
                       return (
-                        <div key={idx} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: `${color}15` }}>
+                        <div key={item.name || `expense-${idx}`} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: `${color}15` }}>
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
                             <span className="text-slate-700">{item.name}</span>
@@ -511,7 +511,7 @@ export default function Reports({ token, onLogout }) {
                       : 0;
                     const color = ASSET_COLORS[idx % ASSET_COLORS.length];
                     return (
-                      <div key={idx} className="p-3 rounded-lg" style={{ backgroundColor: `${color}15` }} data-testid={`asset-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div key={item.name || `asset-${idx}`} className="p-3 rounded-lg" style={{ backgroundColor: `${color}15` }} data-testid={`asset-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-slate-700">{item.name}</span>
                           <span className="font-mono font-bold" style={{ color }}>₹{item.value.toLocaleString()}</span>
@@ -592,7 +592,7 @@ export default function Reports({ token, onLogout }) {
                       : 0;
                     const color = LIABILITY_COLORS[idx % LIABILITY_COLORS.length];
                     return (
-                      <div key={idx} className="p-3 rounded-lg" style={{ backgroundColor: `${color}15` }} data-testid={`liability-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div key={item.name || `liability-${idx}`} className="p-3 rounded-lg" style={{ backgroundColor: `${color}15` }} data-testid={`liability-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-slate-700">{item.name}</span>
                           <span className="font-mono font-bold" style={{ color }}>₹{item.value.toLocaleString()}</span>
