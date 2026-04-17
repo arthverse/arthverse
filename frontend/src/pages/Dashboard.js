@@ -5,7 +5,7 @@ import { API } from '../App';
 import Layout from '../components/Layout';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw, Share2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw, Share2, Target, Shield, Wallet, ChevronRight, Upload, CheckCircle2, Circle } from 'lucide-react';
 import { toast } from 'sonner';
 import BankLinking from '../components/BankLinking';
 import AggregatedFinancialData from '../components/AggregatedFinancialData';
@@ -23,6 +23,7 @@ export default function Dashboard({ token, user, onLogout }) {
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [userData, setUserData] = useState(user);
+  const [hasQuestionnaire, setHasQuestionnaire] = useState(false);
   const navigate = useNavigate();
 
   // Check for demo mode via URL parameter
@@ -52,10 +53,12 @@ export default function Dashboard({ token, user, onLogout }) {
           });
           questionnaireData = qResponse.data;
           setQuestionnaire(questionnaireData);
+          setHasQuestionnaire(true);
         } catch (error) {
-          // Questionnaire not completed, redirect to setup
+          // Questionnaire not completed - show welcome screen instead of redirecting
           if (error.response?.status === 404) {
-            navigate('/arthvyay/questionnaire');
+            setHasQuestionnaire(false);
+            setLoading(false);
             return;
           }
         }
@@ -171,11 +174,163 @@ Check your score too! 👇
     toast.success('Opening WhatsApp...');
   };
 
+  // Progress steps for profile completion
+  const progressSteps = [
+    { id: 'income', label: 'Income', completed: questionnaire?.monthly_income > 0 },
+    { id: 'expenses', label: 'Expenses', completed: questionnaire?.monthly_expenses > 0 },
+    { id: 'assets', label: 'Assets', completed: (questionnaire?.bank_balance > 0 || questionnaire?.mutual_funds > 0) },
+    { id: 'liabilities', label: 'Liabilities', completed: questionnaire?.loans?.length > 0 || questionnaire?.home_loan_emi > 0 }
+  ];
+  
+  const completedSteps = progressSteps.filter(s => s.completed).length;
+  const progressPercentage = hasQuestionnaire ? Math.round((completedSteps / progressSteps.length) * 100) : 0;
+
   if (loading) {
     return (
       <Layout token={token} onLogout={onLogout}>
         <div className="flex items-center justify-center h-96" data-testid="dashboard-loading">
           <div className="text-lg text-slate-600 font-body">Loading dashboard...</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Welcome Screen - shown when questionnaire is not completed
+  if (!hasQuestionnaire) {
+    return (
+      <Layout token={token} onLogout={onLogout}>
+        <div className="max-w-5xl mx-auto px-6 lg:px-12 py-12" data-testid="welcome-screen">
+          {/* Welcome Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold font-heading text-slate-900 tracking-tight mb-4">
+              Welcome to <span className="text-brand-blue">ArthVerse</span>
+            </h1>
+            <p className="text-xl text-slate-600 font-body">
+              Your Personal Finance Operating System
+            </p>
+          </div>
+
+          {/* Financial Status Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <Card className="p-5 bg-gradient-to-br from-blue-50 to-white border-blue-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Target className="w-5 h-5 text-blue-600" />
+                </div>
+                <span className="text-sm font-semibold text-slate-700">ArthSthithi Score</span>
+              </div>
+              <p className="text-lg font-bold text-slate-400">Not Calculated Yet</p>
+            </Card>
+
+            <Card className="p-5 bg-gradient-to-br from-green-50 to-white border-green-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <Wallet className="w-5 h-5 text-green-600" />
+                </div>
+                <span className="text-sm font-semibold text-slate-700">Net Worth</span>
+              </div>
+              <p className="text-lg font-bold text-slate-400">Not Available</p>
+            </Card>
+
+            <Card className="p-5 bg-gradient-to-br from-amber-50 to-white border-amber-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                  <PiggyBank className="w-5 h-5 text-amber-600" />
+                </div>
+                <span className="text-sm font-semibold text-slate-700">Monthly Savings</span>
+              </div>
+              <p className="text-lg font-bold text-slate-400">Not Available</p>
+            </Card>
+
+            <Card className="p-5 bg-gradient-to-br from-purple-50 to-white border-purple-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-purple-600" />
+                </div>
+                <span className="text-sm font-semibold text-slate-700">Risk Status</span>
+              </div>
+              <p className="text-lg font-bold text-slate-400">Pending Analysis</p>
+            </Card>
+          </div>
+
+          {/* Progress Indicator */}
+          <Card className="p-6 mb-10 bg-white border-slate-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-800">Profile Completion Status</h3>
+              <span className="text-2xl font-bold text-brand-blue">{progressPercentage}%</span>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-brand-blue to-brand-orange rounded-full transition-all duration-500"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+            
+            {/* Progress Steps */}
+            <div className="flex items-center justify-between">
+              {progressSteps.map((step, index) => (
+                <div key={step.id} className="flex items-center">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+                      step.completed 
+                        ? 'bg-green-100 text-green-600' 
+                        : 'bg-slate-100 text-slate-400'
+                    }`}>
+                      {step.completed ? (
+                        <CheckCircle2 className="w-5 h-5" />
+                      ) : (
+                        <Circle className="w-5 h-5" />
+                      )}
+                    </div>
+                    <span className={`text-xs font-medium ${
+                      step.completed ? 'text-green-600' : 'text-slate-400'
+                    }`}>
+                      {step.label}
+                    </span>
+                    {!step.completed && (
+                      <span className="text-[10px] text-slate-400 mt-0.5">Pending</span>
+                    )}
+                  </div>
+                  {index < progressSteps.length - 1 && (
+                    <div className={`w-16 md:w-24 h-0.5 mx-2 ${
+                      step.completed ? 'bg-green-200' : 'bg-slate-200'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => navigate('/arthvyay/questionnaire')}
+              className="bg-brand-blue hover:bg-blue-800 text-white rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+              data-testid="start-analysis-btn"
+            >
+              Start Financial Analysis
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => toast.info('Bank statement upload coming soon!')}
+              className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 rounded-full px-8 py-6 text-lg transition-all"
+              data-testid="upload-statement-btn"
+            >
+              <Upload className="w-5 h-5 mr-2" />
+              Upload Bank Statement
+              <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Recommended</span>
+            </Button>
+          </div>
+
+          {/* Info Text */}
+          <p className="text-center text-sm text-slate-500 mt-8 max-w-2xl mx-auto">
+            Complete your financial profile to get your personalized ArthSthithi score, 
+            actionable insights, and a comprehensive financial health report.
+          </p>
         </div>
       </Layout>
     );
