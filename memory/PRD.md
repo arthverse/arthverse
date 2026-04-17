@@ -5,6 +5,27 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### ✅ Risk Meter, Performance Optimization & Future Automation APIs (Apr 17, 2026)
+**Risk Visualization Component:**
+- New `RiskMeter.js` with SVG semicircular gauge (Green → Safe, Yellow → Moderate, Red → Risky)
+- Derives risk level from ArthSthithi score: >=65 = Low/Safe, 35-64 = Medium/Moderate, <35 = High/Risky
+- Shows "Areas of Concern" from lowest-scoring financial components
+- Integrated into Dashboard ArthSthithi card with data-testid attributes
+- Backend `health-score-v2` API now returns `risk_level` and `risk_label` fields
+
+**Performance Optimization:**
+- React.lazy + Suspense code splitting for 6 heavy route components (Dashboard, FinancialQuestionnaire, Transactions, Reports, ArthRakshakDashboard, ArthRakshakFamily)
+- PageLoader fallback component during lazy loading
+- Landing, Auth, and Portal pages kept eagerly loaded for fast initial render
+
+**Future Automation Placeholder APIs:**
+- `GET /api/integrations/account-aggregator` - AA framework placeholder
+- `GET /api/integrations/email-parsing` - Email parsing placeholder
+- `GET /api/integrations/sms-parsing` - SMS parsing placeholder
+- `GET /api/integrations/portfolio-sync` - Portfolio sync placeholder
+- `GET /api/integrations/status` - Aggregated status of all integration modules
+- All APIs are auth-protected and return structured IntegrationStatus responses
+
 ### ✅ Code Quality & Component Refactoring (Apr 9, 2026)
 **Python Backend Fixes:**
 - Replaced `random` with `secrets` module for secure ID generation
