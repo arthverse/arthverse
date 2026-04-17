@@ -743,9 +743,22 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
     };
   }, [score]);
 
+  // Calculate age from date of birth
+  const calculateAge = (dob) => {
+    if (!dob) return 35;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const userName = userData?.name || 'User';
   const userCity = userData?.city || 'India';
-  const userAge = userData?.age || 35;
+  const userAge = userData?.age || calculateAge(userData?.date_of_birth) || 35;
   const clientId = userData?.client_id || 'N/A';
   const reportDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
