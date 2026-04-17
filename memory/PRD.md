@@ -13,9 +13,11 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Score band now displayed as styled pill badge (e.g., VERY GOOD in green)
 - Subtitle: "A diagnostic overview of your financial health based on 10 key factors"
 
-**ArthMitraReport.js Refactoring (2994 → 2477 lines, -517 lines):**
+**ArthMitraReport.js Refactoring (2994 → 1026 lines, -66%):**
 - Extracted `PILLAR_DETAILS` constant (252 lines) → `report/pillarData.js`
 - Extracted CSS string (353 lines) → `report/reportStyles.js`
+- Extracted Financial Opportunity Analyzer (955 lines) → `report/FinancialOpportunityAnalyzer.js`
+- Extracted 10-Factor Analysis + Pillar Modals (530 lines) → `report/TenFactorAnalysis.js`
 - Updated `report/index.js` to re-export new modules
 
 **FinancialQuestionnaire.js Refactoring (2705 → 2507 lines, -198 lines):**
