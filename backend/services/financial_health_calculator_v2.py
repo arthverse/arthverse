@@ -1111,12 +1111,25 @@ def calculate_financial_health_score(data: Dict[str, Any]) -> Dict[str, Any]:
         band = "NEEDS ATTENTION"
         band_description = "Significant improvements needed. Consider seeking professional financial advice."
     
+    # Determine risk level
+    if normalized_score >= 65:
+        risk_level = "low"
+        risk_label = "Low Risk"
+    elif normalized_score >= 35:
+        risk_level = "medium"
+        risk_label = "Medium Risk"
+    else:
+        risk_level = "high"
+        risk_label = "High Risk"
+    
     return {
         "normalized_score": normalized_score,
         "raw_score": round(total_raw_score, 1),
         "max_points": total_max_points,
         "band": band,
         "band_description": band_description,
+        "risk_level": risk_level,
+        "risk_label": risk_label,
         "components": components,
         "summary": {
             "total_assets": round(total_assets, 0),

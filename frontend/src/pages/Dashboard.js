@@ -13,6 +13,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import PaymentSection from '../components/PaymentSection';
 import AnalysisResults from '../components/AnalysisResults';
 import ArthMitraReport from '../components/ArthMitraReport';
+import RiskMeter from '../components/RiskMeter';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
@@ -425,6 +426,12 @@ Check your score too! 👇
                   </div>
                 </Card>
                 
+                {/* Risk Meter */}
+                <RiskMeter
+                  score={healthScore?.score || 0}
+                  components={healthScore?.components || []}
+                />
+
                 {/* WhatsApp Share Button */}
                 <Button
                   onClick={handleWhatsAppShare}
