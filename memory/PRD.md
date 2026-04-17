@@ -5,6 +5,23 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### ✅ ArthSthithi Financial Diagnosis Redesign & Code Refactoring (Apr 17, 2026)
+**Dashboard ArthSthithi Redesign:**
+- Renamed to "Your ArthSthithi Financial Score" with "FINANCIAL DIAGNOSIS" label
+- Added score-based color accent bar at top of card (green >=65, amber 35-64, red <35)
+- Added animated "Live" pulse badge next to the label
+- Score band now displayed as styled pill badge (e.g., VERY GOOD in green)
+- Subtitle: "A diagnostic overview of your financial health based on 10 key factors"
+
+**ArthMitraReport.js Refactoring (2994 → 2477 lines, -517 lines):**
+- Extracted `PILLAR_DETAILS` constant (252 lines) → `report/pillarData.js`
+- Extracted CSS string (353 lines) → `report/reportStyles.js`
+- Updated `report/index.js` to re-export new modules
+
+**FinancialQuestionnaire.js Refactoring (2705 → 2507 lines, -198 lines):**
+- Extracted `defaultFormData`, `generateId`, `ARRAY_FIELDS` → `questionnaire/formDefaults.js`
+- Simplified data loading with `ARRAY_FIELDS` loop
+
 ### ✅ Risk Meter, Performance Optimization & Future Automation APIs (Apr 17, 2026)
 **Risk Visualization Component:**
 - New `RiskMeter.js` with SVG semicircular gauge (Green → Safe, Yellow → Moderate, Red → Risky)
