@@ -369,19 +369,38 @@ Check your score too! 👇
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* ArthSthithi Card */}
-          <div className="col-span-1 md:col-span-4 bg-white rounded-2xl p-8 border border-slate-200 shadow-card" data-testid="arthsthithi-card">
+          {/* ArthSthithi Financial Diagnosis Card */}
+          <div className="col-span-1 md:col-span-4 bg-white rounded-2xl p-8 border border-slate-200 shadow-card relative overflow-hidden" data-testid="arthsthithi-card">
+            {/* Subtle diagnostic accent bar */}
+            <div className={`absolute top-0 left-0 right-0 h-1 ${
+              (healthScore?.score || 0) >= 65 ? 'bg-green-500' : (healthScore?.score || 0) >= 35 ? 'bg-amber-400' : 'bg-red-500'
+            }`} />
             <div className="flex flex-col md:flex-row items-start justify-between gap-8">
               <div className="flex-1">
-                <span className="text-xs uppercase tracking-widest text-brand-orange font-semibold">Aapki Financial Position</span>
-                <h2 className="text-3xl font-semibold font-heading mt-2 mb-1">ArthSthithi</h2>
-                <p className="text-sm text-slate-500 mb-4">Aapki ArthSthithi reflects your personal balance sheet strength.</p>
-                <div className={`text-6xl font-semibold font-heading tracking-tight mb-4 ${getScoreColor(healthScore?.score)}`} data-testid="arthsthithi-value">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs uppercase tracking-widest text-brand-orange font-semibold">Financial Diagnosis</span>
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    (healthScore?.score || 0) >= 65 ? 'bg-green-100 text-green-700' : (healthScore?.score || 0) >= 35 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                      (healthScore?.score || 0) >= 65 ? 'bg-green-500' : (healthScore?.score || 0) >= 35 ? 'bg-amber-500' : 'bg-red-500'
+                    }`} />
+                    Live
+                  </span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-semibold font-heading mt-1 mb-1" data-testid="diagnosis-title">Your ArthSthithi Financial Score</h2>
+                <p className="text-sm text-slate-500 mb-5">A diagnostic overview of your financial health based on 10 key factors.</p>
+                <div className={`text-6xl font-semibold font-heading tracking-tight mb-2 ${getScoreColor(healthScore?.score)}`} data-testid="arthsthithi-value">
                   {healthScore?.score || 0}<span className="text-3xl text-slate-400"> / 100</span>
                 </div>
-                <p className="text-lg font-medium text-slate-700 mb-4" data-testid="arthsthithi-status">
-                  {healthScore?.band || healthScore?.rating || 'FAIR'} — {healthScore?.band_description || 'Your financial health score'}
-                </p>
+                <div className="flex items-center gap-2 mb-4" data-testid="arthsthithi-status">
+                  <span className={`text-sm font-bold uppercase tracking-wide px-3 py-1 rounded-full ${
+                    (healthScore?.score || 0) >= 65 ? 'bg-green-50 text-green-700 border border-green-200' : (healthScore?.score || 0) >= 35 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-red-50 text-red-700 border border-red-200'
+                  }`}>
+                    {healthScore?.band || healthScore?.rating || 'FAIR'}
+                  </span>
+                  <span className="text-sm text-slate-600">{healthScore?.band_description || 'Your financial health score'}</span>
+                </div>
                 
                 {/* Disclaimer */}
                 <p className="text-xs text-slate-400 bg-slate-50 p-3 rounded-lg mb-6 border border-slate-100">
