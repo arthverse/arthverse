@@ -283,10 +283,23 @@ def calculate_emi_tolerance_score(
     vehicle_loan_emi: float,
     education_loan_emi: float,
     other_loan_emi: float,
-    age: int
+    age: int,
+    home_loan_rate: float = 8.5,
+    vehicle_loan_rate: float = 10.0,
+    education_loan_rate: float = 8.0,
+    other_loan_rate: float = 14.0
 ) -> Dict[str, Any]:
-    """Component 2: EMI Tolerance Ratio (20 points max)"""
+    """Component 2: EMI Tolerance Ratio (20 points max)
+    
+    Uses interest-rate-based weighting:
+    Weight_i = min(1.0, Loan_Interest_Rate_i / Reference_Rate)
+    Reference Rate = 12% (Nifty 50 long-run CAGR - opportunity cost of money)
+    
+    - Loans with rate < 12% are "building value" and get weighted down
+    - Loans with rate >= 12% get weight 1.0 (full penalty, no relief)
+    """
     max_points = 20
+    REFERENCE_RATE = 12.0  # Nifty 50 long-run CAGR
     
     if monthly_income <= 0:
         return {
@@ -296,8 +309,19 @@ def calculate_emi_tolerance_score(
             "details": {"status": "No Income Data"}
         }
     
+    # Calculate weights based on interest rates
+    home_loan_weight = min(1.0, home_loan_rate / REFERENCE_RATE)
+    vehicle_loan_weight = min(1.0, vehicle_loan_rate / REFERENCE_RATE)
+    education_loan_weight = min(1.0, education_loan_rate / REFERENCE_RATE)
+    other_loan_weight = min(1.0, other_loan_rate / REFERENCE_RATE)
+    
     total_emi = home_loan_emi + vehicle_loan_emi + education_loan_emi + other_loan_emi
-    adjusted_emi = (home_loan_emi * 0.7) + (vehicle_loan_emi * 0.8) + (education_loan_emi * 0.8) + (other_loan_emi * 1.0)
+    adjusted_emi = (
+        (home_loan_emi * home_loan_weight) + 
+        (vehicle_loan_emi * vehicle_loan_weight) + 
+        (education_loan_emi * education_loan_weight) + 
+        (other_loan_emi * other_loan_weight)
+    )
     
     actual_dti = total_emi / monthly_income
     adjusted_dti = adjusted_emi / monthly_income
@@ -351,11 +375,24 @@ def calculate_emi_tolerance_score(
             "dti_vs_tolerance": round(dti_as_percentage_of_tolerance, 1),
             "debt_level": debt_level,
             "status": status,
+            "reference_rate": REFERENCE_RATE,
             "emi_breakdown": {
                 "home_loan": home_loan_emi,
                 "vehicle_loan": vehicle_loan_emi,
                 "education_loan": education_loan_emi,
                 "other_loans": other_loan_emi
+            },
+            "weights": {
+                "home_loan": round(home_loan_weight, 2),
+                "vehicle_loan": round(vehicle_loan_weight, 2),
+                "education_loan": round(education_loan_weight, 2),
+                "other_loans": round(other_loan_weight, 2)
+            },
+            "interest_rates": {
+                "home_loan": home_loan_rate,
+                "vehicle_loan": vehicle_loan_rate,
+                "education_loan": education_loan_rate,
+                "other_loans": other_loan_rate
             }
         }
     }
@@ -951,6 +988,12 @@ def calculate_financial_health_score(data: Dict[str, Any]) -> Dict[str, Any]:
     education_loan_emi = data.get("education_loan_emi", 0)
     other_loan_emi = data.get("other_loan_emi", 0)
     
+    # Loan interest rates (default to typical market rates if not provided)
+    home_loan_rate = data.get("home_loan_rate", 8.5)
+    vehicle_loan_rate = data.get("vehicle_loan_rate", 10.0)
+    education_loan_rate = data.get("education_loan_rate", 8.0)
+    other_loan_rate = data.get("other_loan_rate", 14.0)
+    
     # Assets
     equity_mf = data.get("mutual_funds", 0)
     stocks = data.get("stocks", 0)
@@ -1006,7 +1049,8 @@ def calculate_financial_health_score(data: Dict[str, Any]) -> Dict[str, Any]:
     
     # 2. EMI Tolerance (20 pts)
     components.append(calculate_emi_tolerance_score(
-        monthly_income, home_loan_emi, vehicle_loan_emi, education_loan_emi, other_loan_emi, age
+        monthly_income, home_loan_emi, vehicle_loan_emi, education_loan_emi, other_loan_emi, age,
+        home_loan_rate, vehicle_loan_rate, education_loan_rate, other_loan_rate
     ))
     
     # 3. Emergency Fund (15 pts)

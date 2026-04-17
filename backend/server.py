@@ -362,6 +362,28 @@ async def verify_token(credentials: HTTPAuthorizationCredentials) -> str:
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
 
+def extract_loan_rate(loans: list, loan_type: str, default_rate: float) -> float:
+    """Extract interest rate for a specific loan type from loans array.
+    
+    Args:
+        loans: List of loan dictionaries
+        loan_type: Type of loan to search for (Home, Vehicle, Education, Personal, etc.)
+        default_rate: Default interest rate if loan not found
+    
+    Returns:
+        Interest rate for the loan type
+    """
+    if not loans:
+        return default_rate
+    
+    for loan in loans:
+        if isinstance(loan, dict) and loan.get("loan_type", "").lower() == loan_type.lower():
+            rate = loan.get("interest_rate", 0)
+            if rate > 0:
+                return rate
+    
+    return default_rate
+
 async def categorize_with_ai(description: str, amount: float) -> dict:
     """Use AI to categorize expenses"""
     try:
@@ -773,6 +795,12 @@ async def get_health_score_v2(credentials: HTTPAuthorizationCredentials = Depend
         "education_loan_emi": questionnaire.get("education_loan_emi", 0),
         "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
         
+        # Loan interest rates (extract from loans array if available)
+        "home_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Home", 8.5),
+        "vehicle_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Vehicle", 10.0),
+        "education_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Education", 8.0),
+        "other_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Personal", 14.0),
+        
         # Assets
         "mutual_funds": questionnaire.get("mutual_funds", 0),
         "stocks": questionnaire.get("stocks", 0),
@@ -903,6 +931,12 @@ async def get_opportunity_analysis(credentials: HTTPAuthorizationCredentials = D
         "vehicle_loan_emi": questionnaire.get("car_loan_emi", 0),
         "education_loan_emi": questionnaire.get("education_loan_emi", 0),
         "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
+        
+        # Loan interest rates (extract from loans array if available)
+        "home_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Home", 8.5),
+        "vehicle_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Vehicle", 10.0),
+        "education_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Education", 8.0),
+        "other_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Personal", 14.0),
         
         # Assets - Use *_value fields if available, fallback to original field names
         "bank_balance": questionnaire.get("bank_balance", 0),

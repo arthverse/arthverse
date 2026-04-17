@@ -201,11 +201,33 @@ def analyze_emi_gap(
     vehicle_loan_emi: float,
     education_loan_emi: float,
     other_loan_emi: float,
-    age: int
+    age: int,
+    home_loan_rate: float = 8.5,
+    vehicle_loan_rate: float = 10.0,
+    education_loan_rate: float = 8.0,
+    other_loan_rate: float = 14.0
 ) -> Dict[str, Any]:
-    """Component 2: EMI & ICR Gap"""
+    """Component 2: EMI & ICR Gap
+    
+    Uses interest-rate-based weighting:
+    Weight_i = min(1.0, Loan_Interest_Rate_i / Reference_Rate)
+    Reference Rate = 12% (Nifty 50 long-run CAGR - opportunity cost of money)
+    """
+    REFERENCE_RATE = 12.0
+    
+    # Calculate weights based on interest rates
+    home_loan_weight = min(1.0, home_loan_rate / REFERENCE_RATE)
+    vehicle_loan_weight = min(1.0, vehicle_loan_rate / REFERENCE_RATE)
+    education_loan_weight = min(1.0, education_loan_rate / REFERENCE_RATE)
+    other_loan_weight = min(1.0, other_loan_rate / REFERENCE_RATE)
+    
     total_emi = home_loan_emi + vehicle_loan_emi + education_loan_emi + other_loan_emi
-    adjusted_emi = (home_loan_emi * 0.7) + (vehicle_loan_emi * 0.8) + (education_loan_emi * 0.8) + (other_loan_emi * 1.0)
+    adjusted_emi = (
+        (home_loan_emi * home_loan_weight) + 
+        (vehicle_loan_emi * vehicle_loan_weight) + 
+        (education_loan_emi * education_loan_weight) + 
+        (other_loan_emi * other_loan_weight)
+    )
     
     tolerance = get_emi_tolerance(age)
     ideal_emi = monthly_income * tolerance
@@ -221,6 +243,7 @@ def analyze_emi_gap(
             "adjusted_emi": round(adjusted_emi, 0),
             "ideal_emi": round(ideal_emi, 0),
             "tolerance": round(tolerance * 100, 0),
+            "reference_rate": REFERENCE_RATE,
             "message": f"Your EMI is ₹{int(gap):,} higher than recommended. Consider prepayment or consolidation",
             "priority": "high" if gap > monthly_income * 0.1 else "medium",
             "emi_breakdown": {
@@ -228,6 +251,12 @@ def analyze_emi_gap(
                 "vehicle_loan": vehicle_loan_emi,
                 "education_loan": education_loan_emi,
                 "other_loans": other_loan_emi
+            },
+            "weights": {
+                "home_loan": round(home_loan_weight, 2),
+                "vehicle_loan": round(vehicle_loan_weight, 2),
+                "education_loan": round(education_loan_weight, 2),
+                "other_loans": round(other_loan_weight, 2)
             }
         }
     else:
@@ -734,6 +763,12 @@ def analyze_financial_opportunities(data: Dict[str, Any]) -> Dict[str, Any]:
     education_loan_emi = data.get("education_loan_emi", 0)
     other_loan_emi = data.get("other_loan_emi", 0)
     
+    # Loan interest rates (default to typical market rates if not provided)
+    home_loan_rate = data.get("home_loan_rate", 8.5)
+    vehicle_loan_rate = data.get("vehicle_loan_rate", 10.0)
+    education_loan_rate = data.get("education_loan_rate", 8.0)
+    other_loan_rate = data.get("other_loan_rate", 14.0)
+    
     # Assets - Use *_value fields if available, fallback to original field names
     savings_account = data.get("bank_balance", 0)
     sweep_fd = data.get("sweep_fd", 0)
@@ -787,7 +822,10 @@ def analyze_financial_opportunities(data: Dict[str, Any]) -> Dict[str, Any]:
         saving_opportunities.append(savings_result)
     
     # 2. EMI Gap
-    emi_result = analyze_emi_gap(monthly_income, home_loan_emi, vehicle_loan_emi, education_loan_emi, other_loan_emi, age)
+    emi_result = analyze_emi_gap(
+        monthly_income, home_loan_emi, vehicle_loan_emi, education_loan_emi, other_loan_emi, age,
+        home_loan_rate, vehicle_loan_rate, education_loan_rate, other_loan_rate
+    )
     if emi_result["type"] == "saving_opportunity":
         saving_opportunities.append(emi_result)
     
