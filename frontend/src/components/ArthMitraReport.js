@@ -60,32 +60,35 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   // Use 10-factor score if available, fallback to legacy score
   const score = tenFactorData?.normalized_score ?? healthScore?.score ?? healthScore?.overall_score ?? 80;
   
-  // Assets breakdown - use ?? to properly handle 0 values (|| treats 0 as falsy)
-  const bankBalance = questionnaire?.bank_balance ?? healthScore?.financials?.bank_balance ?? 0;
-  const mutualFunds = questionnaire?.mutual_funds_value ?? healthScore?.financials?.mutual_funds ?? 0;
-  const pfNps = questionnaire?.pf_nps_value ?? healthScore?.financials?.pf_nps ?? 0;
-  const stocks = questionnaire?.stocks_value ?? healthScore?.financials?.stocks ?? 0;
-  const fd = questionnaire?.fd_value ?? healthScore?.financials?.fd ?? 0;
-  const gold = questionnaire?.gold_value ?? healthScore?.financials?.gold ?? 0;
-  const realEstate = questionnaire?.real_estate_value ?? healthScore?.financials?.real_estate ?? 0;
-  const emergencyFund = questionnaire?.emergency_fund ?? healthScore?.financials?.emergency_fund ?? 0;
-  const totalAssets = bankBalance + mutualFunds + pfNps + stocks + fd + gold + realEstate + emergencyFund;
+  // Assets breakdown (spec-aligned field names)
+  const bankBalance = questionnaire?.bank_savings_balance ?? 0;
+  const sweepFd = questionnaire?.sweep_fd_balance ?? 0;
+  const liquidMf = questionnaire?.liquid_mf_balance ?? 0;
+  const mutualFunds = questionnaire?.equity_mf_current_value ?? 0;
+  const pfNps = questionnaire?.ppf_nps_balance ?? 0;
+  const stocks = questionnaire?.direct_stocks_value ?? 0;
+  const fd = questionnaire?.regular_fd_balance ?? 0;
+  const debtMf = questionnaire?.debt_mf_bonds_value ?? 0;
+  const gold = questionnaire?.gold_silver_value ?? 0;
+  const realEstate = (questionnaire?.real_estate_primary_value ?? 0) + (questionnaire?.real_estate_investment_value ?? 0);
+  const emergencyFund = bankBalance + sweepFd + liquidMf;
+  const totalAssets = bankBalance + sweepFd + liquidMf + mutualFunds + pfNps + stocks + fd + debtMf + gold + realEstate + (questionnaire?.ulip_endowment_value ?? 0) + (questionnaire?.other_assets ?? 0) + (questionnaire?.cash_in_hand ?? 0);
 
-  // Liabilities breakdown - use ?? to properly handle 0 values
-  const homeLoan = questionnaire?.home_loan ?? healthScore?.financials?.home_loan ?? 0;
-  const personalLoan = questionnaire?.personal_loan ?? healthScore?.financials?.personal_loan ?? 0;
-  const carLoan = questionnaire?.car_loan ?? healthScore?.financials?.car_loan ?? 0;
-  const creditCardDebt = questionnaire?.credit_card_debt ?? healthScore?.financials?.credit_card_debt ?? 0;
-  const otherLoans = questionnaire?.other_loans ?? healthScore?.financials?.other_loans ?? 0;
-  const totalLiabilities = homeLoan + personalLoan + carLoan + creditCardDebt + otherLoans;
+  // Liabilities breakdown (spec-aligned)
+  const homeLoan = questionnaire?.home_loan_outstanding ?? 0;
+  const personalLoan = questionnaire?.personal_loan_outstanding ?? 0;
+  const carLoan = questionnaire?.vehicle_loan_outstanding ?? 0;
+  const creditCardDebt = questionnaire?.credit_card_outstanding ?? 0;
+  const otherLoans = 0;
+  const totalLiabilities = homeLoan + personalLoan + carLoan + creditCardDebt;
 
   const netWorth = totalAssets - totalLiabilities;
 
-  // EMI calculations
+  // EMI calculations (spec-aligned)
   const homeLoanEMI = questionnaire?.home_loan_emi || 0;
   const personalLoanEMI = questionnaire?.personal_loan_emi || 0;
-  const carLoanEMI = questionnaire?.car_loan_emi || 0;
-  const totalEMI = homeLoanEMI + personalLoanEMI + carLoanEMI;
+  const carLoanEMI = questionnaire?.vehicle_loan_emi || 0;
+  const totalEMI = homeLoanEMI + personalLoanEMI + carLoanEMI + (questionnaire?.education_loan_emi || 0) + (questionnaire?.other_loans_emi || 0);
   const emiRatio = income > 0 ? ((totalEMI / income) * 100).toFixed(1) : 0;
 
   // ═══ POTENTIAL SAVINGS FORMULA ═══
@@ -678,18 +681,25 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           </div>
           <div style={{padding:'16px'}}>
             {(() => {
-              // Calculate totals from actual user-filled data only
-              const salaryIncome = questionnaire?.salary_income ?? 0;
-              const rentalIncome = (questionnaire?.rental_property1 ?? 0) + (questionnaire?.rental_property2 ?? 0);
-              const calculatedTotalIncome = salaryIncome + rentalIncome;
+              // Calculate totals from spec-aligned fields
+              const salaryIncome = questionnaire?.monthly_salary_net ?? 0;
+              const businessIncome = questionnaire?.monthly_business_income ?? 0;
+              const rentalIncome = questionnaire?.monthly_rental_income ?? 0;
+              const otherIncome = questionnaire?.monthly_other_income ?? 0;
+              const calculatedTotalIncome = salaryIncome + businessIncome + rentalIncome + otherIncome;
               
               return (
                 <>
-                  {/* Summary View - Only show user-filled data */}
                   {salaryIncome > 0 && (
                     <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Salary/Business</span>
+                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Salary (Net Take-Home)</span>
                       <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(salaryIncome)}/mo</span>
+                    </div>
+                  )}
+                  {businessIncome > 0 && (
+                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Business / Professional</span>
+                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(businessIncome)}/mo</span>
                     </div>
                   )}
                   {rentalIncome > 0 && (
@@ -698,37 +708,36 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
                       <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(rentalIncome)}/mo</span>
                     </div>
                   )}
+                  {otherIncome > 0 && (
+                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Other Income</span>
+                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(otherIncome)}/mo</span>
+                    </div>
+                  )}
                   
-                  {/* Detailed View */}
                   {showIncomeDetails && (
                     <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'2px solid var(--border)'}}>
-                      <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'10px'}}>DETAILED BREAKDOWN</div>
+                      <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'10px'}}>ADDITIONAL DETAILS</div>
                       <div style={{background:'var(--bg3)',borderRadius:'var(--r8)',padding:'12px'}}>
-                        {salaryIncome > 0 && (
-                          <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
-                            <span style={{color:'var(--t2)'}}>Salary/Business Income</span>
-                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(salaryIncome)}</span>
+                        {(questionnaire?.employer_epf_monthly ?? 0) > 0 && (
+                          <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                            <span style={{color:'var(--t2)'}}>Employer EPF</span>
+                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.employer_epf_monthly)}/mo</span>
                           </div>
                         )}
-                        {(questionnaire?.rental_property1 ?? 0) > 0 && (
-                          <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px',borderTop:'1px dashed var(--border)',marginTop:'6px',paddingTop:'8px'}}>
-                            <span style={{color:'var(--t2)'}}>Rental Property 1</span>
-                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.rental_property1)}</span>
-                          </div>
-                        )}
-                        {(questionnaire?.rental_property2 ?? 0) > 0 && (
-                          <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px'}}>
-                            <span style={{color:'var(--t2)'}}>Rental Property 2</span>
-                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.rental_property2)}</span>
+                        {(questionnaire?.annual_bonus ?? 0) > 0 && (
+                          <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
+                            <span style={{color:'var(--t2)'}}>Annual Bonus</span>
+                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.annual_bonus)}/yr</span>
                           </div>
                         )}
                       </div>
                       <div style={{marginTop:'10px',padding:'10px',background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r8)'}}>
-                        <div style={{fontSize:'10px',fontWeight:700,color:'#166534',marginBottom:'4px'}}>💡 Income Optimization Tips</div>
+                        <div style={{fontSize:'10px',fontWeight:700,color:'#166534',marginBottom:'4px'}}>Income Optimization Tips</div>
                         <div style={{fontSize:'10px',color:'#15803D',lineHeight:1.5}}>
-                          • Consider dividend-paying stocks for passive income<br/>
-                          • Move low-interest savings to liquid MF for better returns<br/>
-                          • Explore freelance/consulting for additional income
+                          {`\u2022`} Consider SIP in index funds for wealth creation<br/>
+                          {`\u2022`} Move idle savings to liquid MF for better returns<br/>
+                          {`\u2022`} Tax planning: utilize Section 80C, 80D deductions
                         </div>
                       </div>
                     </div>
@@ -760,135 +769,51 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           </div>
           <div style={{padding:'16px'}}>
             {(() => {
-              // Calculate totals from actual user-filled data only
-              const housingExpenses = (questionnaire?.rent_expense ?? 0) + (questionnaire?.telecom_utilities ?? 0);
-              const foodExpenses = (questionnaire?.food_groceries ?? 0) + (questionnaire?.groceries ?? 0);
-              const healthExpenses = questionnaire?.healthcare ?? 0;
-              const transportExpenses = questionnaire?.transport_fuel ?? 0;
-              const lifestyleExpenses = (questionnaire?.entertainment ?? 0) + (questionnaire?.shopping ?? 0) + (questionnaire?.other_expenses ?? 0);
-              const calculatedTotalExpenses = housingExpenses + foodExpenses + healthExpenses + transportExpenses + lifestyleExpenses;
+              // Calculate totals from spec-aligned fields
+              const housingExpenses = questionnaire?.monthly_rent_or_emi_home ?? 0;
+              const groceryExpenses = questionnaire?.monthly_groceries ?? 0;
+              const utilityExpenses = questionnaire?.monthly_utilities ?? 0;
+              const transportExpenses = questionnaire?.monthly_transport ?? 0;
+              const educationExpenses = questionnaire?.monthly_education ?? 0;
+              const foodDiningExpenses = questionnaire?.monthly_food_eating_out ?? 0;
+              const entertainmentExpenses = questionnaire?.monthly_entertainment ?? 0;
+              const medicalExpenses = questionnaire?.monthly_medical ?? 0;
+              const insurancePremiums = questionnaire?.monthly_insurance_premiums ?? 0;
+              const sipInvestments = questionnaire?.monthly_investments_sip ?? 0;
+              const otherExp = questionnaire?.monthly_other_expenses ?? 0;
+              const calculatedTotalExpenses = housingExpenses + groceryExpenses + utilityExpenses + transportExpenses + educationExpenses + foodDiningExpenses + entertainmentExpenses + medicalExpenses + insurancePremiums + sipInvestments + otherExp;
+              
+              const expenseItems = [
+                { label: 'Rent / Home EMI', value: housingExpenses },
+                { label: 'Groceries & Household', value: groceryExpenses },
+                { label: 'Utilities', value: utilityExpenses },
+                { label: 'Transport', value: transportExpenses },
+                { label: 'Education', value: educationExpenses },
+                { label: 'Food & Dining', value: foodDiningExpenses },
+                { label: 'Entertainment', value: entertainmentExpenses },
+                { label: 'Medical', value: medicalExpenses },
+                { label: 'Insurance Premiums', value: insurancePremiums },
+                { label: 'SIP / Investments', value: sipInvestments },
+                { label: 'Other', value: otherExp },
+              ].filter(item => item.value > 0);
               
               return (
                 <>
-                  {/* Summary View - Only show user-filled data */}
-                  {housingExpenses > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Housing & Utilities</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(housingExpenses)}/mo</span>
+                  {expenseItems.map((item) => (
+                    <div key={item.label} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+                      <span style={{fontSize:'12px',color:'var(--t2)'}}>{item.label}</span>
+                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(item.value)}/mo</span>
                     </div>
-                  )}
-                  {foodExpenses > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Food & Groceries</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(foodExpenses)}/mo</span>
-                    </div>
-                  )}
-                  {healthExpenses > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Healthcare & Medical</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(healthExpenses)}/mo</span>
-                    </div>
-                  )}
-                  {transportExpenses > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Transport & Fuel</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(transportExpenses)}/mo</span>
-                    </div>
-                  )}
-                  {lifestyleExpenses > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Lifestyle & Entertainment</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(lifestyleExpenses)}/mo</span>
-                    </div>
-                  )}
+                  ))}
                   
-                  {/* Detailed View */}
                   {showExpenseDetails && (
                     <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'2px solid var(--border)'}}>
-                      <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'10px'}}>DETAILED BREAKDOWN</div>
-                      <div style={{background:'var(--bg3)',borderRadius:'var(--r8)',padding:'12px'}}>
-                        {/* Housing */}
-                        {housingExpenses > 0 && (
-                          <>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginBottom:'6px'}}>🏠 HOUSING</div>
-                            {(questionnaire?.rent_expense ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Rent/EMI</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.rent_expense)}</span>
-                              </div>
-                            )}
-                            {(questionnaire?.telecom_utilities ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Utilities</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.telecom_utilities)}</span>
-                              </div>
-                            )}
-                          </>
-                        )}
-                        
-                        {/* Food & Groceries */}
-                        {foodExpenses > 0 && (
-                          <>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🛒 FOOD & GROCERIES</div>
-                            {(questionnaire?.groceries ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Groceries</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.groceries)}</span>
-                              </div>
-                            )}
-                            {(questionnaire?.food_groceries ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Food</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.food_groceries)}</span>
-                              </div>
-                            )}
-                          </>
-                        )}
-                        
-                        {/* Healthcare */}
-                        {healthExpenses > 0 && (
-                          <>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🏥 HEALTHCARE</div>
-                            <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                              <span style={{color:'var(--t2)'}}>Medical & Healthcare</span>
-                              <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.healthcare)}</span>
-                            </div>
-                          </>
-                        )}
-                        
-                        {/* Lifestyle */}
-                        {lifestyleExpenses > 0 && (
-                          <>
-                            <div style={{fontSize:'9px',fontWeight:700,color:'var(--blu)',letterSpacing:'.05em',marginTop:'10px',marginBottom:'6px'}}>🎯 LIFESTYLE</div>
-                            {(questionnaire?.entertainment ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Entertainment & Dining</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.entertainment)}</span>
-                              </div>
-                            )}
-                            {(questionnaire?.shopping ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Shopping & Personal</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.shopping)}</span>
-                              </div>
-                            )}
-                            {(questionnaire?.other_expenses ?? 0) > 0 && (
-                              <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                                <span style={{color:'var(--t2)'}}>Other Expenses</span>
-                                <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.other_expenses)}</span>
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                      
-                      {/* Expense Analysis */}
                       <div style={{marginTop:'10px',padding:'10px',background:'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',borderRadius:'var(--r8)'}}>
-                        <div style={{fontSize:'10px',fontWeight:700,color:'#92400E',marginBottom:'4px'}}>📊 Expense Analysis</div>
+                        <div style={{fontSize:'10px',fontWeight:700,color:'#92400E',marginBottom:'4px'}}>Expense Analysis</div>
                         <div style={{fontSize:'10px',color:'#B45309',lineHeight:1.5}}>
-                          • Savings Rate: <strong>{(((questionnaire?.salary_income ?? 0) + ((questionnaire?.rental_property1 ?? 0) + (questionnaire?.rental_property2 ?? 0)) - calculatedTotalExpenses) / ((questionnaire?.salary_income ?? 1) + ((questionnaire?.rental_property1 ?? 0) + (questionnaire?.rental_property2 ?? 0))) * 100).toFixed(1)}%</strong><br/>
-                          • Housing-to-Income: <strong>{(((questionnaire?.rent_expense ?? 0) / ((questionnaire?.salary_income ?? 1) + ((questionnaire?.rental_property1 ?? 0) + (questionnaire?.rental_property2 ?? 0)))) * 100).toFixed(1)}%</strong><br/>
-                          • Monthly Surplus: <strong>{formatINR(((questionnaire?.salary_income ?? 0) + ((questionnaire?.rental_property1 ?? 0) + (questionnaire?.rental_property2 ?? 0))) - calculatedTotalExpenses)}</strong>
+                          {`\u2022`} Savings Rate: <strong>{savingsRate}%</strong><br/>
+                          {`\u2022`} Housing-to-Income: <strong>{income > 0 ? ((housingExpenses / income) * 100).toFixed(1) : 0}%</strong><br/>
+                          {`\u2022`} Monthly Surplus: <strong>{formatINR(income - calculatedTotalExpenses)}</strong>
                         </div>
                       </div>
                     </div>
