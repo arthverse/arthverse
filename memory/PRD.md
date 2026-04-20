@@ -5,6 +5,17 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+**Credit Health Report Module (Apr 20, 2026):**
+- New page `/arthvyay/credit-health` — full CIBIL improvement system
+- Backend: `credit_health_engine.py` generates personalized recommendations from 8 credit inputs
+- API: `POST /api/credit/analyze`, `GET /api/credit/profile`, `GET /api/credit/history`
+- MongoDB collection `credit_profiles` with score history (last 12 entries)
+- 4-part report: Score Band → Loan Impact → Top 3 Actions (ranked by impact) → 6-Month Plan
+- Input form: CIBIL score, credit limit, usage, EMI history, loan count, enquiries, credit age, credit mix
+- Auto-calculated utilisation ratio with red/green indicator
+- Score history tracking with diff badges (+/- from previous)
+- CIBILScore component updated with "View Credit Report" button linking to new page
+
 **Plain-Language Insights "Explained Simply" (Apr 20, 2026):**
 - Created `componentInsights.js` — generates personalized Ideal vs Actual messages for all 10 scoring components
 - Each component shows: score, On Track/Needs Attention badge, plain-language message with user's actual amounts, Actual vs Ideal comparison boxes

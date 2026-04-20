@@ -13,6 +13,7 @@ const Transactions = lazy(() => import('./pages/Transactions'));
 const Reports = lazy(() => import('./pages/Reports'));
 const ArthRakshakDashboard = lazy(() => import('./pages/ArthRakshakDashboard'));
 const ArthRakshakFamily = lazy(() => import('./pages/ArthRakshakFamily'));
+const CreditHealthReport = lazy(() => import('./pages/CreditHealthReport'));
 
 function PageLoader() {
   return (
@@ -100,6 +101,10 @@ function App() {
             <Route 
               path="/arthvyay/reports" 
               element={token ? <Reports token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+            />
+            <Route 
+              path="/arthvyay/credit-health" 
+              element={token ? <CreditHealthReport token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
             />
 
             {/* ArthRakshak App Routes */}

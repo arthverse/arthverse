@@ -907,7 +907,7 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       />
 
       {/* 7. CURRENT CIBIL SCORE */}
-      <CIBILScore totalLiabilities={totalLiabilities} />
+      <CIBILScore totalLiabilities={totalLiabilities} cibilScore={questionnaire?.cibil_score} />
 
       {/* 8. KNOW YOUR RETIREMENT AGE */}
       <RetirementAge netWorth={netWorth} expenses={expenses} formatINR2={formatINR2} />

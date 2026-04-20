@@ -2039,10 +2039,12 @@ _set_db(db)
 from routes.auth import router as auth_router
 from routes.questionnaire import router as questionnaire_router
 from routes.integrations import router as integrations_router
+from routes.credit import router as credit_router
 
 api_router.include_router(auth_router)
 api_router.include_router(questionnaire_router)
 api_router.include_router(integrations_router)
+api_router.include_router(credit_router)
 
 app.include_router(api_router)
 
