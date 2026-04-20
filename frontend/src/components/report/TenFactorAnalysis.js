@@ -26,6 +26,7 @@ export default function TenFactorAnalysis({
   carLoan,
 }) {
   const [selectedPillar, setSelectedPillar] = useState(null);
+  const [showRupeeView, setShowRupeeView] = useState(false);
 
   return (
     <>
@@ -333,13 +334,15 @@ export default function TenFactorAnalysis({
               };
             case 'Asset Allocation':
               const alloc = d.allocation_by_class || {};
+              const allocTotalAssets = d.total_assets || totalAssets || 1;
               return {
-                metrics: Object.entries(alloc).map(([asset, data]) => ({
+                metrics: Object.entries(alloc).map(([asset, assetData]) => ({
                   label: asset.charAt(0).toUpperCase() + asset.slice(1).replace(/_/g, ' '),
-                  actual: `${data.actual?.toFixed(1)}%`,
-                  ideal: `${data.ideal}%`,
-                  isGood: Math.abs(data.actual - data.ideal) <= 10
+                  actual: showRupeeView ? `₹${((assetData.value || 0)/100000).toFixed(2)}L` : `${assetData.actual?.toFixed(1)}%`,
+                  ideal: showRupeeView ? `₹${((assetData.ideal / 100 * allocTotalAssets)/100000).toFixed(2)}L` : `${assetData.ideal}%`,
+                  isGood: Math.abs(assetData.actual - assetData.ideal) <= 10
                 })),
+                hasRupeeToggle: true,
                 tips: [
                   'Rebalance portfolio annually to maintain target allocation',
                   'Use age-based allocation: (100 - age)% in equity',
@@ -445,9 +448,27 @@ export default function TenFactorAnalysis({
                 {/* Actual vs Ideal Comparison Table */}
                 {comparisonData.metrics.length > 0 && (
                   <div style={{marginBottom:'24px'}}>
-                    <h4 style={{fontSize:'13px',fontWeight:700,marginBottom:'12px',color:'#18170F',display:'flex',alignItems:'center',gap:'8px'}}>
-                      <span>📊</span> Actual vs Ideal
-                    </h4>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                      <h4 style={{fontSize:'13px',fontWeight:700,color:'#18170F',display:'flex',alignItems:'center',gap:'8px',margin:0}}>
+                        <span>&#x1F4CA;</span> Actual vs Ideal
+                      </h4>
+                      {comparisonData.hasRupeeToggle && (
+                        <button
+                          onClick={() => setShowRupeeView(!showRupeeView)}
+                          data-testid="rupee-percent-toggle"
+                          style={{
+                            padding:'4px 12px',borderRadius:'16px',fontSize:'10px',fontWeight:700,
+                            background: showRupeeView ? '#2563EB' : '#F1F5F9',
+                            color: showRupeeView ? '#fff' : '#475569',
+                            border:'1px solid',borderColor: showRupeeView ? '#2563EB' : '#CBD5E1',
+                            cursor:'pointer',transition:'all .2s',display:'flex',alignItems:'center',gap:'4px'
+                          }}
+                        >
+                          {showRupeeView ? '₹ Rupees' : '% Percent'}
+                          <span style={{fontSize:'8px'}}>{showRupeeView ? '→ %' : '→ ₹'}</span>
+                        </button>
+                      )}
+                    </div>
                     <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',background:'#F7F6F3',borderRadius:'10px',overflow:'hidden'}}>
                       <thead>
                         <tr style={{background:'#E5E4E0'}}>

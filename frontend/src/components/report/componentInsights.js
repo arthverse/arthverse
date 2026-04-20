@@ -109,22 +109,30 @@ export function generateComponentInsight(componentName, details, data) {
     }
 
     case 'Asset Allocation': {
-      const equityPct = totalAssets > 0 ? ((mutualFunds + stocks) / totalAssets * 100).toFixed(0) : 0;
-      const debtPct = totalAssets > 0 ? ((fd + pfNps) / totalAssets * 100).toFixed(0) : 0;
-      const goldPct = totalAssets > 0 ? (gold / totalAssets * 100).toFixed(0) : 0;
+      // Use backend-calculated ideal allocation if available
+      const alloc = details?.allocation_by_class || {};
+      const idealAlloc = details?.ideal_allocation || {};
+      const equityPct = alloc.equity?.actual?.toFixed(0) ?? (totalAssets > 0 ? ((mutualFunds + stocks) / totalAssets * 100).toFixed(0) : 0);
+      const debtPct = alloc.debt?.actual?.toFixed(0) ?? (totalAssets > 0 ? ((fd + pfNps) / totalAssets * 100).toFixed(0) : 0);
+      const goldPct = alloc.metals?.actual?.toFixed(0) ?? (totalAssets > 0 ? (gold / totalAssets * 100).toFixed(0) : 0);
+      const rePct = alloc.real_estate?.actual?.toFixed(0) ?? (totalAssets > 0 ? (realEstate / totalAssets * 100).toFixed(0) : 0);
+      const idealEq = idealAlloc.equity ?? 43;
+      const idealDt = idealAlloc.debt ?? 22;
+      const idealGd = idealAlloc.metals ?? 8;
+      const idealRe = idealAlloc.real_estate ?? 27;
       if (isGood) {
         return {
           isGood: true,
-          message: `Your money is spread wisely — Equity ${equityPct}%, Debt ${debtPct}%, Gold ${goldPct}%. This balance helps reduce risk and improves long-term growth.`,
-          actual: `Equity ${equityPct}% | Debt ${debtPct}% | Gold ${goldPct}%`,
-          ideal: 'Equity 40-50% | Debt 25-30% | Gold 5-10%',
+          message: `Your money is spread wisely — Equity ${equityPct}%, Debt ${debtPct}%, Real Estate ${rePct}%, Metals ${goldPct}%. This balance helps reduce risk and improves long-term growth.`,
+          actual: `Eq ${equityPct}% | Debt ${debtPct}% | RE ${rePct}% | Metals ${goldPct}%`,
+          ideal: `Eq ${idealEq}% | Debt ${idealDt}% | RE ${idealRe}% | Metals ${idealGd}%`,
         };
       }
       return {
         isGood: false,
-        message: `Most of your money is concentrated in one area (Equity ${equityPct}%, Debt ${debtPct}%, Gold ${goldPct}%). Spreading it across different assets can protect your wealth and improve long-term returns.`,
-        actual: `Equity ${equityPct}% | Debt ${debtPct}% | Gold ${goldPct}%`,
-        ideal: 'Equity 40-50% | Debt 25-30% | Gold 5-10%',
+        message: `Your allocation is imbalanced — Equity ${equityPct}% (ideal ${idealEq}%), Debt ${debtPct}% (ideal ${idealDt}%), Real Estate ${rePct}% (ideal ${idealRe}%), Metals ${goldPct}% (ideal ${idealGd}%). Rebalancing can protect your wealth and improve returns.`,
+        actual: `Eq ${equityPct}% | Debt ${debtPct}% | RE ${rePct}% | Metals ${goldPct}%`,
+        ideal: `Eq ${idealEq}% | Debt ${idealDt}% | RE ${idealRe}% | Metals ${idealGd}%`,
       };
     }
 
