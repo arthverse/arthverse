@@ -394,6 +394,14 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
         formatINR2={formatINR2}
         expandedRows={expandedRows}
         toggleRow={toggleRow}
+        totalAssets={totalAssets}
+        mutualFunds={mutualFunds}
+        stocks={stocks}
+        fd={fd}
+        pfNps={pfNps}
+        bankBalance={bankBalance}
+        gold={gold}
+        realEstate={realEstate}
       />
 
       {/* 3.5 TOP 3 HIGHEST IMPACT ACTIONS */}

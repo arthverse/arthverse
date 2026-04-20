@@ -10,6 +10,14 @@ export default function FinancialOpportunityAnalyzer({
   formatINR2,
   expandedRows,
   toggleRow,
+  totalAssets = 0,
+  mutualFunds = 0,
+  stocks = 0,
+  fd = 0,
+  pfNps = 0,
+  bankBalance = 0,
+  gold = 0,
+  realEstate = 0,
 }) {
   const [opportunityTab, setOpportunityTab] = useState('savings');
   const [expandedOpportunity, setExpandedOpportunity] = useState(null);
