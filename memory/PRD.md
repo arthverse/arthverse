@@ -5,6 +5,19 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### ✅ ArthMitra Data Input Spec Alignment — 84 Fields (Apr 20, 2026)
+**Complete field rename and restructuring to match ArthMitra_DataInput_Spec.xlsx:**
+
+**Section A (Profile):** Added `employment_type`, `cibil_score`, `pan_linked`
+**Section B (Income):** Renamed to `monthly_salary_net`, `monthly_business_income`, `monthly_rental_income`, `monthly_other_income`. Added `employer_epf_monthly`, `annual_bonus`, `tax_regime`, `annual_tax_paid`. Auto-computed `annual_income`.
+**Section C (Expenses):** Renamed to `monthly_rent_or_emi_home`, `monthly_groceries`, `monthly_utilities`, etc. (C1-C11). Auto-computed `total_monthly_expenses` (C12).
+**Section D (Assets):** Renamed to `bank_savings_balance`, `equity_mf_current_value`, `direct_stocks_value`, `ppf_nps_balance`, `gold_silver_value`, etc. Added cost-basis fields: `equity_mf_invested_amount`, `direct_stocks_cost`, `debt_mf_bonds_invested`, `gold_silver_cost`. Split real estate: `real_estate_primary_value` + `real_estate_investment_value`. Added `ulip_endowment_value`, `other_assets`.
+**Section E (Liabilities):** Renamed to `vehicle_loan_*`. Added interest rate fields per loan. Added `credit_card_emi_monthly`, `other_loans_emi`.
+**Section F (Insurance):** Added `has_term_life_insurance`, `has_ulip_endowment`, `ulip_endowment_cover/premium`, `health_insurance_type`, `family_members_covered`, `dependent_parents_covered`, `vehicle_idv`. Renamed premiums to `*_premium_annual`.
+**Section G (Habits):** Renamed to `habit_q1_health_insurance` through `habit_q7_invest_beyond_fd`.
+
+**Files updated:** formDefaults.js, IncomeStep.js, ExpenseStep.js, AssetsStep.js, StabilityStep.js, deps.py (Pydantic model), server.py (4 report endpoints).
+
 ### ✅ ArthSthithi Financial Diagnosis Redesign & Code Refactoring (Apr 17, 2026)
 **Dashboard ArthSthithi Redesign:**
 - Renamed to "Your ArthSthithi Financial Score" with "FINANCIAL DIAGNOSIS" label
