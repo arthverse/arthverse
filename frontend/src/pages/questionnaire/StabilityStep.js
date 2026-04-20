@@ -1,325 +1,230 @@
+import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Card } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 
-export default function StabilityStep({ 
-  formData, 
-  setFormData, 
-  addCreditCard, 
-  removeCreditCard,
-  creditCardsList
-}) {
+export default function StabilityStep({ formData, setFormData }) {
   return (
     <Card className="p-8 bg-white border border-slate-200 rounded-2xl mb-6">
-      <h2 className="text-2xl font-bold font-heading text-slate-900 mb-6">4. Financial Profile & Stability</h2>
+      <h2 className="text-2xl font-bold font-heading text-slate-900 mb-2" data-testid="stability-step-title">4. Insurance & Financial Habits</h2>
+      <p className="text-sm text-slate-600 mb-6">Section F (Insurance) and Section G (Financial Habits).</p>
       
       <div className="space-y-6">
-        {/* NEW: Profile & Demographics Section */}
-        <div>
-          <h3 className="text-lg font-semibold text-brand-blue mb-4">Profile & Demographics</h3>
-          <p className="text-sm text-slate-500 mb-4">This helps us customize benchmarks based on your location and family situation.</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="block mb-2 font-medium">City Tier</Label>
-              <Select value={formData.city_tier} onValueChange={(value) => setFormData({ ...formData, city_tier: value })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select city tier" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tier_1">Tier 1 (Mumbai, Delhi, Bangalore, etc.)</SelectItem>
-                  <SelectItem value="tier_2">Tier 2 (Pune, Jaipur, Lucknow, etc.)</SelectItem>
-                  <SelectItem value="tier_3">Tier 3 (Smaller cities)</SelectItem>
-                  <SelectItem value="tier_4">Tier 4 (District headquarters)</SelectItem>
-                  <SelectItem value="town">Town</SelectItem>
-                  <SelectItem value="village">Village</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label className="block mb-2 font-medium">Family Situation</Label>
-              <Select value={formData.family_situation} onValueChange={(value) => setFormData({ ...formData, family_situation: value })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select family situation" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="single_stable">Single / Stable Job</SelectItem>
-                  <SelectItem value="married_children">Married / With Children</SelectItem>
-                  <SelectItem value="family_elderly">Family with Elderly Parents</SelectItem>
-                  <SelectItem value="entrepreneur">Entrepreneur / Variable Income</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Life Insurance - Term */}
+        <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+          <h3 className="text-lg font-semibold text-brand-blue mb-4">Term Life Insurance (F1-F3)</h3>
+          <div className="flex items-center gap-3 mb-4">
+            <Checkbox
+              checked={formData.has_term_life_insurance}
+              onCheckedChange={(v) => setFormData({ ...formData, has_term_life_insurance: v })}
+              data-testid="has-term-life-checkbox"
+            />
+            <Label className="text-sm">I have a pure Term Life Insurance policy</Label>
           </div>
-        </div>
-        
-        {/* NEW: Insurance Coverage Section */}
-        <div>
-          <h3 className="text-lg font-semibold text-brand-blue mb-4">Insurance Coverage Details</h3>
-          <p className="text-sm text-slate-500 mb-4">Enter your insurance coverage amounts and annual premiums.</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-3">Life Insurance</h4>
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-sm">Coverage Amount (₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.life_insurance_coverage || ''}
-                    onChange={(e) => setFormData({ ...formData, life_insurance_coverage: parseFloat(e.target.value) || 0 })}
-                    placeholder="e.g., 10000000"
-                    className="bg-white"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm">Annual Premium (₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.life_insurance_premium || ''}
-                    onChange={(e) => setFormData({ ...formData, life_insurance_premium: parseFloat(e.target.value) || 0 })}
-                    placeholder="e.g., 15000"
-                    className="bg-white"
-                  />
-                </div>
+          {formData.has_term_life_insurance && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">F2. Sum Assured (Cover)</Label>
+                <Input type="number" data-testid="term-cover-input" value={formData.term_insurance_cover} onChange={(e) => setFormData({ ...formData, term_insurance_cover: Number(e.target.value) || 0 })} className="mt-1" placeholder="e.g., 1,00,00,000" />
               </div>
-            </div>
-            
-            <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-              <h4 className="font-semibold text-green-900 mb-3">Health Insurance</h4>
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-sm">Coverage Amount (₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.health_insurance_coverage || ''}
-                    onChange={(e) => setFormData({ ...formData, health_insurance_coverage: parseFloat(e.target.value) || 0 })}
-                    placeholder="e.g., 1000000"
-                    className="bg-white"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm">Annual Premium (₹)</Label>
-                  <Input
-                    type="number"
-                    value={formData.health_insurance_premium || ''}
-                    onChange={(e) => setFormData({ ...formData, health_insurance_premium: parseFloat(e.target.value) || 0 })}
-                    placeholder="e.g., 25000"
-                    className="bg-white"
-                  />
-                </div>
+              <div>
+                <Label className="text-sm font-medium">F3. Annual Premium</Label>
+                <Input type="number" value={formData.term_insurance_premium_annual} onChange={(e) => setFormData({ ...formData, term_insurance_premium_annual: Number(e.target.value) || 0 })} className="mt-1" placeholder="Yearly premium" />
               </div>
-            </div>
-            
-            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 md:col-span-2">
-              <h4 className="font-semibold text-amber-900 mb-3">Vehicle Insurance</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-sm">Do you own a vehicle?</Label>
-                  <Select value={formData.has_vehicle ? 'yes' : 'no'} onValueChange={(value) => setFormData({ ...formData, has_vehicle: value === 'yes' })}>
-                    <SelectTrigger className="bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {formData.has_vehicle && (
-                  <>
-                    <div>
-                      <Label className="text-sm">Insurance Type</Label>
-                      <Select value={formData.vehicle_insurance_type} onValueChange={(value) => setFormData({ ...formData, vehicle_insurance_type: value })}>
-                        <SelectTrigger className="bg-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="comprehensive">Comprehensive (Own Damage + TP)</SelectItem>
-                          <SelectItem value="third_party">Third Party Only</SelectItem>
-                          <SelectItem value="none">No Insurance</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-sm">Annual Premium (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.vehicle_insurance_premium || ''}
-                        onChange={(e) => setFormData({ ...formData, vehicle_insurance_premium: parseFloat(e.target.value) || 0 })}
-                        placeholder="e.g., 8000"
-                        className="bg-white"
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold text-brand-blue mb-4">Financial Stability Checkpoints</h3>
-          <p className="text-sm text-slate-500 mb-4">Answer these 7 questions to help us assess your financial discipline and stability.</p>
-          
-          <div className="space-y-5">
-            {/* Q1 - Health Insurance */}
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-amber-900">
-                Q1. Do you have a personal health insurance policy (not just employer-provided)?
-              </Label>
-              <Select value={formData.q1_health_insurance} onValueChange={(value) => setFormData({ ...formData, q1_health_insurance: value, has_health_insurance: value === 'yes_personal' })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes_personal">Yes – Personal/family floater policy (≥ ₹5L cover)</SelectItem>
-                  <SelectItem value="only_employer">No – Only employer-provided health cover</SelectItem>
-                  <SelectItem value="no_insurance">No health insurance at all</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Q2 - Term Life Insurance */}
-            <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-orange-900">
-                Q2. Do you have a pure Term Life Insurance policy?
-              </Label>
-              <Select value={formData.q2_term_insurance} onValueChange={(value) => setFormData({ ...formData, q2_term_insurance: value, has_term_insurance: value === 'yes_term' })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes_term">Yes – Pure term plan (coverage ≥ 10× annual income)</SelectItem>
-                  <SelectItem value="only_ulip">No – Only ULIP/Endowment/LIC money-back plan</SelectItem>
-                  <SelectItem value="no_insurance">No life insurance at all</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Q3 - ITR Filing */}
-            <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-green-900">
-                Q3. Do you file your Income Tax Return (ITR) every year before the deadline?
-              </Label>
-              <Select value={formData.q3_itr_filing} onValueChange={(value) => setFormData({ ...formData, q3_itr_filing: value, files_itr_yearly: value === 'yes_ontime' || value === 'yes_late', takes_tds_refund: value === 'yes_ontime' })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes_ontime">Yes – Always on time, and I check Form 26AS/claim TDS refunds</SelectItem>
-                  <SelectItem value="yes_late">Yes – But usually after the deadline</SelectItem>
-                  <SelectItem value="only_required">Only when required (loan/visa application)</SelectItem>
-                  <SelectItem value="no_file">No – I do not file ITR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Q4 - Credit Card */}
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-slate-900">
-                Q4. Do you carry a credit card?
-              </Label>
-              <Select value={formData.q4_credit_card} onValueChange={(value) => setFormData({ ...formData, q4_credit_card: value })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Yes</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Q5 - Revolving CC Balance */}
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-red-900">
-                Q5. Do you carry a revolving credit card balance (i.e., not paying the full amount each month)?
-              </Label>
-              <Select value={formData.q5_cc_balance} onValueChange={(value) => setFormData({ ...formData, q5_cc_balance: value })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="no_always_full">No – I always pay the full outstanding amount</SelectItem>
-                  <SelectItem value="occasionally">Occasionally – a few times a year</SelectItem>
-                  <SelectItem value="yes_minimum">Yes – I regularly carry a balance and pay only minimum</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Q6 - Personal Loan */}
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-rose-900">
-                Q6. Do you have an active personal loan taken for consumption (not for buying an asset)?
-              </Label>
-              <Select value={formData.q6_personal_loan} onValueChange={(value) => setFormData({ ...formData, q6_personal_loan: value })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="no_loan">No personal loan for consumption</SelectItem>
-                  <SelectItem value="one_loan">Yes – one loan, actively paying it off</SelectItem>
-                  <SelectItem value="multiple_loans">Yes – multiple personal/consumer loans active</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Q7 - Regular Investing */}
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-              <Label className="block mb-2 font-semibold text-blue-900">
-                Q7. Do you invest regularly beyond savings accounts and Fixed Deposits?
-              </Label>
-              <Select value={formData.q7_regular_investing} onValueChange={(value) => setFormData({ ...formData, q7_regular_investing: value, invests_in_mutual_funds: value === 'yes_regular' })}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes_regular">Yes – Regular SIP/stocks/MF investments</SelectItem>
-                  <SelectItem value="no_fd_only">No – All savings kept only in FD or savings account</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold text-brand-blue mb-3">Your Credit Cards</h3>
-          <div className="flex gap-2 mb-3">
-            <Select value={formData.selected_credit_card} onValueChange={(value) => setFormData({ ...formData, selected_credit_card: value })}>
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select a credit card" />
-              </SelectTrigger>
-              <SelectContent className="max-h-60">
-                {creditCardsList.map((card) => (
-                  <SelectItem key={card} value={card}>{card}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="button" onClick={addCreditCard} className="bg-brand-blue">Add</Button>
-          </div>
-          
-          {formData.credit_cards.length > 0 && (
-            <div className="space-y-2">
-              {formData.credit_cards.map((card) => (
-                <div key={card} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="text-sm">{card}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeCreditCard(card)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
             </div>
           )}
+        </div>
+
+        {/* ULIP / Endowment */}
+        <div className="bg-amber-50 p-6 rounded-xl border border-amber-200">
+          <h3 className="text-lg font-semibold text-amber-700 mb-4">ULIP / Endowment (F4-F6)</h3>
+          <div className="flex items-center gap-3 mb-4">
+            <Checkbox
+              checked={formData.has_ulip_endowment}
+              onCheckedChange={(v) => setFormData({ ...formData, has_ulip_endowment: v })}
+            />
+            <Label className="text-sm">I have ULIP / Endowment / Money-back plan</Label>
+          </div>
+          {formData.has_ulip_endowment && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">F5. Sum Assured</Label>
+                <Input type="number" value={formData.ulip_endowment_cover} onChange={(e) => setFormData({ ...formData, ulip_endowment_cover: Number(e.target.value) || 0 })} className="mt-1" placeholder="0" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">F6. Annual Premium</Label>
+                <Input type="number" value={formData.ulip_endowment_premium_annual} onChange={(e) => setFormData({ ...formData, ulip_endowment_premium_annual: Number(e.target.value) || 0 })} className="mt-1" placeholder="0" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Health Insurance */}
+        <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+          <h3 className="text-lg font-semibold text-green-700 mb-4">Health Insurance (F7-F12)</h3>
+          <div className="flex items-center gap-3 mb-4">
+            <Checkbox
+              checked={formData.has_health_insurance}
+              onCheckedChange={(v) => setFormData({ ...formData, has_health_insurance: v })}
+              data-testid="has-health-insurance-checkbox"
+            />
+            <Label className="text-sm">I have health insurance</Label>
+          </div>
+          {formData.has_health_insurance && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">F8. Insurance Type</Label>
+                <Select value={formData.health_insurance_type} onValueChange={(val) => setFormData({ ...formData, health_insurance_type: val })}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal">Personal / Family Floater</SelectItem>
+                    <SelectItem value="employer">Employer Only</SelectItem>
+                    <SelectItem value="both">Both Personal + Employer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">F9. Sum Insured (Cover)</Label>
+                <Input type="number" data-testid="health-cover-input" value={formData.health_insurance_cover} onChange={(e) => setFormData({ ...formData, health_insurance_cover: Number(e.target.value) || 0 })} className="mt-1" placeholder="e.g., 10,00,000" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">F10. Annual Premium</Label>
+                <Input type="number" value={formData.health_insurance_premium_annual} onChange={(e) => setFormData({ ...formData, health_insurance_premium_annual: Number(e.target.value) || 0 })} className="mt-1" placeholder="0" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">F11. Family Members Covered</Label>
+                <Input type="number" value={formData.family_members_covered} onChange={(e) => setFormData({ ...formData, family_members_covered: Number(e.target.value) || 1 })} className="mt-1" placeholder="Including self" min={1} />
+              </div>
+              <div className="flex items-center gap-3 mt-4">
+                <Checkbox checked={formData.dependent_parents_covered} onCheckedChange={(v) => setFormData({ ...formData, dependent_parents_covered: v })} />
+                <Label className="text-sm">F12. Dependent parents also covered?</Label>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Vehicle Insurance */}
+        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
+          <h3 className="text-lg font-semibold text-slate-700 mb-4">Vehicle Insurance (F13-F16)</h3>
+          <div className="flex items-center gap-3 mb-4">
+            <Checkbox checked={formData.has_vehicle} onCheckedChange={(v) => setFormData({ ...formData, has_vehicle: v })} data-testid="has-vehicle-checkbox" />
+            <Label className="text-sm">I own a vehicle</Label>
+          </div>
+          {formData.has_vehicle && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">F14. Insurance Type</Label>
+                <Select value={formData.vehicle_insurance_type} onValueChange={(val) => setFormData({ ...formData, vehicle_insurance_type: val })}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="comprehensive">Comprehensive (OD + TP)</SelectItem>
+                    <SelectItem value="third_party">Third Party Only</SelectItem>
+                    <SelectItem value="none">No Insurance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">F15. Annual Premium</Label>
+                <Input type="number" value={formData.vehicle_insurance_premium_annual} onChange={(e) => setFormData({ ...formData, vehicle_insurance_premium_annual: Number(e.target.value) || 0 })} className="mt-1" placeholder="0" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">F16. IDV (Insured Declared Value)</Label>
+                <Input type="number" value={formData.vehicle_idv} onChange={(e) => setFormData({ ...formData, vehicle_idv: Number(e.target.value) || 0 })} className="mt-1" placeholder="Vehicle insured value" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Section G: Financial Habits */}
+        <div className="bg-purple-50 p-6 rounded-xl border border-purple-200">
+          <h3 className="text-lg font-semibold text-purple-700 mb-4">Financial Stability Checkpoints (G1-G7)</h3>
+          <p className="text-xs text-slate-500 mb-4">Select the option that best describes your current situation.</p>
+          <div className="space-y-5">
+            {/* G1 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G1. Do you have a personal health insurance policy?</Label>
+              <Select value={formData.habit_q1_health_insurance} onValueChange={(val) => setFormData({ ...formData, habit_q1_health_insurance: val })}>
+                <SelectTrigger className="mt-1" data-testid="habit-g1-select"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. Yes - Personal/family floater (5L+ cover)</SelectItem>
+                  <SelectItem value="B">B. No - Only employer-provided cover</SelectItem>
+                  <SelectItem value="C">C. No health insurance at all</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* G2 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G2. Do you have a pure Term Life Insurance policy?</Label>
+              <Select value={formData.habit_q2_term_insurance} onValueChange={(val) => setFormData({ ...formData, habit_q2_term_insurance: val })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. Yes - Pure term plan (10x+ annual income)</SelectItem>
+                  <SelectItem value="B">B. No - Only ULIP/Endowment</SelectItem>
+                  <SelectItem value="C">C. No life insurance at all</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* G3 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G3. Do you file ITR every year before deadline?</Label>
+              <Select value={formData.habit_q3_itr_filing} onValueChange={(val) => setFormData({ ...formData, habit_q3_itr_filing: val })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. Yes - Always on time, check 26AS</SelectItem>
+                  <SelectItem value="B">B. Yes - But usually after deadline</SelectItem>
+                  <SelectItem value="C">C. Only when required (loan/visa)</SelectItem>
+                  <SelectItem value="D">D. No - I do not file ITR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* G4 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G4. Do you carry a credit card?</Label>
+              <Select value={formData.habit_q4_credit_card} onValueChange={(val) => setFormData({ ...formData, habit_q4_credit_card: val, has_credit_card: val === 'A' })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. Yes</SelectItem>
+                  <SelectItem value="B">B. No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* G5 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G5. Do you carry a revolving credit card balance?</Label>
+              <Select value={formData.habit_q5_cc_revolving} onValueChange={(val) => setFormData({ ...formData, habit_q5_cc_revolving: val })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. No - Always pay full outstanding</SelectItem>
+                  <SelectItem value="B">B. Occasionally - A few times a year</SelectItem>
+                  <SelectItem value="C">C. Yes - Regularly carry balance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* G6 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G6. Active personal loan for consumption?</Label>
+              <Select value={formData.habit_q6_personal_loan} onValueChange={(val) => setFormData({ ...formData, habit_q6_personal_loan: val })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. No personal loan for consumption</SelectItem>
+                  <SelectItem value="B">B. Yes - One loan, paying off</SelectItem>
+                  <SelectItem value="C">C. Yes - Multiple consumer loans</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* G7 */}
+            <div>
+              <Label className="text-sm font-semibold text-slate-800">G7. Do you invest regularly beyond FD/savings?</Label>
+              <Select value={formData.habit_q7_invest_beyond_fd} onValueChange={(val) => setFormData({ ...formData, habit_q7_invest_beyond_fd: val })}>
+                <SelectTrigger className="mt-1" data-testid="habit-g7-select"><SelectValue placeholder="Select answer" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A. Yes - Regular SIP/stocks/MF</SelectItem>
+                  <SelectItem value="B">B. No - Only FD/savings account</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       </div>
     </Card>

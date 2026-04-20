@@ -787,13 +787,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
               addEntry={addEntry}
               removeEntry={removeEntry}
               updateEntry={updateEntry}
-              addInterestInvestment={addInterestInvestment}
-              removeInterestInvestment={removeInterestInvestment}
-              updateInterestInvestment={updateInterestInvestment}
-              calculateInterestIncome={calculateInterestIncome}
-              totalInterestInvestmentPrincipal={totalInterestInvestmentPrincipal}
-              totalYearlyInterestIncome={totalYearlyInterestIncome}
-              totalMonthlyIncome={totalMonthlyIncome}
             />
           )}
 
@@ -802,17 +795,6 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             <ExpenseStep
               formData={formData}
               setFormData={setFormData}
-              addEntry={addEntry}
-              removeEntry={removeEntry}
-              updateEntry={updateEntry}
-              addLoan={addLoan}
-              removeLoan={removeLoan}
-              updateLoan={updateLoan}
-              handleAutoPopulateVehicle={handleAutoPopulateVehicle}
-              calculateEMI={calculateEMI}
-              totalLoanPrincipal={totalLoanPrincipal}
-              totalMonthlyEMI={totalMonthlyEMI}
-              totalMonthlyExpenses={totalMonthlyExpenses}
             />
           )}
 
@@ -821,31 +803,14 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
             <AssetsStep
               formData={formData}
               setFormData={setFormData}
-              addProperty={addProperty}
-              removeProperty={removeProperty}
-              updateProperty={updateProperty}
-              addVehicle={addVehicle}
-              removeVehicle={removeVehicle}
-              updateVehicle={updateVehicle}
-              calculateEMI={calculateEMI}
-              totalPropertyValue={totalPropertyValue}
-              total2WheelerValue={total2WheelerValue}
-              total4WheelerValue={total4WheelerValue}
-              totalVehicleValue={totalVehicleValue}
-              totalLoanPrincipal={totalLoanPrincipal}
-              totalAssets={totalAssets}
-              totalLiabilities={totalLiabilities}
             />
           )}
 
-          {/* Step 4: Financial Stability & Credit Cards */}
+          {/* Step 4: Insurance & Financial Habits */}
           {step === 4 && (
             <StabilityStep
               formData={formData}
               setFormData={setFormData}
-              addCreditCard={addCreditCard}
-              removeCreditCard={removeCreditCard}
-              creditCardsList={creditCardsList}
             />
           )}
 

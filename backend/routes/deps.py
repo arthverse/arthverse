@@ -170,106 +170,119 @@ class FinancialEntry(BaseModel):
     frequency: str = "monthly"
 
 class FinancialQuestionnaire(BaseModel):
-    rental_property1: float = 0
-    rental_property2: float = 0
-    salary_income: float = 0
-    business_income: float = 0
-    interest_income: float = 0
-    dividend_income: float = 0
-    capital_gains: float = 0
-    freelance_income: float = 0
-    other_income: float = 0
-    rent_expense: float = 0
-    emis: float = 0
-    term_insurance: float = 0
-    health_insurance: float = 0
-    vehicle_2w_1: float = 0
-    vehicle_2w_2: float = 0
-    vehicle_4w_1: float = 0
-    vehicle_4w_2: float = 0
-    vehicle_4w_3: float = 0
-    household_maid: float = 0
-    groceries: float = 0
-    food_dining: float = 0
-    fuel: float = 0
-    travel: float = 0
-    shopping: float = 0
-    online_shopping: float = 0
-    electronics: float = 0
-    entertainment: float = 0
-    telecom_utilities: float = 0
-    healthcare: float = 0
-    education: float = 0
-    cash_withdrawals: float = 0
-    foreign_transactions: float = 0
+    # Section A: Profile
     city_tier: str = "tier_2"
     family_situation: str = "single_stable"
-    home_loan_emi: float = 0
-    car_loan_emi: float = 0
-    education_loan_emi: float = 0
-    personal_loan_emi: float = 0
-    other_loan_emi: float = 0
+    has_credit_card: bool = False
+    employment_type: str = "salaried"
+    cibil_score: int = 0
+    pan_linked: bool = False
+
+    # Section B: Income
+    monthly_salary_net: float = 0
+    monthly_business_income: float = 0
+    monthly_rental_income: float = 0
+    monthly_other_income: float = 0
+    annual_income: float = 0
+    employer_epf_monthly: float = 0
+    annual_bonus: float = 0
+    tax_regime: str = "new_regime"
+    annual_tax_paid: float = 0
+
+    # Section C: Expenses
+    monthly_rent_or_emi_home: float = 0
+    monthly_groceries: float = 0
+    monthly_utilities: float = 0
+    monthly_transport: float = 0
+    monthly_education: float = 0
+    monthly_food_eating_out: float = 0
+    monthly_entertainment: float = 0
+    monthly_medical: float = 0
+    monthly_insurance_premiums: float = 0
+    monthly_investments_sip: float = 0
+    monthly_other_expenses: float = 0
+    total_monthly_expenses: float = 0
+
+    # Section D: Assets
+    bank_savings_balance: float = 0
+    cash_in_hand: float = 0
+    sweep_fd_balance: float = 0
+    regular_fd_balance: float = 0
+    liquid_mf_balance: float = 0
+    equity_mf_current_value: float = 0
+    equity_mf_invested_amount: float = 0
+    direct_stocks_value: float = 0
+    direct_stocks_cost: float = 0
+    debt_mf_bonds_value: float = 0
+    debt_mf_bonds_invested: float = 0
+    ppf_nps_balance: float = 0
+    gold_silver_value: float = 0
+    gold_silver_cost: float = 0
+    real_estate_primary_value: float = 0
+    real_estate_investment_value: float = 0
+    ulip_endowment_value: float = 0
+    other_assets: float = 0
+
+    # Section E: Liabilities
     home_loan_outstanding: float = 0
-    car_loan_outstanding: float = 0
+    home_loan_emi: float = 0
+    home_loan_interest_rate: float = 8.5
+    vehicle_loan_outstanding: float = 0
+    vehicle_loan_emi: float = 0
+    vehicle_loan_interest_rate: float = 9.0
     education_loan_outstanding: float = 0
+    education_loan_emi: float = 0
+    education_loan_interest_rate: float = 9.0
     personal_loan_outstanding: float = 0
-    other_loan_outstanding: float = 0
-    mutual_funds: float = 0
-    stocks: float = 0
-    debt_mf: float = 0
-    pf_nps: float = 0
-    fd: float = 0
-    sweep_fd: float = 0
-    bonds: float = 0
-    real_estate: float = 0
-    gold: float = 0
-    silver: float = 0
-    liquid_mf: float = 0
-    life_insurance_coverage: float = 0
-    life_insurance_premium: float = 0
-    health_insurance_coverage: float = 0
-    health_insurance_premium: float = 0
+    personal_loan_emi: float = 0
+    credit_card_outstanding: float = 0
+    credit_card_emi_monthly: float = 0
+    other_loans_emi: float = 0
+
+    # Section F: Insurance
+    has_term_life_insurance: bool = False
+    term_insurance_cover: float = 0
+    term_insurance_premium_annual: float = 0
+    has_ulip_endowment: bool = False
+    ulip_endowment_cover: float = 0
+    ulip_endowment_premium_annual: float = 0
+    has_health_insurance: bool = False
+    health_insurance_type: str = "none"
+    health_insurance_cover: float = 0
+    health_insurance_premium_annual: float = 0
+    family_members_covered: int = 1
+    dependent_parents_covered: bool = False
     has_vehicle: bool = False
     vehicle_insurance_type: str = "none"
-    vehicle_insurance_premium: float = 0
+    vehicle_insurance_premium_annual: float = 0
+    vehicle_idv: float = 0
+
+    # Section G: Financial Habits
+    habit_q1_health_insurance: str = ""
+    habit_q2_term_insurance: str = ""
+    habit_q3_itr_filing: str = ""
+    habit_q4_credit_card: str = ""
+    habit_q5_cc_revolving: str = ""
+    habit_q6_personal_loan: str = ""
+    habit_q7_invest_beyond_fd: str = ""
+
+    # Credit Card Recommendation (Step 5)
+    credit_cards: List[str] = []
+    selected_credit_card: str = ""
+    monthly_investment: float = 0
     yearly_investment: float = 0
-    has_credit_card: bool = False
-    credit_card_debt: float = 0
-    habit_health_insurance: str = "neutral"
-    habit_term_life: str = "neutral"
-    habit_itr_filing: str = "neutral"
-    habit_cc_balance: str = "neutral"
-    habit_personal_loan: str = "neutral"
-    habit_invest_beyond_fd: str = "neutral"
-    property_value: float = 0
-    vehicles_value: float = 0
-    gold_value: float = 0
-    silver_value: float = 0
-    stocks_value: float = 0
-    mutual_funds_value: float = 0
-    pf_nps_value: float = 0
-    bank_balance: float = 0
-    cash_in_hand: float = 0
+
+    # Structural / dynamic
     properties: List[dict] = []
     vehicles: List[dict] = []
-    home_loan: float = 0
-    personal_loan: float = 0
-    vehicle_loan: float = 0
-    credit_card_outstanding: float = 0
     loans: List[dict] = []
     interest_investments: List[dict] = []
+    insurance_policies: List[dict] = []
     income_entries: List[FinancialEntry] = []
-    expense_entries: List[FinancialEntry] = []
+    expense_entries: List[dict] = []
     asset_entries: List[dict] = []
     liability_entries: List[dict] = []
-    has_health_insurance: bool = False
-    has_term_insurance: bool = False
-    invests_in_mutual_funds: bool = False
-    takes_tds_refund: bool = False
-    has_emergency_fund: bool = False
-    files_itr_yearly: bool = False
-    credit_cards: List[str] = []
-    monthly_investment: float = 0
+
     completed_at: str = ""
 
 class QuestionnaireResponse(BaseModel):

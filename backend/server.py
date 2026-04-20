@@ -542,35 +542,30 @@ async def get_health_score_v2(credentials: HTTPAuthorizationCredentials = Depend
             "summary": {}
         }
     
-    # Prepare data for 10-factor calculation
+    # Prepare data for 10-factor calculation (spec-aligned field names)
     monthly_income = (
-        questionnaire.get("salary_income", 0) +
-        questionnaire.get("business_income", 0) +
-        questionnaire.get("rental_property1", 0) +
-        questionnaire.get("rental_property2", 0) +
-        questionnaire.get("interest_income", 0) +
-        questionnaire.get("dividend_income", 0) +
-        questionnaire.get("capital_gains", 0) +
-        questionnaire.get("freelance_income", 0) +
-        questionnaire.get("other_income", 0)
+        questionnaire.get("monthly_salary_net", 0) +
+        questionnaire.get("monthly_business_income", 0) +
+        questionnaire.get("monthly_rental_income", 0) +
+        questionnaire.get("monthly_other_income", 0)
     )
     
     monthly_expenses = (
-        questionnaire.get("rent_expense", 0) +
-        questionnaire.get("telecom_utilities", 0) +
-        questionnaire.get("groceries", 0) +
-        questionnaire.get("transportation", 0) +
-        questionnaire.get("healthcare", 0) +
-        questionnaire.get("education_expenses", 0) +
-        questionnaire.get("entertainment", 0) +
-        questionnaire.get("shopping", 0) +
-        questionnaire.get("insurance_premiums", 0) +
-        questionnaire.get("other_expenses", 0) +
+        questionnaire.get("monthly_rent_or_emi_home", 0) +
+        questionnaire.get("monthly_groceries", 0) +
+        questionnaire.get("monthly_utilities", 0) +
+        questionnaire.get("monthly_transport", 0) +
+        questionnaire.get("monthly_education", 0) +
+        questionnaire.get("monthly_food_eating_out", 0) +
+        questionnaire.get("monthly_entertainment", 0) +
+        questionnaire.get("monthly_medical", 0) +
+        questionnaire.get("monthly_insurance_premiums", 0) +
+        questionnaire.get("monthly_other_expenses", 0) +
         questionnaire.get("home_loan_emi", 0) +
-        questionnaire.get("car_loan_emi", 0) +
+        questionnaire.get("vehicle_loan_emi", 0) +
         questionnaire.get("education_loan_emi", 0) +
         questionnaire.get("personal_loan_emi", 0) +
-        questionnaire.get("other_loan_emi", 0)
+        questionnaire.get("other_loans_emi", 0)
     )
     
     # Build data dict for calculator
@@ -585,60 +580,60 @@ async def get_health_score_v2(credentials: HTTPAuthorizationCredentials = Depend
         "family_situation": questionnaire.get("family_situation", "single_stable"),
         "has_credit_card": questionnaire.get("has_credit_card", False),
         
-        # EMI data
+        # EMI data (spec-aligned)
         "home_loan_emi": questionnaire.get("home_loan_emi", 0),
-        "vehicle_loan_emi": questionnaire.get("car_loan_emi", 0),
+        "vehicle_loan_emi": questionnaire.get("vehicle_loan_emi", 0),
         "education_loan_emi": questionnaire.get("education_loan_emi", 0),
-        "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
+        "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loans_emi", 0),
         
-        # Loan interest rates (extract from loans array if available)
-        "home_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Home", 8.5),
-        "vehicle_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Vehicle", 10.0),
-        "education_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Education", 8.0),
-        "other_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Personal", 14.0),
+        # Loan interest rates (direct from questionnaire, with defaults)
+        "home_loan_rate": questionnaire.get("home_loan_interest_rate", 8.5),
+        "vehicle_loan_rate": questionnaire.get("vehicle_loan_interest_rate", 9.0),
+        "education_loan_rate": questionnaire.get("education_loan_interest_rate", 9.0),
+        "other_loan_rate": 14.0,
         
-        # Assets
-        "mutual_funds": questionnaire.get("mutual_funds", 0),
-        "stocks": questionnaire.get("stocks", 0),
-        "debt_mf": questionnaire.get("debt_mf", 0),
-        "pf_nps": questionnaire.get("pf_nps", 0),
-        "fd": questionnaire.get("fd", 0),
-        "sweep_fd": questionnaire.get("sweep_fd", 0),
-        "bonds": questionnaire.get("bonds", 0),
-        "real_estate": questionnaire.get("real_estate", 0),
-        "gold": questionnaire.get("gold", 0),
-        "silver": questionnaire.get("silver", 0),
-        "bank_balance": questionnaire.get("bank_balance", 0),
-        "liquid_mf": questionnaire.get("liquid_mf", 0),
+        # Assets (spec-aligned)
+        "mutual_funds": questionnaire.get("equity_mf_current_value", 0),
+        "stocks": questionnaire.get("direct_stocks_value", 0),
+        "debt_mf": questionnaire.get("debt_mf_bonds_value", 0),
+        "pf_nps": questionnaire.get("ppf_nps_balance", 0),
+        "fd": questionnaire.get("regular_fd_balance", 0),
+        "sweep_fd": questionnaire.get("sweep_fd_balance", 0),
+        "bonds": 0,
+        "real_estate": questionnaire.get("real_estate_primary_value", 0) + questionnaire.get("real_estate_investment_value", 0),
+        "gold": questionnaire.get("gold_silver_value", 0),
+        "silver": 0,
+        "bank_balance": questionnaire.get("bank_savings_balance", 0),
+        "liquid_mf": questionnaire.get("liquid_mf_balance", 0),
         
-        # Liabilities
+        # Liabilities (spec-aligned)
         "home_loan_outstanding": questionnaire.get("home_loan_outstanding", 0),
-        "vehicle_loan_outstanding": questionnaire.get("car_loan_outstanding", 0),
+        "vehicle_loan_outstanding": questionnaire.get("vehicle_loan_outstanding", 0),
         "education_loan_outstanding": questionnaire.get("education_loan_outstanding", 0),
-        "other_loan_outstanding": questionnaire.get("personal_loan_outstanding", 0) + questionnaire.get("other_loan_outstanding", 0),
-        "credit_card_debt": questionnaire.get("credit_card_debt", 0),
+        "other_loan_outstanding": questionnaire.get("personal_loan_outstanding", 0),
+        "credit_card_debt": questionnaire.get("credit_card_outstanding", 0),
         
-        # Insurance
-        "life_insurance_coverage": questionnaire.get("life_insurance_coverage", 0),
-        "life_insurance_premium": questionnaire.get("life_insurance_premium", 0),
-        "health_insurance_coverage": questionnaire.get("health_insurance_coverage", 0),
-        "health_insurance_premium": questionnaire.get("health_insurance_premium", 0),
+        # Insurance (spec-aligned)
+        "life_insurance_coverage": questionnaire.get("term_insurance_cover", 0) + questionnaire.get("ulip_endowment_cover", 0),
+        "life_insurance_premium": questionnaire.get("term_insurance_premium_annual", 0),
+        "health_insurance_coverage": questionnaire.get("health_insurance_cover", 0),
+        "health_insurance_premium": questionnaire.get("health_insurance_premium_annual", 0),
         "vehicle_insurance_type": questionnaire.get("vehicle_insurance_type", "none"),
-        "vehicle_insurance_premium": questionnaire.get("vehicle_insurance_premium", 0),
+        "vehicle_insurance_premium": questionnaire.get("vehicle_insurance_premium_annual", 0),
         "has_vehicle": questionnaire.get("has_vehicle", False),
         
         # Investment
-        "yearly_investment": questionnaire.get("yearly_investment", 0),
+        "yearly_investment": questionnaire.get("yearly_investment", 0) or (questionnaire.get("monthly_investments_sip", 0) * 12),
         
-        # Financial habits
+        # Financial habits (spec-aligned G1-G7)
         "financial_habits": {
-            "health_insurance": questionnaire.get("habit_health_insurance", "neutral"),
-            "term_life_insurance": questionnaire.get("habit_term_life", "neutral"),
-            "itr_filing": questionnaire.get("habit_itr_filing", "neutral"),
+            "health_insurance": questionnaire.get("habit_q1_health_insurance", "neutral"),
+            "term_life_insurance": questionnaire.get("habit_q2_term_insurance", "neutral"),
+            "itr_filing": questionnaire.get("habit_q3_itr_filing", "neutral"),
             "has_credit_card": questionnaire.get("has_credit_card", False),
-            "cc_balance": questionnaire.get("habit_cc_balance", "neutral"),
-            "personal_loan": questionnaire.get("habit_personal_loan", "neutral"),
-            "invest_beyond_fd": questionnaire.get("habit_invest_beyond_fd", "neutral"),
+            "cc_balance": questionnaire.get("habit_q5_cc_revolving", "neutral"),
+            "personal_loan": questionnaire.get("habit_q6_personal_loan", "neutral"),
+            "invest_beyond_fd": questionnaire.get("habit_q7_invest_beyond_fd", "neutral"),
         }
     }
     
@@ -680,35 +675,30 @@ async def get_opportunity_analysis(credentials: HTTPAuthorizationCredentials = D
             "metadata": {"age": user_age, "annual_income": 0, "net_worth": 0, "total_assets": 0}
         }
     
-    # Build data dict for analyzer
+    # Build data dict for analyzer (spec-aligned field names)
     monthly_income = (
-        questionnaire.get("salary_income", 0) +
-        questionnaire.get("business_income", 0) +
-        questionnaire.get("rental_property1", 0) +
-        questionnaire.get("rental_property2", 0) +
-        questionnaire.get("interest_income", 0) +
-        questionnaire.get("dividend_income", 0) +
-        questionnaire.get("capital_gains", 0) +
-        questionnaire.get("freelance_income", 0) +
-        questionnaire.get("other_income", 0)
+        questionnaire.get("monthly_salary_net", 0) +
+        questionnaire.get("monthly_business_income", 0) +
+        questionnaire.get("monthly_rental_income", 0) +
+        questionnaire.get("monthly_other_income", 0)
     )
     
     monthly_expenses = (
-        questionnaire.get("rent_expense", 0) +
-        questionnaire.get("telecom_utilities", 0) +
-        questionnaire.get("groceries", 0) +
-        questionnaire.get("transportation", 0) +
-        questionnaire.get("healthcare", 0) +
-        questionnaire.get("education_expenses", 0) +
-        questionnaire.get("entertainment", 0) +
-        questionnaire.get("shopping", 0) +
-        questionnaire.get("insurance_premiums", 0) +
-        questionnaire.get("other_expenses", 0) +
+        questionnaire.get("monthly_rent_or_emi_home", 0) +
+        questionnaire.get("monthly_groceries", 0) +
+        questionnaire.get("monthly_utilities", 0) +
+        questionnaire.get("monthly_transport", 0) +
+        questionnaire.get("monthly_education", 0) +
+        questionnaire.get("monthly_food_eating_out", 0) +
+        questionnaire.get("monthly_entertainment", 0) +
+        questionnaire.get("monthly_medical", 0) +
+        questionnaire.get("monthly_insurance_premiums", 0) +
+        questionnaire.get("monthly_other_expenses", 0) +
         questionnaire.get("home_loan_emi", 0) +
-        questionnaire.get("car_loan_emi", 0) +
+        questionnaire.get("vehicle_loan_emi", 0) +
         questionnaire.get("education_loan_emi", 0) +
         questionnaire.get("personal_loan_emi", 0) +
-        questionnaire.get("other_loan_emi", 0)
+        questionnaire.get("other_loans_emi", 0)
     )
     
     calc_data = {
@@ -722,56 +712,56 @@ async def get_opportunity_analysis(credentials: HTTPAuthorizationCredentials = D
         "family_situation": questionnaire.get("family_situation", "single_stable"),
         "has_credit_card": questionnaire.get("has_credit_card", False),
         
-        # EMI data
+        # EMI data (spec-aligned)
         "home_loan_emi": questionnaire.get("home_loan_emi", 0),
-        "vehicle_loan_emi": questionnaire.get("car_loan_emi", 0),
+        "vehicle_loan_emi": questionnaire.get("vehicle_loan_emi", 0),
         "education_loan_emi": questionnaire.get("education_loan_emi", 0),
-        "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loan_emi", 0),
+        "other_loan_emi": questionnaire.get("personal_loan_emi", 0) + questionnaire.get("other_loans_emi", 0),
         
-        # Loan interest rates (extract from loans array if available)
-        "home_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Home", 8.5),
-        "vehicle_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Vehicle", 10.0),
-        "education_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Education", 8.0),
-        "other_loan_rate": extract_loan_rate(questionnaire.get("loans", []), "Personal", 14.0),
+        # Loan interest rates
+        "home_loan_rate": questionnaire.get("home_loan_interest_rate", 8.5),
+        "vehicle_loan_rate": questionnaire.get("vehicle_loan_interest_rate", 9.0),
+        "education_loan_rate": questionnaire.get("education_loan_interest_rate", 9.0),
+        "other_loan_rate": 14.0,
         
-        # Assets - Use *_value fields if available, fallback to original field names
-        "bank_balance": questionnaire.get("bank_balance", 0),
-        "sweep_fd": questionnaire.get("sweep_fd", 0),
-        "liquid_mf": questionnaire.get("liquid_mf", 0),
-        "mutual_funds": questionnaire.get("mutual_funds_value", 0) or questionnaire.get("mutual_funds", 0),
-        "stocks": questionnaire.get("stocks_value", 0) or questionnaire.get("stocks", 0),
-        "debt_mf": questionnaire.get("debt_mf", 0),
-        "pf_nps": questionnaire.get("pf_nps_value", 0) or questionnaire.get("pf_nps", 0),
-        "fd": questionnaire.get("fd_value", 0) or questionnaire.get("fd", 0) or questionnaire.get("fixed_deposits", 0),
-        "real_estate": questionnaire.get("property_value", 0) or questionnaire.get("real_estate", 0),
-        "gold": questionnaire.get("gold_value", 0) or questionnaire.get("gold", 0),
-        "silver": questionnaire.get("silver_value", 0) or questionnaire.get("silver", 0),
+        # Assets (spec-aligned)
+        "bank_balance": questionnaire.get("bank_savings_balance", 0),
+        "sweep_fd": questionnaire.get("sweep_fd_balance", 0),
+        "liquid_mf": questionnaire.get("liquid_mf_balance", 0),
+        "mutual_funds": questionnaire.get("equity_mf_current_value", 0),
+        "stocks": questionnaire.get("direct_stocks_value", 0),
+        "debt_mf": questionnaire.get("debt_mf_bonds_value", 0),
+        "pf_nps": questionnaire.get("ppf_nps_balance", 0),
+        "fd": questionnaire.get("regular_fd_balance", 0),
+        "real_estate": questionnaire.get("real_estate_primary_value", 0) + questionnaire.get("real_estate_investment_value", 0),
+        "gold": questionnaire.get("gold_silver_value", 0),
+        "silver": 0,
         
-        # Liabilities
+        # Liabilities (spec-aligned)
         "home_loan_outstanding": questionnaire.get("home_loan_outstanding", 0),
-        "vehicle_loan_outstanding": questionnaire.get("car_loan_outstanding", 0),
+        "vehicle_loan_outstanding": questionnaire.get("vehicle_loan_outstanding", 0),
         "education_loan_outstanding": questionnaire.get("education_loan_outstanding", 0),
-        "other_loan_outstanding": questionnaire.get("personal_loan_outstanding", 0) + questionnaire.get("other_loan_outstanding", 0),
-        "credit_card_debt": questionnaire.get("credit_card_debt", 0),
+        "other_loan_outstanding": questionnaire.get("personal_loan_outstanding", 0),
+        "credit_card_debt": questionnaire.get("credit_card_outstanding", 0),
         
-        # Insurance
-        "life_insurance_coverage": questionnaire.get("life_insurance_coverage", 0),
-        "health_insurance_coverage": questionnaire.get("health_insurance_coverage", 0),
+        # Insurance (spec-aligned)
+        "life_insurance_coverage": questionnaire.get("term_insurance_cover", 0) + questionnaire.get("ulip_endowment_cover", 0),
+        "health_insurance_coverage": questionnaire.get("health_insurance_cover", 0),
         "vehicle_insurance_type": questionnaire.get("vehicle_insurance_type", "none"),
         "has_vehicle": questionnaire.get("has_vehicle", False),
         
         # Investment
-        "yearly_investment": questionnaire.get("yearly_investment", 0),
+        "yearly_investment": questionnaire.get("yearly_investment", 0) or (questionnaire.get("monthly_investments_sip", 0) * 12),
         
-        # Financial habits
+        # Financial habits (spec-aligned)
         "financial_habits": {
-            "health_insurance": questionnaire.get("habit_health_insurance", "neutral"),
-            "term_life_insurance": questionnaire.get("habit_term_life", "neutral"),
-            "itr_filing": questionnaire.get("habit_itr_filing", "neutral"),
+            "health_insurance": questionnaire.get("habit_q1_health_insurance", "neutral"),
+            "term_life_insurance": questionnaire.get("habit_q2_term_insurance", "neutral"),
+            "itr_filing": questionnaire.get("habit_q3_itr_filing", "neutral"),
             "has_credit_card": questionnaire.get("has_credit_card", False),
-            "cc_balance": questionnaire.get("habit_cc_balance", "neutral"),
-            "personal_loan": questionnaire.get("habit_personal_loan", "neutral"),
-            "invest_beyond_fd": questionnaire.get("habit_invest_beyond_fd", "neutral"),
+            "cc_balance": questionnaire.get("habit_q5_cc_revolving", "neutral"),
+            "personal_loan": questionnaire.get("habit_q6_personal_loan", "neutral"),
+            "invest_beyond_fd": questionnaire.get("habit_q7_invest_beyond_fd", "neutral"),
         }
     }
     
@@ -787,45 +777,32 @@ async def get_pl_statement(credentials: HTTPAuthorizationCredentials = Depends(s
     # Get questionnaire data for income and expense breakdown
     questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
     
-    # Income breakdown from questionnaire
+    # Income breakdown from questionnaire (spec-aligned)
     income_by_category = {}
     if questionnaire:
         income_fields = [
-            ("Salary", questionnaire.get("salary_income", 0)),
-            ("Business", questionnaire.get("business_income", 0)),
-            ("Rental Property 1", questionnaire.get("rental_property1", 0)),
-            ("Rental Property 2", questionnaire.get("rental_property2", 0)),
-            ("Interest", questionnaire.get("interest_income", 0)),
-            ("Dividends", questionnaire.get("dividend_income", 0)),
-            ("Capital Gains", questionnaire.get("capital_gains", 0)),
-            ("Freelance", questionnaire.get("freelance_income", 0)),
-            ("Other Income", questionnaire.get("other_income", 0))
+            ("Salary (Net)", questionnaire.get("monthly_salary_net", 0)),
+            ("Business Income", questionnaire.get("monthly_business_income", 0)),
+            ("Rental Income", questionnaire.get("monthly_rental_income", 0)),
+            ("Other Income", questionnaire.get("monthly_other_income", 0)),
         ]
         income_by_category = {k: v for k, v in income_fields if v and v > 0}
     
-    # Expense breakdown from questionnaire
+    # Expense breakdown from questionnaire (spec-aligned)
     expenses_by_category = {}
     if questionnaire:
         expense_fields = [
-            ("Rent", questionnaire.get("rent_expense", 0)),
-            ("EMIs", questionnaire.get("emis", 0)),
-            ("Term Insurance", questionnaire.get("term_insurance", 0)),
-            ("Health Insurance", questionnaire.get("health_insurance", 0)),
-            ("Groceries", questionnaire.get("groceries", 0)),
-            ("Food & Dining", questionnaire.get("food_dining", 0)),
-            ("Fuel", questionnaire.get("fuel", 0)),
-            ("Travel", questionnaire.get("travel", 0)),
-            ("Shopping", questionnaire.get("shopping", 0)),
-            ("Online Shopping", questionnaire.get("online_shopping", 0)),
-            ("Electronics", questionnaire.get("electronics", 0)),
-            ("Entertainment", questionnaire.get("entertainment", 0)),
-            ("Telecom & Utilities", questionnaire.get("telecom_utilities", 0)),
-            ("Healthcare", questionnaire.get("healthcare", 0)),
-            ("Education", questionnaire.get("education", 0)),
-            ("Vehicle 2W", questionnaire.get("vehicle_2w_1", 0) + questionnaire.get("vehicle_2w_2", 0)),
-            ("Vehicle 4W", questionnaire.get("vehicle_4w_1", 0) + questionnaire.get("vehicle_4w_2", 0) + questionnaire.get("vehicle_4w_3", 0)),
-            ("Household Help", questionnaire.get("household_maid", 0)),
-            ("Cash Withdrawals", questionnaire.get("cash_withdrawals", 0))
+            ("Rent / Home EMI", questionnaire.get("monthly_rent_or_emi_home", 0)),
+            ("Groceries", questionnaire.get("monthly_groceries", 0)),
+            ("Utilities", questionnaire.get("monthly_utilities", 0)),
+            ("Transport", questionnaire.get("monthly_transport", 0)),
+            ("Education", questionnaire.get("monthly_education", 0)),
+            ("Food & Dining", questionnaire.get("monthly_food_eating_out", 0)),
+            ("Entertainment", questionnaire.get("monthly_entertainment", 0)),
+            ("Medical", questionnaire.get("monthly_medical", 0)),
+            ("Insurance Premiums", questionnaire.get("monthly_insurance_premiums", 0)),
+            ("SIP / Investments", questionnaire.get("monthly_investments_sip", 0)),
+            ("Other Expenses", questionnaire.get("monthly_other_expenses", 0)),
         ]
         expenses_by_category = {k: v for k, v in expense_fields if v and v > 0}
     
@@ -849,30 +826,36 @@ async def get_balance_sheet(credentials: HTTPAuthorizationCredentials = Depends(
     # Get questionnaire data for assets and liabilities
     questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
     
-    # Assets breakdown from questionnaire
+    # Assets breakdown from questionnaire (spec-aligned)
     assets_breakdown = {}
     if questionnaire:
         asset_fields = [
-            ("Real Estate", questionnaire.get("property_value", 0)),
-            ("Vehicles", questionnaire.get("vehicles_value", 0)),
-            ("Gold", questionnaire.get("gold_value", 0)),
-            ("Silver", questionnaire.get("silver_value", 0)),
-            ("Stocks", questionnaire.get("stocks_value", 0)),
-            ("Mutual Funds", questionnaire.get("mutual_funds_value", 0)),
-            ("PF/NPS", questionnaire.get("pf_nps_value", 0)),
-            ("Bank Balance", questionnaire.get("bank_balance", 0)),
-            ("Cash in Hand", questionnaire.get("cash_in_hand", 0))
+            ("Bank Savings", questionnaire.get("bank_savings_balance", 0)),
+            ("Fixed Deposits", questionnaire.get("regular_fd_balance", 0)),
+            ("Sweep FD", questionnaire.get("sweep_fd_balance", 0)),
+            ("Liquid MF", questionnaire.get("liquid_mf_balance", 0)),
+            ("Equity MF", questionnaire.get("equity_mf_current_value", 0)),
+            ("Stocks", questionnaire.get("direct_stocks_value", 0)),
+            ("Debt MF/Bonds", questionnaire.get("debt_mf_bonds_value", 0)),
+            ("PPF/NPS", questionnaire.get("ppf_nps_balance", 0)),
+            ("Gold & Silver", questionnaire.get("gold_silver_value", 0)),
+            ("Real Estate (Primary)", questionnaire.get("real_estate_primary_value", 0)),
+            ("Real Estate (Investment)", questionnaire.get("real_estate_investment_value", 0)),
+            ("ULIP/Endowment", questionnaire.get("ulip_endowment_value", 0)),
+            ("Cash in Hand", questionnaire.get("cash_in_hand", 0)),
+            ("Other Assets", questionnaire.get("other_assets", 0)),
         ]
         assets_breakdown = {k: v for k, v in asset_fields if v and v > 0}
     
-    # Liabilities breakdown from questionnaire
+    # Liabilities breakdown from questionnaire (spec-aligned)
     liabilities_breakdown = {}
     if questionnaire:
         liability_fields = [
-            ("Home Loan", questionnaire.get("home_loan", 0)),
-            ("Personal Loan", questionnaire.get("personal_loan", 0)),
-            ("Vehicle Loan", questionnaire.get("vehicle_loan", 0)),
-            ("Credit Card", questionnaire.get("credit_card_outstanding", 0))
+            ("Home Loan", questionnaire.get("home_loan_outstanding", 0)),
+            ("Vehicle Loan", questionnaire.get("vehicle_loan_outstanding", 0)),
+            ("Education Loan", questionnaire.get("education_loan_outstanding", 0)),
+            ("Personal Loan", questionnaire.get("personal_loan_outstanding", 0)),
+            ("Credit Card", questionnaire.get("credit_card_outstanding", 0)),
         ]
         liabilities_breakdown = {k: v for k, v in liability_fields if v and v > 0}
     
