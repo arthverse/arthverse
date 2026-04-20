@@ -6,7 +6,16 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 ## Latest Updates
 
 ### ✅ ArthMitra Data Input Spec Alignment — 84 Fields (Apr 20, 2026)
-**Complete field rename and restructuring to match ArthMitra_DataInput_Spec.xlsx:**
+**Complete field rename across full stack to match ArthMitra_DataInput_Spec.xlsx.**
+
+**ArthMitraReport.js spec-aligned (Apr 20, 2026):**
+- Assets: bank_savings_balance, equity_mf_current_value, direct_stocks_value, ppf_nps_balance, regular_fd_balance, gold_silver_value, real_estate split
+- Liabilities: home_loan_outstanding, vehicle_loan_outstanding, personal_loan_outstanding, credit_card_outstanding
+- Income breakdown: monthly_salary_net, monthly_business_income, monthly_rental_income, monthly_other_income (+ employer_epf, annual_bonus in details)
+- Expense breakdown: All C1-C11 categories rendered dynamically with filter(value > 0)
+- Emergency fund = bank_savings_balance + sweep_fd_balance + liquid_mf_balance
+
+**Frontend step components (Apr 20, 2026):**
 
 **Section A (Profile):** Added `employment_type`, `cibil_score`, `pan_linked`
 **Section B (Income):** Renamed to `monthly_salary_net`, `monthly_business_income`, `monthly_rental_income`, `monthly_other_income`. Added `employer_epf_monthly`, `annual_bonus`, `tax_regime`, `annual_tax_paid`. Auto-computed `annual_income`.
