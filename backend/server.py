@@ -412,165 +412,6 @@ async def categorize_with_ai(description: str, amount: float) -> dict:
         logger.error(f"AI categorization failed: {e}")
         return {'category': 'Other', 'confidence': 'low'}
 
-# ============= Auth Routes =============
-
-@api_router.post("/auth/register", response_model=AuthResponse)
-async def register(user_data: UserCreate):
-    # Validate date of birth
-    if not validate_date_of_birth(user_data.date_of_birth):
-        raise HTTPException(status_code=400, detail="Invalid date of birth format. Use YYYY-MM-DD or DD-MM-YYYY")
-    
-    # Check if user exists
-    existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # Check if PAN already exists
-    if user_data.pan_number:
-        existing_pan = await db.users.find_one({"pan_number": user_data.pan_number}, {"_id": 0})
-        if existing_pan:
-            raise HTTPException(status_code=400, detail="PAN number already registered")
-    
-    # Generate unique User Login ID
-    client_id = await generate_user_login_id_async(
-        name=user_data.name,
-        date_of_birth=user_data.date_of_birth,
-        db_collection=db.users
-    )
-    
-    # Create user without password (user will set it later)
-    user_id = str(uuid.uuid4())
-    user_doc = {
-        "id": user_id,
-        "client_id": client_id,  # This is now the User Login ID
-        "email": user_data.email,
-        "password_hash": "",  # Empty - user will set password later
-        "name": user_data.name,
-        "mobile_number": user_data.mobile_number,
-        "pan_number": user_data.pan_number,
-        "date_of_birth": user_data.date_of_birth,
-        "city": user_data.city,
-        "data_privacy_consent": user_data.data_privacy_consent,
-        "networth": 0,
-        "needs_password_setup": True,
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.users.insert_one(user_doc)
-    
-    # Create token
-    token = create_token(user_id)
-    
-    user_response = UserResponse(
-        id=user_id,
-        client_id=client_id,
-        email=user_data.email,
-        name=user_data.name,
-        mobile_number=user_data.mobile_number,
-        pan_number=user_data.pan_number,
-        date_of_birth=user_data.date_of_birth,
-        city=user_data.city,
-        created_at=user_doc['created_at'],
-        networth=0,
-        needs_password_setup=True
-    )
-    
-    return AuthResponse(token=token, user=user_response)
-
-@api_router.post("/auth/login", response_model=AuthResponse)
-async def login(credentials: UserLogin):
-    user = await db.users.find_one({"client_id": credentials.client_id}, {"_id": 0})
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    # Check if user needs password setup
-    if user.get('needs_password_setup', False) or not user.get('password_hash'):
-        raise HTTPException(status_code=403, detail="Please set up your password first")
-    
-    if not verify_password(credentials.password, user['password_hash']):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    token = create_token(user['id'])
-    
-    user_response = UserResponse(
-        id=user['id'],
-        client_id=user['client_id'],
-        email=user['email'],
-        name=user['name'],
-        mobile_number=user['mobile_number'],
-        pan_number=user.get('pan_number', ''),
-        date_of_birth=user.get('date_of_birth', ''),
-        city=user['city'],
-        created_at=user['created_at'],
-        networth=user.get('networth', 0),
-        needs_password_setup=False
-    )
-    
-    return AuthResponse(token=token, user=user_response)
-
-class SetPasswordRequest(BaseModel):
-    client_id: str
-    password: str
-    confirm_password: str
-
-@api_router.post("/auth/set-password")
-async def set_password(request: SetPasswordRequest):
-    if request.password != request.confirm_password:
-        raise HTTPException(status_code=400, detail="Passwords do not match")
-    
-    if len(request.password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
-    
-    user = await db.users.find_one({"client_id": request.client_id}, {"_id": 0})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Update password
-    await db.users.update_one(
-        {"client_id": request.client_id},
-        {"$set": {"password_hash": hash_password(request.password), "needs_password_setup": False}}
-    )
-    
-    # Create token for auto-login
-    token = create_token(user['id'])
-    
-    user_response = UserResponse(
-        id=user['id'],
-        client_id=user['client_id'],
-        email=user['email'],
-        name=user['name'],
-        mobile_number=user['mobile_number'],
-        pan_number=user.get('pan_number', ''),
-        date_of_birth=user.get('date_of_birth', ''),
-        city=user['city'],
-        created_at=user['created_at'],
-        networth=user.get('networth', 0),
-        needs_password_setup=False
-    )
-    
-    return AuthResponse(token=token, user=user_response)
-
-@api_router.get("/auth/me", response_model=UserResponse)
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    user_id = await verify_token(credentials)
-    user = await db.users.find_one({"id": user_id}, {"_id": 0})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return UserResponse(
-        id=user['id'],
-        client_id=user['client_id'],
-        email=user['email'],
-        name=user['name'],
-        mobile_number=user['mobile_number'],
-        pan_number=user.get('pan_number', ''),
-        date_of_birth=user.get('date_of_birth', ''),
-        city=user['city'],
-        created_at=user['created_at'],
-        networth=user.get('networth', 0),
-        needs_password_setup=user.get('needs_password_setup', False)
-    )
-
 # ============= Transaction Routes =============
 
 @api_router.post("/transactions", response_model=Transaction)
@@ -622,51 +463,6 @@ async def categorize_expense(request: CategorizeExpenseRequest, credentials: HTT
     
     result = await categorize_with_ai(request.description, request.amount)
     return CategorizeExpenseResponse(**result)
-
-# ============= Questionnaire Routes =============
-
-@api_router.post("/questionnaire", response_model=QuestionnaireResponse)
-async def submit_questionnaire(questionnaire: FinancialQuestionnaire, credentials: HTTPAuthorizationCredentials = Depends(security)):
-    user_id = await verify_token(credentials)
-    
-    questionnaire_data = questionnaire.dict()
-    questionnaire_data['user_id'] = user_id
-    questionnaire_data['completed_at'] = datetime.now(timezone.utc).isoformat()
-    
-    # Update or insert questionnaire
-    await db.questionnaires.update_one(
-        {"user_id": user_id},
-        {"$set": questionnaire_data},
-        upsert=True
-    )
-    
-    return QuestionnaireResponse(
-        message="Questionnaire saved successfully",
-        questionnaire=questionnaire
-    )
-
-@api_router.get("/questionnaire", response_model=FinancialQuestionnaire)
-async def get_questionnaire(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    user_id = await verify_token(credentials)
-    
-    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
-    
-    if not questionnaire:
-        raise HTTPException(status_code=404, detail="Questionnaire not found")
-    
-    return FinancialQuestionnaire(**questionnaire)
-
-@api_router.delete("/questionnaire")
-async def reset_questionnaire(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Reset/delete user's questionnaire data"""
-    user_id = await verify_token(credentials)
-    
-    result = await db.questionnaires.delete_one({"user_id": user_id})
-    
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="No questionnaire found to reset")
-    
-    return {"message": "Financial data reset successfully"}
 
 # ============= Reports Routes =============
 
@@ -2252,77 +2048,19 @@ async def root():
 async def health_check():
     return {"status": "healthy", "service": "arth-verse-api"}
 
-# ============= Future Automation Placeholder APIs =============
-
-class IntegrationStatus(BaseModel):
-    status: str = "placeholder"
-    message: str
-    module: str
-    version: str = "0.1.0"
-    ready: bool = False
-
-@api_router.get("/integrations/account-aggregator")
-async def account_aggregator_placeholder(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Placeholder for Account Aggregator integration - auto-fetch bank/MF/insurance data."""
-    await verify_token(credentials)
-    return IntegrationStatus(
-        status="placeholder",
-        message="Account Aggregator integration is under development. This will enable automated fetching of bank accounts, mutual funds, and insurance policies via Setu/Sahamati AA framework.",
-        module="account_aggregator",
-        version="0.1.0",
-        ready=False
-    )
-
-@api_router.get("/integrations/email-parsing")
-async def email_parsing_placeholder(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Placeholder for Email Parsing - extract financial data from emails."""
-    await verify_token(credentials)
-    return IntegrationStatus(
-        status="placeholder",
-        message="Email Parsing module is under development. This will automatically parse bank statements, investment confirmations, and insurance renewal emails to keep your financial profile updated.",
-        module="email_parsing",
-        version="0.1.0",
-        ready=False
-    )
-
-@api_router.get("/integrations/sms-parsing")
-async def sms_parsing_placeholder(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Placeholder for SMS Parsing - extract transaction data from SMS."""
-    await verify_token(credentials)
-    return IntegrationStatus(
-        status="placeholder",
-        message="SMS Parsing module is under development. This will parse bank transaction SMS, credit card alerts, and UPI notifications to auto-categorize your expenses.",
-        module="sms_parsing",
-        version="0.1.0",
-        ready=False
-    )
-
-@api_router.get("/integrations/portfolio-sync")
-async def portfolio_sync_placeholder(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Placeholder for Investment Portfolio Sync - real-time portfolio tracking."""
-    await verify_token(credentials)
-    return IntegrationStatus(
-        status="placeholder",
-        message="Portfolio Sync module is under development. This will connect to CAMS/KFintech/CDSL to provide real-time mutual fund, stock, and NPS portfolio tracking.",
-        module="portfolio_sync",
-        version="0.1.0",
-        ready=False
-    )
-
-@api_router.get("/integrations/status")
-async def all_integrations_status(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Get status of all automation integration modules."""
-    await verify_token(credentials)
-    return {
-        "integrations": [
-            {"module": "account_aggregator", "status": "development", "ready": False, "description": "Auto-fetch bank/MF/insurance data via AA framework"},
-            {"module": "email_parsing", "status": "planned", "ready": False, "description": "Parse financial emails for auto-updates"},
-            {"module": "sms_parsing", "status": "planned", "ready": False, "description": "Parse transaction SMS for expense tracking"},
-            {"module": "portfolio_sync", "status": "planned", "ready": False, "description": "Real-time investment portfolio sync"},
-        ]
-    }
-
 # Include the router in the main app
+# Register modular route modules
+from routes.deps import set_db as _set_db
+_set_db(db)
+
+from routes.auth import router as auth_router
+from routes.questionnaire import router as questionnaire_router
+from routes.integrations import router as integrations_router
+
+api_router.include_router(auth_router)
+api_router.include_router(questionnaire_router)
+api_router.include_router(integrations_router)
+
 app.include_router(api_router)
 
 app.add_middleware(

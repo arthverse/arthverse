@@ -20,9 +20,20 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 - Extracted 10-Factor Analysis + Pillar Modals (530 lines) → `report/TenFactorAnalysis.js`
 - Updated `report/index.js` to re-export new modules
 
-**FinancialQuestionnaire.js Refactoring (2705 → 2507 lines, -198 lines):**
+**FinancialQuestionnaire.js Refactoring (2705 → 917 lines, -66%):**
 - Extracted `defaultFormData`, `generateId`, `ARRAY_FIELDS` → `questionnaire/formDefaults.js`
+- Extracted Step 1 (Income) → `questionnaire/IncomeStep.js` (339 lines)
+- Extracted Step 2 (Expenses) → `questionnaire/ExpenseStep.js` (435 lines)
+- Extracted Step 3 (Assets) → `questionnaire/AssetsStep.js` (445 lines)
+- Extracted Step 4 (Stability) → `questionnaire/StabilityStep.js` (327 lines)
+- Extracted Step 5 (Credit Card) → `questionnaire/CreditCardStep.js` (200 lines)
 - Simplified data loading with `ARRAY_FIELDS` loop
+
+**Backend server.py Refactoring (2364 → 2101 lines):**
+- Created `/app/backend/routes/deps.py` — shared models, auth helpers, db reference
+- Extracted auth routes → `routes/auth.py` (register, login, set-password, me)
+- Extracted questionnaire CRUD → `routes/questionnaire.py` (GET/POST/DELETE)
+- Extracted integration placeholders → `routes/integrations.py` (5 endpoints)
 
 ### ✅ Risk Meter, Performance Optimization & Future Automation APIs (Apr 17, 2026)
 **Risk Visualization Component:**
