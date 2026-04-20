@@ -9,11 +9,12 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 **Complete field rename across full stack to match ArthMitra_DataInput_Spec.xlsx.**
 
 **ArthMitraReport.js spec-aligned (Apr 20, 2026):**
-- Assets: bank_savings_balance, equity_mf_current_value, direct_stocks_value, ppf_nps_balance, regular_fd_balance, gold_silver_value, real_estate split
-- Liabilities: home_loan_outstanding, vehicle_loan_outstanding, personal_loan_outstanding, credit_card_outstanding
+- **FIXED: Asset/Liability totals now match displayed components exactly** — dynamic rendering from `assetItems[]` and `liabilityItems[]` arrays, `totalAssets = assetItems.reduce(sum)` ensures displayed cards always sum to the total
+- Removed Emergency Fund double-counting (was adding bankBalance again). Emergency fund is now a derived metric only, not a card in the asset grid
+- All 13 asset types shown when >0: Bank Balance, Sweep FD, Liquid MF, Mutual Funds, PF/NPS, Stocks, FD, Debt MF/Bonds, Gold, Real Estate, Cash, ULIP, Other
+- All 5 liability types shown when >0: Home Loan, Vehicle Loan, Education Loan, Personal Loan, Credit Card
 - Income breakdown: monthly_salary_net, monthly_business_income, monthly_rental_income, monthly_other_income (+ employer_epf, annual_bonus in details)
 - Expense breakdown: All C1-C11 categories rendered dynamically with filter(value > 0)
-- Emergency fund = bank_savings_balance + sweep_fd_balance + liquid_mf_balance
 
 **Frontend step components (Apr 20, 2026):**
 

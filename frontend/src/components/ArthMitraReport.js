@@ -71,16 +71,49 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
   const debtMf = questionnaire?.debt_mf_bonds_value ?? 0;
   const gold = questionnaire?.gold_silver_value ?? 0;
   const realEstate = (questionnaire?.real_estate_primary_value ?? 0) + (questionnaire?.real_estate_investment_value ?? 0);
+  const cashInHand = questionnaire?.cash_in_hand ?? 0;
+  const ulidEndowment = questionnaire?.ulip_endowment_value ?? 0;
+  const otherAssets = questionnaire?.other_assets ?? 0;
+  // Emergency fund is a DERIVED label (not an independent asset) — it's the sum of liquid assets
   const emergencyFund = bankBalance + sweepFd + liquidMf;
-  const totalAssets = bankBalance + sweepFd + liquidMf + mutualFunds + pfNps + stocks + fd + debtMf + gold + realEstate + (questionnaire?.ulip_endowment_value ?? 0) + (questionnaire?.other_assets ?? 0) + (questionnaire?.cash_in_hand ?? 0);
+
+  // Build asset list — every item that contributes to totalAssets must appear here
+  const assetItems = [
+    { label: 'Bank Balance', value: bankBalance, sub: 'Savings & Current', color: 'var(--grn)' },
+    { label: 'Sweep-in FD', value: sweepFd, sub: 'Highly liquid FD', color: 'var(--grn)' },
+    { label: 'Liquid MF', value: liquidMf, sub: 'Overnight / liquid funds', color: 'var(--grn)' },
+    { label: 'Mutual Funds', value: mutualFunds, sub: 'Equity MF (SIP + Lump)', color: 'var(--grn)' },
+    { label: 'PF / NPS', value: pfNps, sub: 'Retirement corpus', color: 'var(--blu)' },
+    { label: 'Stocks', value: stocks, sub: 'Direct equity', color: 'var(--grn)' },
+    { label: 'Fixed Deposits', value: fd, sub: 'Bank FD / RD', color: 'var(--grn)' },
+    { label: 'Debt MF / Bonds', value: debtMf, sub: 'Debt instruments', color: 'var(--blu)' },
+    { label: 'Gold / Jewellery', value: gold, sub: 'Physical + Digital', color: 'var(--gold)' },
+    { label: 'Real Estate', value: realEstate, sub: 'Property (primary + investment)', color: 'var(--amb)' },
+    { label: 'Cash in Hand', value: cashInHand, sub: 'Physical cash', color: 'var(--t2)' },
+    { label: 'ULIP / Endowment', value: ulidEndowment, sub: 'Surrender value', color: 'var(--t2)' },
+    { label: 'Other Assets', value: otherAssets, sub: 'EPF, gratuity, etc.', color: 'var(--t2)' },
+  ].filter(a => a.value > 0);
+
+  // totalAssets = exact sum of all displayed asset items
+  const totalAssets = assetItems.reduce((sum, a) => sum + a.value, 0);
 
   // Liabilities breakdown (spec-aligned)
   const homeLoan = questionnaire?.home_loan_outstanding ?? 0;
   const personalLoan = questionnaire?.personal_loan_outstanding ?? 0;
   const carLoan = questionnaire?.vehicle_loan_outstanding ?? 0;
   const creditCardDebt = questionnaire?.credit_card_outstanding ?? 0;
-  const otherLoans = 0;
-  const totalLiabilities = homeLoan + personalLoan + carLoan + creditCardDebt;
+  const educationLoan = questionnaire?.education_loan_outstanding ?? 0;
+
+  const liabilityItems = [
+    { label: 'Home Loan', value: homeLoan, sub: 'Outstanding principal' },
+    { label: 'Vehicle Loan', value: carLoan, sub: 'Vehicle finance' },
+    { label: 'Education Loan', value: educationLoan, sub: 'Student loan' },
+    { label: 'Personal Loan', value: personalLoan, sub: 'Unsecured debt' },
+    { label: 'Credit Card Debt', value: creditCardDebt, sub: 'Revolving credit' },
+  ].filter(l => l.value > 0);
+
+  // totalLiabilities = exact sum of all displayed liability items
+  const totalLiabilities = liabilityItems.reduce((sum, l) => sum + l.value, 0);
 
   const netWorth = totalAssets - totalLiabilities;
 
@@ -280,97 +313,61 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       </div>
 
       {/* NET WORTH STATEMENT */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in" style={{animationDelay:'.1s'}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
         {/* ASSETS */}
         <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
           <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-            <span style={{fontSize:'14px'}}>📈</span>
+            <span style={{fontSize:'14px'}}>&#x1F4C8;</span>
             <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Assets (What You Own)</span>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Bank Balance</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(bankBalance)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Savings & Current</div>
-            </div>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Mutual Funds</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(mutualFunds)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>SIP + Lumpsum</div>
-            </div>
-            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>PF / NPS</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(pfNps)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Retirement corpus</div>
-            </div>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Stocks</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(stocks)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Direct equity</div>
-            </div>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Fixed Deposits</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(fd)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Bank FD / RD</div>
-            </div>
-            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Gold / Jewellery</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--gold)',marginBottom:'4px'}}>{formatINR2(gold)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Physical + Digital</div>
-            </div>
-            <div style={{padding:'16px',gridColumn:'span 3'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Emergency Fund</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)',marginBottom:'4px'}}>{formatINR2(emergencyFund)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Liquid savings</div>
-            </div>
+            {assetItems.map((item, idx) => (
+              <div key={item.label} style={{
+                padding:'16px',
+                borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',
+                borderBottom:'1px solid var(--border)',
+                ...(assetItems.length - idx <= (assetItems.length % 3 || 3) ? {} : {})
+              }}>
+                <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>{item.label}</div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:item.color,marginBottom:'4px'}}>{formatINR2(item.value)}</div>
+                <div style={{fontSize:'11px',color:'var(--t3)'}}>{item.sub}</div>
+              </div>
+            ))}
           </div>
           <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
             <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL ASSETS</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)'}}>{formatINR2(totalAssets)}</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)'}} data-testid="total-assets-value">{formatINR2(totalAssets)}</span>
           </div>
         </div>
 
         {/* LIABILITIES */}
         <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
           <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-            <span style={{fontSize:'14px'}}>📉</span>
+            <span style={{fontSize:'14px'}}>&#x1F4C9;</span>
             <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Liabilities (What You Owe)</span>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Home Loan</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(homeLoan)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Outstanding principal</div>
-            </div>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Personal Loan</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(personalLoan)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Unsecured debt</div>
-            </div>
-            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Car Loan</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(carLoan)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Vehicle finance</div>
-            </div>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Credit Card Debt</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(creditCardDebt)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Revolving credit</div>
-            </div>
-            <div style={{padding:'16px',borderRight:'1px solid var(--border)',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Other Loans</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(otherLoans)}</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Education / Other</div>
-            </div>
+            {liabilityItems.map((item, idx) => (
+              <div key={item.label} style={{
+                padding:'16px',
+                borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',
+                borderBottom:'1px solid var(--border)'
+              }}>
+                <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>{item.label}</div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(item.value)}</div>
+                <div style={{fontSize:'11px',color:'var(--t3)'}}>{item.sub}</div>
+              </div>
+            ))}
+            {/* Debt-to-Income ratio always shown */}
             <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
               <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Debt-to-Income</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--amb)',marginBottom:'4px'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(2) : '0.00'}%</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--amb)',marginBottom:'4px'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(2) : '0.00'}%</div>
               <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: &lt;30%</div>
             </div>
           </div>
           <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
             <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL LIABILITIES</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)'}}>{formatINR2(totalLiabilities)}</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)'}} data-testid="total-liabilities-value">{formatINR2(totalLiabilities)}</span>
           </div>
         </div>
       </div>
