@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PILLAR_DETAILS } from "./pillarData";
+import { generateComponentInsight } from "./componentInsights";
 
 export default function TenFactorAnalysis({
   tenFactorData,
@@ -171,6 +172,67 @@ export default function TenFactorAnalysis({
           </div>
         )}
       </div>
+
+      {/* PERSONALIZED INSIGHTS — Plain-language Ideal vs Actual for each component */}
+      {tenFactorData?.components && (
+        <div style={{marginBottom:'20px'}} className="an in">
+          <div className="sh"><div className="shn">&#x2261;</div><div className="sht">Your Financial Health — Explained Simply</div><div className="shl"></div></div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+            {tenFactorData.components.map((component) => {
+              const percentage = component.max_points > 0 ? (component.score / component.max_points) * 100 : 0;
+              const insight = generateComponentInsight(component.component, {
+                ...component.details,
+                percentage,
+                actual_cover: component.details?.coverage ?? component.details?.actual_cover ?? 0,
+                type: component.details?.insurance_type ?? component.details?.vehicle_insurance_type,
+                total_emi: component.details?.adjusted_emi ?? component.details?.total_emi ?? 0,
+                actual_emi: component.details?.adjusted_emi ?? component.details?.total_emi ?? 0,
+              }, {
+                income, expenses, savings, emergencyFund, totalAssets, totalLiabilities, netWorth,
+                mutualFunds, stocks, pfNps, fd, gold, realEstate, formatINR, formatINR2,
+              });
+              const icons = { 'Savings Rate': '\u{1F4B0}', 'EMI Tolerance': '\u{1F3E6}', 'Emergency Fund': '\u{1F6E1}', 'Investment Portfolio': '\u{1F4C8}', 'Net Worth': '\u{1F48E}', 'Asset Allocation': '\u{2696}', 'Financial Habits': '\u{2705}', 'Life Insurance': '\u{2764}', 'Health Insurance': '\u{1F3E5}', 'Vehicle Insurance': '\u{1F697}' };
+              const borderColor = insight.isGood ? 'var(--grnbr)' : 'var(--ambbr)';
+              const bgColor = insight.isGood ? 'var(--grnbg)' : 'var(--ambbg)';
+              const accentColor = insight.isGood ? 'var(--grn)' : 'var(--amb)';
+
+              return (
+                <div key={component.component} data-testid={`insight-${component.component.replace(/\s+/g, '-').toLowerCase()}`} style={{
+                  background:'var(--bg2)', border:`1px solid ${borderColor}`, borderRadius:'var(--r12)',
+                  overflow:'hidden', borderLeft:`4px solid ${accentColor}`,
+                }}>
+                  {/* Header */}
+                  <div style={{padding:'12px 14px',display:'flex',alignItems:'center',gap:'10px',borderBottom:`1px solid ${borderColor}`,background:bgColor}}>
+                    <span style={{fontSize:'16px'}}>{icons[component.component] || '\u{1F4CA}'}</span>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:'12px',fontWeight:700,color:'var(--t0)'}}>{component.component}</div>
+                      <div style={{fontSize:'10px',color:accentColor,fontWeight:600}}>{insight.isGood ? 'On Track' : 'Needs Attention'}</div>
+                    </div>
+                    <div style={{fontSize:'13px',fontWeight:700,fontFamily:"'JetBrains Mono',monospace",color:accentColor}}>
+                      {component.score.toFixed(1)}/{component.max_points}
+                    </div>
+                  </div>
+                  {/* Message */}
+                  <div style={{padding:'12px 14px'}}>
+                    <p style={{fontSize:'12px',color:'var(--t2)',lineHeight:1.65,marginBottom:'10px'}}>{insight.message}</p>
+                    {/* Actual vs Ideal */}
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+                      <div style={{background:'var(--bg3)',borderRadius:'var(--r8)',padding:'8px 10px'}}>
+                        <div style={{fontSize:'8px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'3px'}}>Actual</div>
+                        <div style={{fontSize:'11px',fontWeight:600,color:'var(--t1)',fontFamily:"'JetBrains Mono',monospace"}}>{insight.actual}</div>
+                      </div>
+                      <div style={{background:bgColor,borderRadius:'var(--r8)',padding:'8px 10px',border:`1px solid ${borderColor}`}}>
+                        <div style={{fontSize:'8px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:accentColor,marginBottom:'3px'}}>Ideal</div>
+                        <div style={{fontSize:'11px',fontWeight:600,color:accentColor,fontFamily:"'JetBrains Mono',monospace"}}>{insight.ideal}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* 10-FACTOR DETAILS MODAL */}
       {selectedPillar && tenFactorData?.components && (() => {

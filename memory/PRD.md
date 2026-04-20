@@ -5,6 +5,12 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+**Plain-Language Insights "Explained Simply" (Apr 20, 2026):**
+- Created `componentInsights.js` — generates personalized Ideal vs Actual messages for all 10 scoring components
+- Each component shows: score, On Track/Needs Attention badge, plain-language message with user's actual amounts, Actual vs Ideal comparison boxes
+- Messages adapt dynamically: good score = positive reinforcement, gap = actionable recommendation with specific amounts and timelines
+- Green-bordered cards for on-track components, amber for needs-attention
+
 ### ✅ ArthMitra Data Input Spec Alignment — 84 Fields (Apr 20, 2026)
 **Complete field rename across full stack to match ArthMitra_DataInput_Spec.xlsx.**
 
