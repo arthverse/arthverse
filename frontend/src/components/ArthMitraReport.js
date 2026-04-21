@@ -910,7 +910,23 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       <CIBILScore totalLiabilities={totalLiabilities} cibilScore={questionnaire?.cibil_score} />
 
       {/* 8. KNOW YOUR RETIREMENT AGE */}
-      <RetirementAge netWorth={netWorth} expenses={expenses} formatINR2={formatINR2} />
+      <RetirementAge
+        netWorth={netWorth}
+        expenses={expenses}
+        savings={savings}
+        income={income}
+        age={userAge}
+        familySituation={questionnaire?.family_situation}
+        mutualFunds={mutualFunds}
+        stocks={stocks}
+        realEstate={realEstate}
+        fd={fd}
+        pfNps={pfNps}
+        debtMf={debtMf}
+        gold={gold}
+        totalAssets={totalAssets}
+        formatINR2={formatINR2}
+      />
 
       {/* 9. WHAT TO TRACK MONTHLY */}
       <div className="sh an in"><div className="shn">11</div><div className="sht">What to Track Monthly</div><div className="shl"></div></div>
