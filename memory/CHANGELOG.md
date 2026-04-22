@@ -1,5 +1,27 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 25: PAN Auto-Try + Credit Card Statement Parsing ✅
+
+### PAN Auto-Try
+- `/api/gmail/parse-attachment` now **auto-tries the user's saved PAN** (from `users.pan_number`) before prompting. If PAN unlocks the PDF → parse proceeds silently. If PAN is wrong → response includes `tried_your_pan: true` with tailored message: *"We tried your saved PAN but it didn't work — this may be a family member's PAN, or it might need PAN + DDMMYYYY"*.
+- Frontend password modal now renders conditional intro text based on `tried_your_pan` flag.
+
+### Credit Card Statement Parsing
+- Extended GPT-5.2 prompt schema in `services/pdf_attachment_parser.py` with new `credit_card` object: `{issuer, card_number_last4, statement_date, due_date, total_due, min_due, credit_limit, available_credit, reward_points, previous_balance, payments_credits, purchases_debits, finance_charges}`.
+- New `document_type` enum value: `credit_card_statement`.
+- `cas_to_questionnaire_updates()` now maps CC fields: `credit_limit → has_credit_card=true + credit_card_limit`, `total_due → credit_card_outstanding`, `purchases_debits → monthly_credit_card_spend`.
+- Individual card purchases → saved as transactions with inferred category (Food/Travel/Shopping).
+
+### Expanded Gmail Search
+- Subjects added: `"card statement"`, `"credit card statement"`, `"payment due"`, `bill`, `dues`, `"your statement"`.
+- Senders added: `sbicard.com`, `americanexpress`, `hdfcbank.net`, `axisbank.com`.
+- `looks_like_cas` heuristic now also matches `credit`, `card`, `bill` filename keywords.
+- Result: Gmail emails pulled went 15 → 30 for test user (more credit card notifications now surfaced).
+
+### Testing
+- **13/13 backend tests passed** (public URL) including live verification of both PAN-auto-try branches, CC-to-questionnaire mapping, and regression on all prior endpoints.
+- Frontend conditional modal text verified by source inspection.
+
 ## Feb 2026 — Iteration 24: PDF Attachment + CAS Parsing ✅
 
 ### Core Capability
