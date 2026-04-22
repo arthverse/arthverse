@@ -232,6 +232,7 @@ async def parse_gmail_email(
     """Fetch a specific Gmail email and parse it with AI."""
     from services.document_parser import parse_email_text
 
+    db = get_db()
     user_id = await verify_token(credentials)
 
     creds = await _get_gmail_creds(user_id)
@@ -258,7 +259,57 @@ async def parse_gmail_email(
         full_text = f"From: {headers.get('From', '')}\nSubject: {headers.get('Subject', '')}\nDate: {headers.get('Date', '')}\n\n{body_text}"
 
         result = await parse_email_text(full_text)
+
+        # Mark as parsed in inbox queue
+        await db.gmail_inbox.update_one(
+            {"user_id": user_id, "email_id": email_id},
+            {"$set": {"parsed": True, "parsed_at": datetime.now(timezone.utc).isoformat(),
+                      "parsed_data": result.get("data")}}
+        )
+
         return result
     except Exception as e:
         logger.error(f"Gmail parse error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/inbox")
+async def get_inbox_queue(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    unparsed_only: bool = Query(True),
+):
+    """Get the auto-scanned Gmail inbox queue for this user."""
+    db = get_db()
+    user_id = await verify_token(credentials)
+
+    query = {"user_id": user_id}
+    if unparsed_only:
+        query["parsed"] = False
+
+    emails = await db.gmail_inbox.find(query, {"_id": 0}).sort("queued_at", -1).limit(100).to_list(100)
+    unparsed_count = await db.gmail_inbox.count_documents({"user_id": user_id, "parsed": False})
+
+    token_doc = await db.gmail_tokens.find_one({"user_id": user_id}, {"_id": 0})
+    last_scanned = token_doc.get("last_scanned_at") if token_doc else None
+
+    return {
+        "emails": emails,
+        "unparsed_count": unparsed_count,
+        "last_scanned": last_scanned,
+    }
+
+
+@router.post("/refresh")
+async def refresh_gmail_scan(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Manually trigger a Gmail scan for the current user (same logic as auto-scan)."""
+    from services.gmail_auto_scan import scan_user_gmail
+
+    db = get_db()
+    user_id = await verify_token(credentials)
+
+    creds = await _get_gmail_creds(user_id)
+    if not creds:
+        raise HTTPException(status_code=403, detail="Gmail not connected")
+
+    result = await scan_user_gmail(db, user_id)
+    return result

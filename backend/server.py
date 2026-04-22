@@ -455,6 +455,20 @@ async def delete_transaction(transaction_id: str, credentials: HTTPAuthorization
     
     return {"message": "Transaction deleted"}
 
+
+@api_router.get("/transactions/subscriptions")
+async def get_recurring_subscriptions(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Detect recurring subscriptions from the user's transactions."""
+    from services.subscription_detector import detect_subscriptions
+    user_id = await verify_token(credentials)
+
+    transactions = await db.transactions.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("date", -1).limit(500).to_list(500)
+
+    return detect_subscriptions(transactions)
+
 # ============= AI Routes =============
 
 @api_router.post("/ai/categorize", response_model=CategorizeExpenseResponse)
@@ -2086,6 +2100,32 @@ async def startup_db_client():
         logger.error(f"Failed to connect to MongoDB: {e}")
         # Don't raise - let the app start and handle DB errors per request
 
+    # Start Gmail auto-scan scheduler (runs every 12 hours)
+    try:
+        from apscheduler.schedulers.asyncio import AsyncIOScheduler
+        from services.gmail_auto_scan import scan_all_connected_users
+
+        scheduler = AsyncIOScheduler(timezone="UTC")
+
+        async def _run_scan():
+            try:
+                await scan_all_connected_users(db)
+            except Exception as e:
+                logger.error(f"Gmail auto-scan job failed: {e}")
+
+        scheduler.add_job(_run_scan, 'interval', hours=12, id='gmail_auto_scan',
+                         next_run_time=datetime.now(timezone.utc) + timedelta(minutes=5))
+        scheduler.start()
+        app.state.scheduler = scheduler
+        logger.info("Gmail auto-scan scheduler started (every 12h)")
+    except Exception as e:
+        logger.error(f"Failed to start scheduler: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    try:
+        if hasattr(app.state, 'scheduler'):
+            app.state.scheduler.shutdown(wait=False)
+    except Exception:
+        pass
     client.close()

@@ -14,6 +14,7 @@ import PaymentSection from '../components/PaymentSection';
 import AnalysisResults from '../components/AnalysisResults';
 import ArthMitraReport from '../components/ArthMitraReport';
 import RiskMeter from '../components/RiskMeter';
+import SubscriptionsCard from '../components/SubscriptionsCard';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
@@ -486,6 +487,11 @@ Check your score too! 👇
               />
             </div>
           )}
+        </div>
+
+        {/* Recurring Subscriptions (auto-detected) */}
+        <div className="col-span-1 md:col-span-4 mt-8">
+          <SubscriptionsCard token={token} />
         </div>
 
         {/* Smart Import Quick Access */}

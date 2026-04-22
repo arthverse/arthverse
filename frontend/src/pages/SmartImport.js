@@ -6,7 +6,7 @@ import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, Upload, FileText, Mail, CheckCircle2, AlertTriangle, Loader2, ExternalLink, Shield, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Mail, CheckCircle2, AlertTriangle, Loader2, ExternalLink, Shield, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 
 export default function SmartImport({ token, onLogout }) {
   const navigate = useNavigate();
@@ -24,6 +24,8 @@ export default function SmartImport({ token, onLogout }) {
   const [applyingPolicy, setApplyingPolicy] = useState(false);
   const [savingTransactions, setSavingTransactions] = useState(false);
   const [savedTransactionIds, setSavedTransactionIds] = useState(new Set());
+  const [inbox, setInbox] = useState({ emails: [], unparsed_count: 0, last_scanned: null });
+  const [refreshingInbox, setRefreshingInbox] = useState(false);
 
   const loadGmailStatus = useCallback(async () => {
     try {
@@ -31,6 +33,30 @@ export default function SmartImport({ token, onLogout }) {
       setGmailStatus(res.data);
     } catch { /* ignore */ }
   }, [token]);
+
+  const loadInbox = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/gmail/inbox?unparsed_only=false`, { headers: { Authorization: `Bearer ${token}` } });
+      setInbox(res.data);
+    } catch { /* ignore — might not be connected yet */ }
+  }, [token]);
+
+  const handleRefreshInbox = async () => {
+    setRefreshingInbox(true);
+    try {
+      const res = await axios.post(`${API}/gmail/refresh`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.data.error) {
+        toast.error('Refresh failed: ' + res.data.error);
+      } else {
+        toast.success(`Found ${res.data.new_count} new financial email${res.data.new_count === 1 ? '' : 's'}`);
+        loadInbox();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Refresh failed');
+    } finally {
+      setRefreshingInbox(false);
+    }
+  };
 
   const loadParsedPolicies = useCallback(async () => {
     try {
@@ -42,9 +68,10 @@ export default function SmartImport({ token, onLogout }) {
   useEffect(() => {
     loadGmailStatus();
     loadParsedPolicies();
+    loadInbox();
     if (searchParams.get('gmail') === 'connected') toast.success('Gmail connected successfully!');
     if (searchParams.get('gmail') === 'error') toast.error('Gmail connection failed');
-  }, [loadGmailStatus, loadParsedPolicies, searchParams]);
+  }, [loadGmailStatus, loadParsedPolicies, loadInbox, searchParams]);
 
   const handlePolicyUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -296,6 +323,39 @@ export default function SmartImport({ token, onLogout }) {
                       <CheckCircle2 className="w-4 h-4 text-green-600" />
                       <span className="text-sm text-green-700 font-medium">Connected: {gmailStatus.email}</span>
                     </div>
+
+                    {/* Auto-scan status banner */}
+                    <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-200 mb-4" data-testid="auto-scan-banner">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-start gap-2">
+                          <RefreshCw className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs font-bold text-indigo-900">Auto-Refresh Active</p>
+                            <p className="text-[11px] text-indigo-700">
+                              Background scan runs every 12h.
+                              {inbox.last_scanned && ` Last: ${new Date(inbox.last_scanned).toLocaleString()}`}
+                            </p>
+                          </div>
+                        </div>
+                        {inbox.unparsed_count > 0 && (
+                          <span className="bg-brand-orange text-white text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0" data-testid="inbox-unparsed-badge">
+                            {inbox.unparsed_count} new
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        onClick={handleRefreshInbox}
+                        disabled={refreshingInbox}
+                        size="sm"
+                        variant="outline"
+                        className="w-full text-xs h-8 border-indigo-300 text-indigo-700 hover:bg-indigo-100 rounded-lg"
+                        data-testid="refresh-inbox-btn"
+                      >
+                        {refreshingInbox ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCw className="w-3 h-3 mr-1" />}
+                        {refreshingInbox ? 'Scanning...' : 'Refresh now'}
+                      </Button>
+                    </div>
+
                     <Button onClick={handleFetchEmails} disabled={loadingEmails} className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl mb-3" data-testid="fetch-emails-btn">
                       {loadingEmails ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Mail className="w-4 h-4 mr-2" />}
                       {loadingEmails ? 'Scanning...' : 'Scan Financial Emails'}

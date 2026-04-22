@@ -1,0 +1,35 @@
+{
+  "summary": "Iteration 18 — Subscription detector + Gmail auto-scan/inbox/refresh + regressions. All 13 backend pytest tests pass. Frontend Smart Import page renders with 3 tabs, Gmail Connect tab shows only 'Connect Gmail' button (no auto-scan banner since user not connected, which is correct). Dashboard and Transactions pages render without JS errors.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_18.py",
+    "/app/test_reports/pytest/iteration_18_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "gmail_auto_scan.py: FINANCIAL_SEARCH_QUERY parenthesis wraps multiple subject filters — 'newer_than:14d' is appended outside the parenthesis which is correct, but note the 'OR' chain risks very broad matches; minor.",
+    "subscription_detector.py: Uses datetime.now() (naive) in days_until_next; mixing naive datetimes with ISO date parsing works but consider timezone-awareness if later user dates include tz offsets.",
+    "server.py startup: APScheduler runs inside FastAPI lifespan — good. Ensure that on hot-reload no duplicate schedulers spawn; log shows two 'scheduler started' entries within seconds of each other which could indicate a double-start during reload. Non-blocking since job id='gmail_auto_scan' would dedupe via replace_existing if set."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration_18.py"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13)",
+    "frontend": "100% (all flows passed; 0 console JS errors, 4 unrelated resource 404s)"
+  },
+  "test_credentials": "AV271676A7 / Demo123!",
+  "seed_data_creation": "None created; used pre-seeded transactions (Netflix ₹799, Spotify ₹199, HDFC MF SIP ₹5000). A temporary TEST_iteration18_txn was created and immediately deleted during CRUD regression test.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Test file /app/backend/tests/test_iteration_18.py covers subscriptions, /api/gmail/inbox, /api/gmail/refresh (403 unconnected), regressions for gmail status/connect, parsed-policies, save-transactions, and transactions CRUD. Backend URL auto-loaded from /app/frontend/.env if env var absent. Frontend login flow: POST /api/auth/login → response {token, user}; token stored in localStorage under key 'token'. Login page is at /arthverse/auth (not /arthvyay/login).",
+  "rca of the issue": "N/A — no issues found."
+}
