@@ -205,14 +205,18 @@ async def get_financial_emails(
         from googleapiclient.discovery import build
         service = build('gmail', 'v1', credentials=creds)
 
-        # Search for financial emails (365-day window, broad financial senders)
+        # Search for financial emails (365-day window, broad financial senders incl. credit card)
         query = ('(subject:statement OR subject:policy OR subject:investment OR subject:SIP '
                  'OR subject:premium OR subject:renewal OR subject:insurance OR subject:EMI '
                  'OR subject:credit OR subject:debit OR subject:CAS OR subject:"consolidated account" '
                  'OR subject:portfolio OR subject:holdings OR subject:"demat statement" '
+                 'OR subject:"credit card statement" OR subject:"card statement" '
+                 'OR subject:"your statement" OR subject:bill OR subject:"payment due" '
                  'OR from:cams.com OR from:karvy.com OR from:kfintech.com '
                  'OR from:cdslindia.com OR from:nsdl.co.in '
-                 'OR from:noreply@hdfcbank OR from:alerts@icicibank) newer_than:365d')
+                 'OR from:noreply@hdfcbank OR from:alerts@icicibank '
+                 'OR from:sbicard.com OR from:axisbank.com OR from:americanexpress '
+                 'OR from:hdfcbank.net) newer_than:365d')
         result = service.users().messages().list(userId='me', q=query, maxResults=max_results).execute()
         messages = result.get('messages', [])
 
@@ -238,11 +242,12 @@ async def get_financial_emails(
                     if mime == 'text/plain' and body.get('data') and not body_text:
                         body_text = base64.urlsafe_b64decode(body['data']).decode('utf-8', errors='ignore')
                     elif filename and filename.lower().endswith('.pdf') and body.get('attachmentId'):
+                        fn_lower = filename.lower()
                         attachments.append({
                             "attachment_id": body['attachmentId'],
                             "filename": filename,
                             "size": body.get('size', 0),
-                            "looks_like_cas": any(k in filename.lower() for k in ['cas', 'consolidated', 'cams', 'karvy', 'statement', 'portfolio', 'holdings']),
+                            "looks_like_cas": any(k in fn_lower for k in ['cas', 'consolidated', 'cams', 'karvy', 'statement', 'portfolio', 'holdings', 'credit', 'card', 'bill']),
                         })
                     if part.get('parts'):
                         _walk_parts(part['parts'])
@@ -310,6 +315,24 @@ async def parse_gmail_attachment(
         logger.error(f"Attachment download failed: {e}")
         raise HTTPException(status_code=500, detail=f"Download failed: {e}")
 
+    # Auto-try user's PAN as password if none was provided (common for Zerodha/CAS/CC statements)
+    auto_tried = False
+    if not password:
+        user = await db.users.find_one({"id": user_id}, {"_id": 0, "pan_number": 1})
+        user_pan = (user or {}).get("pan_number", "").strip().upper()
+        if user_pan and len(user_pan) == 10:
+            try:
+                pdf_text_try, was_encrypted_try = extract_pdf_text(pdf_bytes, password=user_pan)
+                if pdf_text_try:
+                    # PAN worked!
+                    password = user_pan
+                    auto_tried = True
+            except ValueError:
+                # PAN was tried but is wrong — signal to UI so it can show helpful message
+                auto_tried = True
+            except Exception:
+                pass
+
     # Extract text (may be password-protected)
     try:
         pdf_text, was_encrypted = extract_pdf_text(pdf_bytes, password=password)
@@ -324,7 +347,11 @@ async def parse_gmail_attachment(
         return {
             "success": False,
             "password_required": True,
-            "message": "This PDF is password-protected. For CAS files, the password is usually your PAN (uppercase) or PAN + DOB (DDMMYYYY)."
+            "tried_your_pan": auto_tried,
+            "message": ("We tried your saved PAN but it didn't work — try entering the password manually. "
+                        "This may be a family member's PAN, or it might need PAN + DDMMYYYY (date of birth)."
+                        if auto_tried else
+                        "This PDF is password-protected. For CAS / credit card / Zerodha files, the password is usually your PAN (uppercase) or PAN + DOB (DDMMYYYY).")
         }
 
     # Parse via GPT-5.2

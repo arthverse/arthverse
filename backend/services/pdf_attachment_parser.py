@@ -61,11 +61,12 @@ def extract_pdf_text(pdf_bytes: bytes, password: Optional[str] = None) -> tuple[
 
 
 async def parse_cas_pdf(pdf_text: str) -> dict:
-    """Parse a Consolidated Account Statement (CAS) via GPT-5.2.
+    """Parse a Consolidated Account Statement (CAS) or credit card statement via GPT-5.2.
 
     Returns a dict with structured keys that map to the questionnaire:
         - mutual_funds: list of {scheme, folio, units, current_value, cost}
         - equity_holdings: list of {symbol, quantity, current_value}
+        - credit_card: {issuer, card_number_last4, statement_date, due_date, total_due, min_due, credit_limit, available_credit}
         - totals: {total_mf_value, total_equity_value, total_nps_value, total_liquid_value}
         - transactions: list of {date, description, amount, type}
     """
@@ -76,14 +77,19 @@ async def parse_cas_pdf(pdf_text: str) -> dict:
     if not emergent_key:
         return {"error": "LLM key not configured"}
 
-    prompt = f"""You are a financial document parser. The following is text extracted from an Indian
-Consolidated Account Statement (CAS) from CDSL/NSDL/CAMS or a bank e-statement / portfolio statement.
+    prompt = f"""You are a financial document parser. The following is text extracted from one of:
+- Indian Consolidated Account Statement (CAS) from CDSL/NSDL/CAMS/Karvy
+- Bank e-statement (HDFC, ICICI, SBI, Axis etc.)
+- Credit card statement (HDFC, ICICI, SBI Cards, Axis, Amex etc.)
+- Mutual fund / demat / portfolio statement
+- Capital gains statement (Zerodha, Groww etc.)
 
-Extract a JSON object with EXACTLY this schema — use 0 or empty list [] if data is absent.
+Identify the document type and extract a JSON object with EXACTLY this schema.
+Use 0 or empty list [] or empty string "" if data is absent.
 Return ONLY valid JSON, no markdown, no commentary.
 
 {{
-  "document_type": "cas | bank_statement | mf_statement | demat_statement | other",
+  "document_type": "cas | bank_statement | mf_statement | demat_statement | credit_card_statement | capital_gain_statement | other",
   "period": {{"from": "YYYY-MM-DD or empty", "to": "YYYY-MM-DD or empty"}},
   "holder_name": "string or empty",
   "mutual_funds": [
@@ -92,6 +98,21 @@ Return ONLY valid JSON, no markdown, no commentary.
   "equity_holdings": [
     {{"symbol": "stock symbol/ISIN", "quantity": 0, "current_value": 0.0}}
   ],
+  "credit_card": {{
+    "issuer": "HDFC | ICICI | SBI | Axis | Amex | RBL | Other or empty",
+    "card_number_last4": "last 4 digits or empty",
+    "statement_date": "YYYY-MM-DD or empty",
+    "due_date": "YYYY-MM-DD or empty",
+    "total_due": 0.0,
+    "min_due": 0.0,
+    "credit_limit": 0.0,
+    "available_credit": 0.0,
+    "reward_points": 0,
+    "previous_balance": 0.0,
+    "payments_credits": 0.0,
+    "purchases_debits": 0.0,
+    "finance_charges": 0.0
+  }},
   "totals": {{
     "total_mf_value": 0.0,
     "total_equity_mf_value": 0.0,
@@ -100,7 +121,9 @@ Return ONLY valid JSON, no markdown, no commentary.
     "total_nps_value": 0.0,
     "total_ppf_value": 0.0,
     "total_epf_value": 0.0,
-    "total_liquid_value": 0.0
+    "total_liquid_value": 0.0,
+    "realized_capital_gains_st": 0.0,
+    "realized_capital_gains_lt": 0.0
   }},
   "transactions": [
     {{"date": "YYYY-MM-DD", "description": "text", "amount": 0.0, "type": "credit | debit", "category": "inferred category"}}
@@ -110,9 +133,12 @@ Return ONLY valid JSON, no markdown, no commentary.
 
 Rules:
 - All amounts MUST be in INR (convert if needed).
-- For MF category classification: names containing "Liquid/Savings/Money Market" → liquid;
-  names with "Debt/Bond/Gilt/Income" → debt; "Hybrid/Balanced" → hybrid; else equity.
+- For MF category: names with "Liquid/Savings/Money Market" → liquid; "Debt/Bond/Gilt/Income" → debt; "Hybrid/Balanced" → hybrid; else equity.
 - total_equity_mf_value = sum of equity + hybrid category current_value.
+- For CREDIT CARD statements: populate the credit_card object AND extract individual purchases/payments as transactions.
+  - For credit card purchases, use type="debit", category should be inferred from merchant (Food/Travel/Shopping/Entertainment/Utilities/etc).
+  - For credit card payments, use type="credit", category="credit_card_payment".
+- For CAPITAL GAIN statements: populate realized_capital_gains_st/lt under totals.
 - Cap transactions list at 50 most recent rows if longer.
 
 PDF TEXT:
@@ -143,7 +169,7 @@ PDF TEXT:
 
 
 def cas_to_questionnaire_updates(cas_data: dict) -> dict:
-    """Map parsed CAS data to questionnaire field updates."""
+    """Map parsed CAS / credit-card / bank-statement data to questionnaire field updates."""
     totals = cas_data.get("totals", {}) or {}
     updates = {}
 
@@ -171,5 +197,19 @@ def cas_to_questionnaire_updates(cas_data: dict) -> dict:
         updates["ppf_balance"] = ppf
     if epf > 0:
         updates["epf_balance"] = epf
+
+    # Credit card statements → affect credit_limit + monthly_credit_card_payment
+    cc = cas_data.get("credit_card") or {}
+    total_due = float(cc.get("total_due") or 0)
+    credit_limit = float(cc.get("credit_limit") or 0)
+    purchases = float(cc.get("purchases_debits") or 0)
+    if credit_limit > 0:
+        updates["has_credit_card"] = True
+        # Take the highest credit limit seen across statements
+        updates["credit_card_limit"] = credit_limit
+    if total_due > 0:
+        updates["credit_card_outstanding"] = total_due
+    if purchases > 0:
+        updates["monthly_credit_card_spend"] = purchases
 
     return updates

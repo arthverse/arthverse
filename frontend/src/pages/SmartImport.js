@@ -52,7 +52,14 @@ export default function SmartImport({ token, onLogout }) {
       }, { headers: { Authorization: `Bearer ${token}` }, timeout: 300000 });
 
       if (res.data.password_required) {
-        setAttachmentModal({ ...workingModal, loading: false, error: null, password_required: true });
+        setAttachmentModal({
+          ...workingModal,
+          loading: false,
+          error: null,
+          password_required: true,
+          tried_your_pan: Boolean(res.data.tried_your_pan),
+          password: '', // reset so user enters fresh
+        });
         return;
       }
 
@@ -869,8 +876,15 @@ export default function SmartImport({ token, onLogout }) {
               </div>
               <div className="p-5 space-y-3">
                 <div className="text-[11px] text-slate-600 leading-relaxed p-3 bg-purple-50 rounded-lg border border-purple-200">
-                  <p className="font-semibold text-purple-900 mb-1">Common CAS passwords:</p>
-                  <ul className="space-y-0.5 text-slate-600">
+                  {attachmentModal.tried_your_pan ? (
+                    <>
+                      <p className="font-semibold text-purple-900 mb-1">We tried your saved PAN — didn't work.</p>
+                      <p className="text-slate-600">This might be a family member's PAN or need PAN + DOB. Try:</p>
+                    </>
+                  ) : (
+                    <p className="font-semibold text-purple-900 mb-1">Common password formats:</p>
+                  )}
+                  <ul className="space-y-0.5 text-slate-600 mt-1">
                     <li>• <span className="font-mono font-semibold">PAN</span> (uppercase, e.g. ABCDE1234F)</li>
                     <li>• <span className="font-mono font-semibold">PAN + DDMMYYYY</span> (e.g. ABCDE1234F15081990)</li>
                     <li>• <span className="font-mono font-semibold">DDMMYYYY</span> (your date of birth)</li>
