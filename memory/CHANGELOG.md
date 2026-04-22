@@ -1,5 +1,22 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 21: Scan & Parse All + Smart Cancel Nudges ✅
+
+### Scan & Parse All (60-second Onboarding)
+- **New endpoint `POST /api/gmail/scan-and-apply-all`**: Refreshes inbox → parses every unparsed financial email with GPT-5.2 → auto-applies each extraction via the shared `apply_parsed_data()` helper (extracted from `/documents/auto-apply`). Returns aggregate summary: emails_processed, emails_with_data, total_transactions_saved, total_fields_updated, policies_applied[], investments_applied[], errors, details[].
+- **Live-tested against real Gmail** (mehul.2017@gmail.com): 8 emails → 5 with data → 3 transactions saved + 2 Niva Bupa policies applied + 2 questionnaire fields auto-filled, 0 errors.
+- **UI**: Orange gradient "Scan & Parse All" mega-button below the blue "Scan Financial Emails" button. Shows loading state ("AI is working its magic..."). Right-panel displays bulk-result card with 4 metric tiles + per-email details.
+
+### Smart Cancel Nudges
+- **Subscription detector enhanced**: Now computes `likely_unused: true` when category is Entertainment/Education/Shopping, no other recent (60d) category activity, 3+ occurrences, and 20+ days since last charge. Returns `yearly_savings_if_cancelled`.
+- **New endpoint `POST /api/transactions/subscriptions/cancel`** + `cancelled_subscriptions` collection: marks a merchant so it's excluded from future subscription scans.
+- **UI**: Emerald "Save ₹X/year" banner on Dashboard SubscriptionsCard when unused subs detected. Per-item "UNUSED" pill + one-click X-button to mark cancelled. Cancelled subs disappear from list immediately.
+
+### Refactor
+- Extracted auto-apply logic from `/documents/auto-apply` into shared `apply_parsed_data(db, user_id, data, source)` helper — reused by `/gmail/scan-and-apply-all`. No behavior change, just DRY.
+
+**Testing**: 13/13 backend pytest cases pass. Frontend verified via smoke screenshot (mega-button renders, unused sub nudge works end-to-end: cancel removes Netflix from list).
+
 ## Feb 2026 — Iteration 20: Auto-Apply Everything ✅
 - **New endpoint `POST /api/documents/auto-apply`**: One-click routing of AI-parsed data to the right destinations. Accepts `{data, source}`, handles transactions (→ transactions collection), insurance_data (→ questionnaire with smart insurer-based classification: Star/Niva/Care → health; LIC/HDFC Life/Max Life → term life), investment_data (SIP → monthly_investments_sip increment; lump_sum → equity_mf_current_value), and policy_type from PDF uploads. Uses `upsert` so works even without an existing questionnaire.
 - **UI**: Prominent purple-gradient "Auto-Fill Your Profile" hero card at top of parsed result with single "Auto-Apply Everything" button. Plus new Investment Details and Insurance Details detail cards (previously only policy PDFs had structured display).
