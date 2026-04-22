@@ -1,203 +1,134 @@
 {
-  "identity": {
-    "name": "Arth-Verse",
-    "persona": "E1: The Anti-AI Designer",
-    "emotional_archetype": "The Modern Bazaar (Trust + Prosperity)",
-    "core_values": ["Fusion", "Emotion First", "Content is King", "Zoom In", "Negative Space", "Contrast"]
-  },
-  "typography": {
-    "font_family": {
-      "heading": "Outfit, sans-serif",
-      "body": "Plus Jakarta Sans, sans-serif",
-      "mono": "JetBrains Mono, monospace"
-    },
-    "weights": {
-      "heading": "600 (SemiBold) or 300 (Light) - Avoid Regular",
-      "body": "400 (Regular) and 500 (Medium)"
-    },
-    "rules": [
-      "Headings > 32px MUST use tracking-tight (-0.02em)",
-      "Overlines MUST be Uppercase + tracking-widest (0.2em) + text-xs",
-      "Line height: leading-none for headings, leading-relaxed for body",
-      "Never use Inter for headings"
-    ]
+  "theme_archetype": {
+    "domain": "Finance, Advisory Dashboard",
+    "theme": "Light",
+    "archetype": "Archetype 4 (Swiss & High-Contrast) adapted for Premium Glassmorphic Ecosystem",
+    "vibe": "Sleek, Modern, Gamified, Trustworthy",
+    "tone": "Mentor tone, simplified language, user-friendly for non-finance individuals"
   },
   "colors": {
-    "palette": {
-      "primary": {
-        "name": "Royal Indigo",
-        "hex": "#1e3a8a",
-        "tailwind": "bg-blue-900",
-        "usage": "Primary Actions, Trust Indicators, Headers"
-      },
-      "secondary": {
-        "name": "Marigold Orange",
-        "hex": "#ea580c",
-        "tailwind": "bg-orange-600",
-        "usage": "High-Energy CTAs, Highlights, Growth Metrics"
-      },
-      "background": {
-        "name": "Warm Alabaster",
-        "hex": "#fdfbf7",
-        "tailwind": "bg-[#fdfbf7]",
-        "usage": "Main Page Background (Light Mode)"
-      },
-      "surface": {
-        "name": "Pure White",
-        "hex": "#ffffff",
-        "tailwind": "bg-white",
-        "usage": "Cards, Modals, Inputs"
-      },
-      "text": {
-        "primary": "#0f172a",
-        "secondary": "#475569",
-        "muted": "#94a3b8"
-      }
+    "backgrounds": {
+      "base": "#F8FAFC",
+      "surface": "rgba(255, 255, 255, 0.7)",
+      "glass": "rgba(255, 255, 255, 0.75)"
+    },
+    "primary": {
+      "brand": "#2563EB",
+      "hover": "#1D4ED8",
+      "light": "#DBEAFE"
+    },
+    "secondary": {
+      "gamification": "#F97316",
+      "gamification_hover": "#EA580C",
+      "gamification_light": "#FFEDD5"
+    },
+    "text": {
+      "primary": "#0F172A",
+      "secondary": "#475569",
+      "tertiary": "#94A3B8",
+      "inverse": "#FFFFFF"
+    },
+    "status": {
+      "success_green": "#10B981",
+      "warning_yellow": "#F59E0B",
+      "danger_red": "#EF4444"
     },
     "gradients": {
-      "hero_glow": "bg-gradient-to-br from-blue-50 to-orange-50",
-      "tracing_beam": "linear-gradient(to right, transparent, #ea580c, transparent)"
-    },
-    "rules": [
-      "Never use pure black (#000000). Use #0f172a (Slate 900).",
-      "No full-screen gradients. Use subtle mesh gradients or noise textures.",
-      "Text on colored backgrounds must meet APCA contrast standards."
-    ]
-  },
-  "visual_enhancers": {
-    "textures": [
-      "Noise Overlay: opacity-5 mix-blend-overlay fixed inset-0 pointer-events-none",
-      "Grid Pattern: bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"
-    ],
-    "shadows": {
-      "card": "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_24px_rgba(0,0,0,0.04)]",
-      "floating": "shadow-[0_20px_40px_rgba(0,0,0,0.08)]",
-      "glow": "shadow-[0_0_20px_rgba(234,88,12,0.3)]"
-    },
-    "borders": {
-      "subtle": "border border-slate-200",
-      "glass": "border border-white/20"
-    },
-    "radius": {
-      "default": "rounded-xl",
-      "button": "rounded-full",
-      "card": "rounded-2xl"
+      "hero_bg": "linear-gradient(135deg, rgba(219, 234, 254, 0.5) 0%, rgba(255, 237, 213, 0.5) 100%)",
+      "score_ring": "linear-gradient(90deg, #2563EB, #F97316)"
     }
   },
-  "layout_strategies": {
-    "marketing_landing": {
-      "grid_type": "Bento Grid (Tetris Mode)",
-      "classes": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-6 p-4 md:p-8",
-      "hero_span": "col-span-full lg:col-span-8 row-span-2",
-      "feature_span": "col-span-full md:col-span-4 row-span-1"
+  "typography": {
+    "fonts": {
+      "heading": "'Plus Jakarta Sans', sans-serif",
+      "body": "'Inter', sans-serif",
+      "mono": "'JetBrains Mono', monospace"
     },
-    "dashboard": {
-      "grid_type": "High Density Grid",
-      "classes": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4",
-      "widget_span": "col-span-1 md:col-span-2"
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-800",
+      "h3": "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
+      "h4": "text-lg sm:text-xl font-semibold tracking-tight text-slate-700",
+      "body": "text-base font-normal leading-relaxed text-slate-600",
+      "small": "text-sm font-medium text-slate-500",
+      "label": "text-xs font-bold uppercase tracking-[0.2em] text-slate-500"
+    }
+  },
+  "layout_spacing": {
+    "grid_system": {
+      "base": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4",
+      "gap": "gap-6 lg:gap-8",
+      "rules": "Mobile-first responsive grid. Override default stretch with align-items: start where necessary. Grid items must be direct children of the grid container."
     },
     "spacing": {
-      "section_gap": "py-20 or py-32",
-      "container_padding": "px-4 md:px-8 lg:px-12",
-      "internal_padding": "p-6 or p-8"
+      "container_padding": "p-6 sm:p-8",
+      "section_gap": "gap-8 sm:gap-12"
+    },
+    "radii": {
+      "card": "rounded-3xl",
+      "button": "rounded-full",
+      "input": "rounded-2xl"
+    }
+  },
+  "surfaces": {
+    "glassmorphism": {
+      "card": "bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-3xl",
+      "hero_card": "bg-white/80 backdrop-blur-2xl border border-white/50 shadow-lg rounded-3xl overflow-hidden relative"
+    },
+    "neumorphism": {
+      "widget": "bg-[#F8FAFC] border border-slate-200 shadow-sm rounded-3xl"
     }
   },
   "components": {
-    "buttons": {
-      "primary": "bg-blue-900 text-white rounded-full px-8 py-3 hover:bg-blue-800 transition-all hover:shadow-lg hover:-translate-y-0.5",
-      "secondary": "bg-orange-100 text-orange-700 rounded-full px-8 py-3 hover:bg-orange-200 transition-all",
-      "ghost": "text-slate-600 hover:text-blue-900 hover:bg-slate-50 rounded-full px-6 py-2"
+    "hero_metrics": {
+      "description": "ArthSthithi Score (0-100) + Retirement Age. Top-left placement. Gamified animated SVG ring wrapping the score.",
+      "layout": "col-span-full md:col-span-2 row-span-2"
     },
-    "cards": {
-      "style": "bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden",
-      "interactive": "Use 'Tracing Beam' effect on hover for product cards."
+    "progress_bars": {
+      "description": "10-Factor Financial Health Analysis. Use customized Shadcn Progress or Framer Motion divs. Gamified look with rounded-full edges. Use Orange to Blue gradient fill.",
+      "layout": "col-span-1 md:col-span-2 lg:col-span-3"
     },
-    "inputs": {
-      "style": "bg-slate-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 rounded-lg h-12 px-4 transition-all"
+    "charts": {
+      "description": "Recharts / Shadcn charts for Income & Expense Breakdown, Asset Allocation (SVG Donut Charts). Use the primary blue and gamification orange palette with clean tooltips. Remove axis lines for a cleaner look.",
+      "layout": "col-span-1 md:col-span-1 lg:col-span-2"
+    },
+    "risk_meter": {
+      "description": "Gauge or colored bar indicator (Green/Yellow/Red) mapping to risk level.",
+      "layout": "col-span-1"
+    },
+    "action_cards": {
+      "description": "3 Highest Impact Actions. Simple glassmorphic cards with bullet points and a 'mentor tone' description.",
+      "layout": "col-span-1 md:col-span-3 lg:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-6"
     }
   },
+  "motion_interactions": {
+    "hover_states": "Cards lift slightly (-translate-y-1) with increased shadow (shadow-lg) and border color shift. Buttons scale up slightly (scale-105).",
+    "animations": "Framer Motion for entrance animations (staggered list items). Animated progress rings filling up on viewport enter (transition: duration 1.5s ease-out).",
+    "micro_interactions": "Smooth transitions on all interactive elements (transition: transform 0.2s ease, opacity 0.2s ease)."
+  },
   "media": {
-    "image_urls": {
-      "hero_family": {
-        "url": "https://images.unsplash.com/photo-1659352790654-058e9077a4f4",
-        "alt": "Happy Indian family representing financial freedom",
-        "usage": "Landing Page Hero"
-      },
-      "hero_candid": {
-        "url": "https://images.unsplash.com/photo-1639979511572-ff346bc5b3b7",
-        "alt": "Candid moment of family outdoors",
-        "usage": "About Section / Emotional Hook"
-      },
-      "arth_vyay": {
-        "url": "https://images.pexels.com/photos/5980752/pexels-photo-5980752.jpeg",
-        "alt": "Coins and calculator",
-        "usage": "ArthVyay (Expenses) Card"
-      },
-      "arth_rakshak": {
-        "url": "https://images.pexels.com/photos/12969357/pexels-photo-12969357.jpeg",
-        "alt": "Hands holding paper house model",
-        "usage": "ArthRakshak (Insurance) Card"
-      },
-      "arth_yojna": {
-        "url": "https://images.unsplash.com/photo-1677816156435-e844da620fa9",
-        "alt": "Chess board strategy",
-        "usage": "ArthYojna (Planning) Card"
-      },
-      "arth_nivesh": {
-        "url": "https://images.pexels.com/photos/8369680/pexels-photo-8369680.jpeg",
-        "alt": "Plant growing in coins",
-        "usage": "ArthNivesh (Investment) Card"
-      },
-      "arth_dhan": {
-        "url": "https://images.unsplash.com/photo-1565372520605-6f7987d1551b",
-        "alt": "Gold coins pot",
-        "usage": "ArthDhan (Wealth) Card"
-      },
-      "arth_unnati": {
-        "url": "https://images.pexels.com/photos/6069467/pexels-photo-6069467.jpeg",
-        "alt": "Paper rocket launch",
-        "usage": "ArthUnnati (Growth) Card"
-      },
-      "office_tech": {
-        "url": "https://images.unsplash.com/photo-1618410325698-018bb3eb2318",
-        "alt": "Modern clean workspace",
-        "usage": "Dashboard / Professional Context"
+    "images": [
+      {
+        "category": "mentor_avatar",
+        "url": "https://images.pexels.com/photos/8636649/pexels-photo-8636649.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Smiling professional mentor portrait. Used in the 'Insights' or 'Advice' section to add a human, trustworthy tone to the data."
       }
-    },
-    "icons": "Use Lucide-React. Stroke width: 1.5px (Elegant). Size: 20px or 24px."
-  },
-  "motion": {
-    "library": "Framer Motion",
-    "principles": [
-      "Stagger children animations by 0.1s",
-      "Use spring physics (stiffness: 100, damping: 20) for natural feel",
-      "Micro-interactions on all buttons (scale: 0.98 on tap)"
     ],
-    "transitions": "transition-all duration-300 ease-out"
-  },
-  "accessibility": {
-    "contrast": "Ensure 4.5:1 ratio for text. Use Slate-600+ on white.",
-    "focus": "Visible focus rings (ring-2 ring-blue-500 ring-offset-2) are MANDATORY.",
-    "reduced_motion": "Respect prefers-reduced-motion media query."
+    "icons_library": "lucide-react"
   },
   "instructions_to_main_agent": [
-    "1. Update tailwind.config.js with the new color palette and font families.",
-    "2. Install 'framer-motion' and 'clsx' 'tailwind-merge' if not present.",
-    "3. Refactor the Landing Page to use the Bento Grid layout.",
-    "4. Replace generic cards with the 'Tracing Beam' or 'Glass' style cards.",
-    "5. Use the provided Image URLs for the specific product sections.",
-    "6. Ensure the Dashboard uses the High Density Grid with 'Cardless' widgets where possible.",
-    "7. Apply the 'Warm Alabaster' background to the main body to kill the clinical white feel.",
-    "8. Use 'Outfit' font for all Headings and 'Plus Jakarta Sans' for body.",
-    "9. Add data-testid to all interactive elements."
+    "Use Framer Motion to animate the ArthSthithi Score SVG progress rings and gamified progress bars for the 10-Factor Analysis.",
+    "Implement the 'Sleek Glassmorphism' surface strictly on structural cards by combining bg-white/70, backdrop-blur-xl, and border-white/40 over a subtle gradient background (e.g., bg-slate-50 with soft blue/orange blurred blobs).",
+    "Do NOT change existing formulas, input logic, or retire badge triggers. Focus entirely on the visual presentation and frontend component architecture.",
+    "Use Plus Jakarta Sans for all headings (with tight tracking) and Inter for all body text.",
+    "Content should be simplified, using bullet points and a 'mentor tone' to explain the Ideal vs Actual insights for the Financial Opportunity Analyzer and Net Worth Statement.",
+    "Build SVG Donut Charts using Recharts for Asset Allocation and Income/Expense Breakdown.",
+    "Ensure the layout follows the 'Control Room' grid philosophy (dense but clean, gap-6, utilizing every pixel logically) but wraps it in the approachable, premium glassmorphism aesthetic.",
+    "Include data-testid attributes on all interactive and key informational elements (e.g., data-testid='arthsthithi-score', data-testid='retirement-age-value')."
   ],
-  "universal_guidelines": [
-    "Avoid 'AI Slop' - no generic centered layouts.",
-    "Use 2-3x more spacing than you think is necessary.",
-    "Dark colors look good when used independently without gradients.",
-    "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur).",
-    "Every interaction needs micro-animations.",
-    "Use sonner for toasts."
-  ]
+  "accessibility": {
+    "contrast": "Ensure text over glassmorphic surfaces maintains WCAG AA / APCA standards. Use dark text (#0F172A) on light glassmorphic backgrounds.",
+    "focus": "focus:ring-2 focus:ring-blue-500 focus:outline-none for all interactive elements.",
+    "reduced_motion": "Wrap Framer Motion animations in prefers-reduced-motion checks."
+  }
 }
