@@ -71,6 +71,7 @@ async def connect_gmail(user_id: str = Query(...)):
         await db.gmail_states.insert_one({
             "state": state,
             "user_id": user_id,
+            "code_verifier": flow.code_verifier,
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
 
@@ -90,11 +91,15 @@ async def gmail_callback(code: str = Query(...), state: str = Query(...)):
         raise HTTPException(status_code=400, detail="Invalid or expired state")
 
     user_id = state_doc["user_id"]
+    code_verifier = state_doc.get("code_verifier")
     await db.gmail_states.delete_one({"state": state})
 
     try:
         from google_auth_oauthlib.flow import Flow
         flow = Flow.from_client_config(get_client_config(), scopes=SCOPES, redirect_uri=REDIRECT_URI)
+        # Restore the PKCE code_verifier from the original /connect request
+        if code_verifier:
+            flow.code_verifier = code_verifier
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
