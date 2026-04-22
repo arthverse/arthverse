@@ -4,6 +4,7 @@ import { PILLAR_DETAILS } from "./report/pillarData";
 import { reportCSS } from "./report/reportStyles";
 import FinancialOpportunityAnalyzer from "./report/FinancialOpportunityAnalyzer";
 import TenFactorAnalysis from "./report/TenFactorAnalysis";
+import DonutChart from "./report/DonutChart";
 
 const css = reportCSS;
 
@@ -313,61 +314,71 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
       </div>
 
       {/* NET WORTH STATEMENT */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
-        {/* ASSETS */}
-        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
-          <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-            <span style={{fontSize:'14px'}}>&#x1F4C8;</span>
-            <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Assets (What You Own)</span>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
-            {assetItems.map((item, idx) => (
-              <div key={item.label} style={{
-                padding:'16px',
-                borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',
-                borderBottom:'1px solid var(--border)',
-                ...(assetItems.length - idx <= (assetItems.length % 3 || 3) ? {} : {})
-              }}>
-                <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>{item.label}</div>
-                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:item.color,marginBottom:'4px'}}>{formatINR2(item.value)}</div>
-                <div style={{fontSize:'11px',color:'var(--t3)'}}>{item.sub}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
-            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL ASSETS</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--grn)'}} data-testid="total-assets-value">{formatINR2(totalAssets)}</span>
-          </div>
+      <div className="sh an in"><div className="shn">2</div><div className="sht">Net Worth Statement</div><div className="shl"></div></div>
+      
+      {/* Asset Allocation Donut */}
+      <div className="resp-3col an in">
+        <div style={{background:'rgba(255,255,255,0.75)',backdropFilter:'blur(12px)',border:'1px solid rgba(255,255,255,0.4)',borderRadius:'20px',padding:'20px',boxShadow:'0 4px 16px rgba(0,0,0,0.04)'}}>
+          <div style={{fontSize:'11px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'4px',textAlign:'center'}}>Asset Allocation</div>
+          <DonutChart
+            data={assetItems.map(a => ({ name: a.label, value: a.value, color: a.chartColor || undefined }))}
+            centerLabel="Net Worth"
+            centerValue={formatINR2(netWorth)}
+            height={220}
+            innerRadius={60}
+            outerRadius={85}
+            formatValue={(v) => `₹${(v/100000).toFixed(1)}L`}
+          />
         </div>
-
-        {/* LIABILITIES */}
-        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
-          <div style={{background:'var(--t0)',padding:'14px 20px',display:'flex',alignItems:'center',gap:'8px'}}>
-            <span style={{fontSize:'14px'}}>&#x1F4C9;</span>
-            <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Liabilities (What You Owe)</span>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)'}}>
-            {liabilityItems.map((item, idx) => (
-              <div key={item.label} style={{
-                padding:'16px',
-                borderRight: (idx % 3 !== 2) ? '1px solid var(--border)' : 'none',
-                borderBottom:'1px solid var(--border)'
-              }}>
-                <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>{item.label}</div>
-                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--red)',marginBottom:'4px'}}>{formatINR2(item.value)}</div>
-                <div style={{fontSize:'11px',color:'var(--t3)'}}>{item.sub}</div>
-              </div>
-            ))}
-            {/* Debt-to-Income ratio always shown */}
-            <div style={{padding:'16px',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:'10px',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t3)',marginBottom:'8px'}}>Debt-to-Income</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:'var(--amb)',marginBottom:'4px'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(2) : '0.00'}%</div>
-              <div style={{fontSize:'11px',color:'var(--t3)'}}>Target: &lt;30%</div>
+        <div className="resp-2col" style={{alignContent:'start'}}>
+          {/* Assets grid */}
+          <div style={{background:'rgba(255,255,255,0.75)',backdropFilter:'blur(12px)',border:'1px solid rgba(255,255,255,0.4)',borderRadius:'20px',overflow:'hidden',boxShadow:'0 4px 16px rgba(0,0,0,0.04)'}}>
+            <div style={{background:'var(--t0)',padding:'12px 16px',display:'flex',alignItems:'center',gap:'6px'}}>
+              <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Assets</span>
+              <span style={{fontSize:'10px',color:'rgba(255,255,255,.5)',marginLeft:'auto',fontFamily:"'JetBrains Mono',monospace"}}>{formatINR2(totalAssets)}</span>
+            </div>
+            <div style={{padding:'8px'}}>
+              {assetItems.map((item) => (
+                <div key={item.label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 10px',borderRadius:'8px',transition:'background .15s'}}>
+                  <span style={{fontSize:'11px',color:'var(--t2)',display:'flex',alignItems:'center',gap:'6px'}}>
+                    <span style={{width:6,height:6,borderRadius:'50%',background:item.color,flexShrink:0}}></span>
+                    {item.label}
+                  </span>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'11px',fontWeight:600,color:'var(--t1)'}}>{formatINR2(item.value)}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{borderTop:'1px dashed var(--border)',padding:'10px 16px',display:'flex',justifyContent:'space-between',background:'var(--grnbg)'}}>
+              <span style={{fontSize:'11px',fontWeight:700,color:'var(--grn)'}}>TOTAL</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:700,color:'var(--grn)'}} data-testid="total-assets-value">{formatINR2(totalAssets)}</span>
             </div>
           </div>
-          <div style={{borderTop:'1px dashed var(--border)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',background:'var(--bg3)'}}>
-            <span style={{fontSize:'12px',fontWeight:700,color:'var(--t1)',letterSpacing:'.05em'}}>TOTAL LIABILITIES</span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'20px',fontWeight:700,color:'var(--red)'}} data-testid="total-liabilities-value">{formatINR2(totalLiabilities)}</span>
+          {/* Liabilities grid */}
+          <div style={{background:'rgba(255,255,255,0.75)',backdropFilter:'blur(12px)',border:'1px solid rgba(255,255,255,0.4)',borderRadius:'20px',overflow:'hidden',boxShadow:'0 4px 16px rgba(0,0,0,0.04)'}}>
+            <div style={{background:'var(--t0)',padding:'12px 16px',display:'flex',alignItems:'center',gap:'6px'}}>
+              <span style={{fontSize:'13px',fontWeight:700,color:'#fff',letterSpacing:'.03em',textTransform:'uppercase'}}>Liabilities</span>
+              <span style={{fontSize:'10px',color:'rgba(255,255,255,.5)',marginLeft:'auto',fontFamily:"'JetBrains Mono',monospace"}}>{formatINR2(totalLiabilities)}</span>
+            </div>
+            <div style={{padding:'8px'}}>
+              {liabilityItems.map((item) => (
+                <div key={item.label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 10px',borderRadius:'8px'}}>
+                  <span style={{fontSize:'11px',color:'var(--t2)',display:'flex',alignItems:'center',gap:'6px'}}>
+                    <span style={{width:6,height:6,borderRadius:'50%',background:'var(--red)',flexShrink:0}}></span>
+                    {item.label}
+                  </span>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'11px',fontWeight:600,color:'var(--red)'}}>{formatINR2(item.value)}</span>
+                </div>
+              ))}
+              {/* Debt-to-Income */}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 10px',borderRadius:'8px',marginTop:'4px',background:'var(--ambbg)'}}>
+                <span style={{fontSize:'11px',color:'var(--amb)',fontWeight:600}}>Debt-to-Income</span>
+                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'11px',fontWeight:700,color:'var(--amb)'}}>{income > 0 ? ((totalLiabilities / (income * 12)) * 100).toFixed(1) : '0'}%</span>
+              </div>
+            </div>
+            <div style={{borderTop:'1px dashed var(--border)',padding:'10px 16px',display:'flex',justifyContent:'space-between',background:'var(--redbg)'}}>
+              <span style={{fontSize:'11px',fontWeight:700,color:'var(--red)'}}>TOTAL</span>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:700,color:'var(--red)'}} data-testid="total-liabilities-value">{formatINR2(totalLiabilities)}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -669,165 +680,123 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
 
       {/* 3. INCOME & EXPENSE BREAKDOWN */}
       <div className="sh an in"><div className="shn">5</div><div className="sht">Income & Expense Breakdown</div><div className="shl"></div></div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}} className="an in">
-        {/* INCOME SOURCES */}
-        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
-          <div style={{background:'var(--t0)',padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>💰 INCOME SOURCES</span>
+      <div className="resp-2col an in">
+        {/* INCOME SOURCES with Donut */}
+        <div style={{background:'rgba(255,255,255,0.75)',backdropFilter:'blur(12px)',border:'1px solid rgba(255,255,255,0.4)',borderRadius:'20px',overflow:'hidden',boxShadow:'0 4px 16px rgba(0,0,0,0.04)'}}>
+          <div style={{background:'linear-gradient(135deg,#166534,#15803d)',padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>INCOME SOURCES</span>
             <button
               onClick={() => setShowIncomeDetails(!showIncomeDetails)}
-              style={{
-                padding:'4px 10px',borderRadius:'12px',fontSize:'9px',fontWeight:600,
-                background:'rgba(255,255,255,0.15)',color:'#fff',border:'none',cursor:'pointer'
-              }}
+              style={{padding:'4px 10px',borderRadius:'12px',fontSize:'9px',fontWeight:600,background:'rgba(255,255,255,0.15)',color:'#fff',border:'none',cursor:'pointer',transition:'background .2s'}}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.25)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; }}
             >
-              {showIncomeDetails ? '▲ Hide' : '▼ View Details'}
+              {showIncomeDetails ? 'Hide Details' : 'View Details'}
             </button>
           </div>
           <div style={{padding:'16px'}}>
             {(() => {
-              // Calculate totals from spec-aligned fields
-              const salaryIncome = questionnaire?.monthly_salary_net ?? 0;
-              const businessIncome = questionnaire?.monthly_business_income ?? 0;
-              const rentalIncome = questionnaire?.monthly_rental_income ?? 0;
-              const otherIncome = questionnaire?.monthly_other_income ?? 0;
-              const calculatedTotalIncome = salaryIncome + businessIncome + rentalIncome + otherIncome;
-              
+              const incomeItems = [
+                { name: 'Salary', value: questionnaire?.monthly_salary_net ?? 0, color: '#10B981' },
+                { name: 'Business', value: questionnaire?.monthly_business_income ?? 0, color: '#2563EB' },
+                { name: 'Rental', value: questionnaire?.monthly_rental_income ?? 0, color: '#F97316' },
+                { name: 'Other', value: questionnaire?.monthly_other_income ?? 0, color: '#8B5CF6' },
+              ].filter(i => i.value > 0);
+              const totalInc = incomeItems.reduce((s, i) => s + i.value, 0);
               return (
                 <>
-                  {salaryIncome > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Salary (Net Take-Home)</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(salaryIncome)}/mo</span>
-                    </div>
-                  )}
-                  {businessIncome > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Business / Professional</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(businessIncome)}/mo</span>
-                    </div>
-                  )}
-                  {rentalIncome > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Rental Income</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(rentalIncome)}/mo</span>
-                    </div>
-                  )}
-                  {otherIncome > 0 && (
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>Other Income</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--grn)'}}>{formatINR(otherIncome)}/mo</span>
-                    </div>
-                  )}
-                  
+                  <DonutChart
+                    data={incomeItems}
+                    centerLabel="Total"
+                    centerValue={formatINR(totalInc)}
+                    centerSub="per month"
+                    height={180}
+                    innerRadius={48}
+                    outerRadius={70}
+                    formatValue={(v) => `₹${v.toLocaleString('en-IN')}`}
+                  />
                   {showIncomeDetails && (
-                    <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'2px solid var(--border)'}}>
-                      <div style={{fontSize:'10px',fontWeight:700,color:'var(--t3)',letterSpacing:'.05em',marginBottom:'10px'}}>ADDITIONAL DETAILS</div>
-                      <div style={{background:'var(--bg3)',borderRadius:'var(--r8)',padding:'12px'}}>
-                        {(questionnaire?.employer_epf_monthly ?? 0) > 0 && (
-                          <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                            <span style={{color:'var(--t2)'}}>Employer EPF</span>
-                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.employer_epf_monthly)}/mo</span>
-                          </div>
-                        )}
-                        {(questionnaire?.annual_bonus ?? 0) > 0 && (
-                          <div style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'11px'}}>
-                            <span style={{color:'var(--t2)'}}>Annual Bonus</span>
-                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,color:'var(--t1)'}}>{formatINR(questionnaire?.annual_bonus)}/yr</span>
-                          </div>
-                        )}
-                      </div>
-                      <div style={{marginTop:'10px',padding:'10px',background:'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',borderRadius:'var(--r8)'}}>
-                        <div style={{fontSize:'10px',fontWeight:700,color:'#166534',marginBottom:'4px'}}>Income Optimization Tips</div>
-                        <div style={{fontSize:'10px',color:'#15803D',lineHeight:1.5}}>
-                          {`\u2022`} Consider SIP in index funds for wealth creation<br/>
-                          {`\u2022`} Move idle savings to liquid MF for better returns<br/>
-                          {`\u2022`} Tax planning: utilize Section 80C, 80D deductions
+                    <div style={{marginTop:'12px',borderTop:'1px solid var(--border)',paddingTop:'12px'}}>
+                      {incomeItems.map(item => (
+                        <div key={item.name} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid var(--bg3)'}}>
+                          <span style={{fontSize:'12px',color:'var(--t2)',display:'flex',alignItems:'center',gap:'6px'}}>
+                            <span style={{width:6,height:6,borderRadius:'50%',background:item.color}}></span>
+                            {item.name}
+                          </span>
+                          <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--grn)'}}>{formatINR(item.value)}/mo</span>
                         </div>
-                      </div>
+                      ))}
+                      {(questionnaire?.employer_epf_monthly ?? 0) > 0 && (
+                        <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:'11px',color:'var(--t3)'}}>
+                          <span>+ Employer EPF</span>
+                          <span style={{fontFamily:"'JetBrains Mono',monospace"}}>{formatINR(questionnaire?.employer_epf_monthly)}/mo</span>
+                        </div>
+                      )}
                     </div>
                   )}
-                  
-                  <div style={{display:'flex',justifyContent:'space-between',padding:'12px 0',fontWeight:700}}>
-                    <span style={{fontSize:'13px',color:'var(--t1)'}}>TOTAL INCOME</span>
-                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',color:'var(--grn)'}}>{formatINR(calculatedTotalIncome)}/mo</span>
-                  </div>
                 </>
               );
             })()}
           </div>
         </div>
-        
-        {/* EXPENSE CATEGORIES */}
-        <div style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r16)',overflow:'hidden'}}>
-          <div style={{background:'var(--t0)',padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>💸 EXPENSE CATEGORIES</span>
+
+        {/* EXPENSE TRACKER with Donut */}
+        <div style={{background:'rgba(255,255,255,0.75)',backdropFilter:'blur(12px)',border:'1px solid rgba(255,255,255,0.4)',borderRadius:'20px',overflow:'hidden',boxShadow:'0 4px 16px rgba(0,0,0,0.04)'}}>
+          <div style={{background:'linear-gradient(135deg,#9a3412,#c2410c)',padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontSize:'12px',fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>EXPENSE TRACKER</span>
             <button
               onClick={() => setShowExpenseDetails(!showExpenseDetails)}
-              style={{
-                padding:'4px 10px',borderRadius:'12px',fontSize:'9px',fontWeight:600,
-                background:'rgba(255,255,255,0.15)',color:'#fff',border:'none',cursor:'pointer'
-              }}
+              style={{padding:'4px 10px',borderRadius:'12px',fontSize:'9px',fontWeight:600,background:'rgba(255,255,255,0.15)',color:'#fff',border:'none',cursor:'pointer',transition:'background .2s'}}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.25)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; }}
             >
-              {showExpenseDetails ? '▲ Hide' : '▼ View Details'}
+              {showExpenseDetails ? 'Hide Details' : 'View Details'}
             </button>
           </div>
           <div style={{padding:'16px'}}>
             {(() => {
-              // Calculate totals from spec-aligned fields
-              const housingExpenses = questionnaire?.monthly_rent_or_emi_home ?? 0;
-              const groceryExpenses = questionnaire?.monthly_groceries ?? 0;
-              const utilityExpenses = questionnaire?.monthly_utilities ?? 0;
-              const transportExpenses = questionnaire?.monthly_transport ?? 0;
-              const educationExpenses = questionnaire?.monthly_education ?? 0;
-              const foodDiningExpenses = questionnaire?.monthly_food_eating_out ?? 0;
-              const entertainmentExpenses = questionnaire?.monthly_entertainment ?? 0;
-              const medicalExpenses = questionnaire?.monthly_medical ?? 0;
-              const insurancePremiums = questionnaire?.monthly_insurance_premiums ?? 0;
-              const sipInvestments = questionnaire?.monthly_investments_sip ?? 0;
-              const otherExp = questionnaire?.monthly_other_expenses ?? 0;
-              const calculatedTotalExpenses = housingExpenses + groceryExpenses + utilityExpenses + transportExpenses + educationExpenses + foodDiningExpenses + entertainmentExpenses + medicalExpenses + insurancePremiums + sipInvestments + otherExp;
-              
               const expenseItems = [
-                { label: 'Rent / Home EMI', value: housingExpenses },
-                { label: 'Groceries & Household', value: groceryExpenses },
-                { label: 'Utilities', value: utilityExpenses },
-                { label: 'Transport', value: transportExpenses },
-                { label: 'Education', value: educationExpenses },
-                { label: 'Food & Dining', value: foodDiningExpenses },
-                { label: 'Entertainment', value: entertainmentExpenses },
-                { label: 'Medical', value: medicalExpenses },
-                { label: 'Insurance Premiums', value: insurancePremiums },
-                { label: 'SIP / Investments', value: sipInvestments },
-                { label: 'Other', value: otherExp },
-              ].filter(item => item.value > 0);
-              
+                { name: 'Housing', value: questionnaire?.monthly_rent_or_emi_home ?? 0, color: '#EF4444' },
+                { name: 'Groceries', value: questionnaire?.monthly_groceries ?? 0, color: '#F97316' },
+                { name: 'Transport', value: questionnaire?.monthly_transport ?? 0, color: '#2563EB' },
+                { name: 'Education', value: questionnaire?.monthly_education ?? 0, color: '#8B5CF6' },
+                { name: 'Food & Dining', value: questionnaire?.monthly_food_eating_out ?? 0, color: '#EC4899' },
+                { name: 'Entertainment', value: questionnaire?.monthly_entertainment ?? 0, color: '#06B6D4' },
+                { name: 'Medical', value: questionnaire?.monthly_medical ?? 0, color: '#10B981' },
+                { name: 'Utilities', value: questionnaire?.monthly_utilities ?? 0, color: '#14B8A6' },
+                { name: 'Insurance', value: questionnaire?.monthly_insurance_premiums ?? 0, color: '#6366F1' },
+                { name: 'SIP/Invest', value: questionnaire?.monthly_investments_sip ?? 0, color: '#22C55E' },
+                { name: 'Other', value: questionnaire?.monthly_other_expenses ?? 0, color: '#94A3B8' },
+              ].filter(e => e.value > 0);
+              const totalExp = expenseItems.reduce((s, e) => s + e.value, 0);
               return (
                 <>
-                  {expenseItems.map((item) => (
-                    <div key={item.label} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
-                      <span style={{fontSize:'12px',color:'var(--t2)'}}>{item.label}</span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'13px',fontWeight:600,color:'var(--amb)'}}>{formatINR(item.value)}/mo</span>
-                    </div>
-                  ))}
-                  
+                  <DonutChart
+                    data={expenseItems}
+                    centerLabel="Total"
+                    centerValue={formatINR(totalExp)}
+                    centerSub="per month"
+                    height={180}
+                    innerRadius={48}
+                    outerRadius={70}
+                    formatValue={(v) => `₹${v.toLocaleString('en-IN')}`}
+                  />
                   {showExpenseDetails && (
-                    <div style={{marginTop:'12px',paddingTop:'12px',borderTop:'2px solid var(--border)'}}>
-                      <div style={{marginTop:'10px',padding:'10px',background:'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',borderRadius:'var(--r8)'}}>
-                        <div style={{fontSize:'10px',fontWeight:700,color:'#92400E',marginBottom:'4px'}}>Expense Analysis</div>
-                        <div style={{fontSize:'10px',color:'#B45309',lineHeight:1.5}}>
-                          {`\u2022`} Savings Rate: <strong>{savingsRate}%</strong><br/>
-                          {`\u2022`} Housing-to-Income: <strong>{income > 0 ? ((housingExpenses / income) * 100).toFixed(1) : 0}%</strong><br/>
-                          {`\u2022`} Monthly Surplus: <strong>{formatINR(income - calculatedTotalExpenses)}</strong>
+                    <div style={{marginTop:'12px',borderTop:'1px solid var(--border)',paddingTop:'12px'}}>
+                      {expenseItems.map(item => (
+                        <div key={item.name} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid var(--bg3)'}}>
+                          <span style={{fontSize:'12px',color:'var(--t2)',display:'flex',alignItems:'center',gap:'6px'}}>
+                            <span style={{width:6,height:6,borderRadius:'50%',background:item.color}}></span>
+                            {item.name}
+                          </span>
+                          <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',fontWeight:600,color:'var(--amb)'}}>{formatINR(item.value)}/mo</span>
                         </div>
+                      ))}
+                      <div style={{marginTop:'8px',padding:'8px 10px',background:'var(--ambbg)',borderRadius:'10px',fontSize:'11px',color:'var(--amb)',fontWeight:600}}>
+                        Savings Rate: {savingsRate}% | Surplus: {formatINR(income - totalExp)}/mo
                       </div>
                     </div>
                   )}
-                  
-                  <div style={{display:'flex',justifyContent:'space-between',padding:'12px 0',fontWeight:700}}>
-                    <span style={{fontSize:'13px',color:'var(--t1)'}}>TOTAL EXPENSES</span>
-                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'14px',color:'var(--amb)'}}>{formatINR(calculatedTotalExpenses)}/mo</span>
-                  </div>
                 </>
               );
             })()}

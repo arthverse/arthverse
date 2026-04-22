@@ -241,12 +241,39 @@ export const reportCSS = `
 .arthm-page .an.in{animation:arthm-up .5s ease forwards}
 
 /* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .arthm-page .qs4{grid-template-columns:repeat(2,1fr)}
+  .arthm-page .cc3{grid-template-columns:1fr}
+}
 @media(max-width:700px){
+  .arthm-page{padding:16px 12px 60px}
   .arthm-page .qs4,.arthm-page .mg4,.arthm-page .g2,.arthm-page .g3,.arthm-page .mg3,.arthm-page .mg2{grid-template-columns:1fr 1fr}
   .arthm-page .cc3,.arthm-page .hab-split{grid-template-columns:1fr}
   .arthm-page .shi{flex-direction:column;text-align:center}
   .arthm-page .snap2{grid-template-columns:1fr}
   .arthm-page .snap-grid{grid-template-columns:1fr 1fr}
+  .arthm-page .sht{font-size:16px}
+  .arthm-page .score-hero{padding:20px;border-radius:16px}
+  .arthm-page .sring{width:80px;height:80px}
+  .arthm-page .snum{font-size:28px}
+  .arthm-page .qn{padding:12px 14px;border-radius:16px}
+  .arthm-page .qn-v{font-size:15px}
+  .arthm-page .card{border-radius:16px}
+}
+@media(max-width:480px){
+  .arthm-page .qs4,.arthm-page .mg4,.arthm-page .mg3,.arthm-page .mg2,.arthm-page .g2,.arthm-page .g3{grid-template-columns:1fr}
+  .arthm-page .topbar{flex-direction:column;gap:8px}
+  .arthm-page .shi{gap:12px}
+  .arthm-page .sring{width:70px;height:70px}
+  .arthm-page .snum{font-size:24px}
+}
+
+/* ═══ RESPONSIVE GRID OVERRIDES ═══ */
+.arthm-page .resp-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.arthm-page .resp-3col{display:grid;grid-template-columns:1fr 2fr;gap:16px}
+@media(max-width:700px){
+  .arthm-page .resp-2col{grid-template-columns:1fr}
+  .arthm-page .resp-3col{grid-template-columns:1fr}
 }
 
 /* ═══ PILLAR MODAL ═══ */

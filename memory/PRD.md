@@ -5,6 +5,15 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+**SVG Donut Charts & Mobile Responsive (Apr 22, 2026):**
+- Created reusable `DonutChart.js` component using Recharts (PieChart, Pie, Cell, Tooltip)
+- Asset Allocation donut: shows all asset classes with color segments, Net Worth center label, hover tooltips in ₹L format
+- Income Sources donut: Salary + Business + Rental + Other with green gradient header and ₹/mo center
+- Expense Tracker donut: 9 expense categories with distinct colors, orange gradient header
+- Responsive CSS: 3-tier breakpoints (900px tablet, 700px mobile, 480px small mobile)
+- `.resp-2col` and `.resp-3col` classes for grid→stack behavior on mobile
+- Score hero, quick stats, cards all shrink/stack properly on mobile viewports
+
 **Credit Health Report Module (Apr 20, 2026):**
 - New page `/arthvyay/credit-health` — full CIBIL improvement system
 - Backend: `credit_health_engine.py` generates personalized recommendations from 8 credit inputs
