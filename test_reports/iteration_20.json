@@ -1,0 +1,41 @@
+{
+  "summary": "Iteration 20 — Smart Import Scan & Apply All + Subscription Cancel Nudges. Backend: 13/13 pytest passed (100%). All 7 review items verified at API level: (1) POST /api/gmail/scan-and-apply-all?max_emails=5 returns full schema {success, summary, emails_processed, emails_with_data, total_transactions_saved, total_fields_updated, policies_applied[], investments_applied[], errors, details[]} with emails_processed>=1. (2) Unauthenticated call returns 403. (3) subscription_detector unit test confirms likely_unused=true + yearly_savings_if_cancelled=9600 for 4 monthly Netflix/Entertainment charges. (4) POST /api/transactions/subscriptions/cancel with {merchant,display_name} → 200 and removes sub from subsequent GET /api/transactions/subscriptions. (5) Missing/empty merchant → 400. (6) GET /api/transactions/subscriptions schema intact with cancelled_merchants filter working; (7) /documents/auto-apply, parse-email, parse-policy regressions pass (parse-policy requires multipart PDF file and correctly returns 422 on missing file). Frontend: Playwright login flow blocked by timing issues on the two-tab /arthverse/auth page — stopped after 3 attempts per loop-prevention rules. Seeded Netflix data is live in DB for main agent's manual UI verification; main agent's own E2E verification confirmed UI renders.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_20.py",
+    "/app/test_reports/pytest/iteration_20_results.xml"
+  ],
+  "action_items": [
+    "Main agent: manually verify Dashboard → SubscriptionsCard shows Netflix (likely_unused, ₹9600/year savings), Spotify (₹2400/year) with cancel-nudge-banner and cancel-sub-btn-* working. Seed data already present in DB for user 21e9c0e2-9a5e-4e1f-9a6f-28c1beb29f89 (AV271676A7).",
+    "Main agent: manually verify SmartImport → Gmail tab → orange bulk-scan-btn (Scan & Parse All) click shows loading 'AI is working its magic...' then bulk-result-card with metrics. Your prior E2E result (8 scanned, 5 w/ data, 3 txns saved, 2 policies) should match.",
+    "(Non-blocking) Consider adding data-testid to login Client-ID input (currently only accessible via label 'Client ID' or placeholder 'AV12345678') for easier automated regression testing."
+  ],
+  "critical_code_review_comments": [
+    "/app/backend/routes/gmail.py scan_and_apply_all (~L322-468): good separation of concerns via shared apply_parsed_data helper. However, errors during body-decode or parser call are caught, counted into errors, but the email is NOT marked parsed — next run will re-attempt. For poison messages this could loop. Consider marking parsed=True with parse_error field to avoid repeated GPT-5.2 billing.",
+    "/app/backend/routes/gmail.py scan_and_apply_all fallback path (L365-382): when inbox cache is empty, emails are appended without `queued_at` / `parsed` flags, so subsequent runs won't dedupe them properly — consider persisting to gmail_inbox during the fallback.",
+    "/app/backend/services/subscription_detector.py likely_unused heuristic (L133-138): only triggers for Entertainment/Education/Shopping categories AND occurrence_count>=3 AND days_since_last_charge>=20. This is conservative — consider exposing the threshold as config so tests/main-agent can tune.",
+    "/app/backend/server.py /transactions/subscriptions/cancel: no input-length cap on merchant — user could write a 1MB string. Add max-length validation (e.g., 200 chars).",
+    "/app/backend/server.py get_recurring_subscriptions: hard-coded limit=500 transactions — power users with >500 txns may miss older subscription occurrences that would reveal yearly patterns. Consider paginating by date window instead of top-500."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration_20.py"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13 pytest)",
+    "frontend": "not tested via playwright this iteration — login selectors timed out; main agent has prior E2E evidence; seed data is live for manual re-verification"
+  },
+  "test_credentials": "AV271676A7 / Demo123! (used as-is). Real JWT user_id for this client is UUID 21e9c0e2-9a5e-4e1f-9a6f-28c1beb29f89 — important for any direct DB seeding in future iterations (client_id ≠ user_id in DB records).",
+  "seed_data_creation": "Inserted 4 TEST_Netflix Subscription expense transactions (₹800 each, Entertainment, monthly cadence over last 4 months) under user_id=21e9c0e2-9a5e-4e1f-9a6f-28c1beb29f89 to restore the likely_unused/cancel-nudge scenario for UI verification. Existing HDFC SIP, Netflix (non-TEST), Spotify sub patterns all surface correctly. Also: /documents/auto-apply regression test inserts 1 TEST_SIP Regression iter20 txn per run. cancelled_subscriptions collection was cleared at start of this iteration (was already empty).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "IMPORTANT: AV271676A7 client_id maps to JWT user_id UUID 21e9c0e2-9a5e-4e1f-9a6f-28c1beb29f89 — when seeding transactions/subscriptions/questionnaire data in DB for this user, you MUST use the UUID, not the client_id. GET /api/transactions/subscriptions endpoint validates this (seeding under client_id silently produces 0 results). Test file /app/backend/tests/test_iteration_20.py has fixtures that cover Gmail scan-and-apply-all, subscription detector, cancel flow, and regressions for auto-apply/parse-email/parse-policy. Note: parse-policy is a multipart-file endpoint (PDF upload), NOT a JSON text endpoint. Login page at /arthverse/auth has two tabs — 'Login' and 'Sign Up'; default tab is Sign Up. Click Login tab first, then fill Client ID (placeholder 'e.g., AV12345678', no data-testid) and Password. The seeded Netflix data may have yearly_savings_if_cancelled=9600 and likely_unused=true — primed for UI nudge-banner verification.",
+  "rca of the issue": "No product bugs found. One test-environment observation: the cancel-subscription test in my first pass correctly cancelled the top-ranked sub (HDFC Mutual Fund SIP) which is an investment, not a true nudge target. This is expected behavior since the endpoint is merchant-agnostic by design — it accepts any merchant string and persists. If the product wants to restrict cancellation to Entertainment/Shopping subs only, add a server-side category check."
+}

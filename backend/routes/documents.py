@@ -253,18 +253,38 @@ async def auto_apply_parsed(
     body: dict,
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    """One-click: route parsed email/policy data to the right destinations.
-
-    Accepts any of: transactions, insurance_data, investment_data, policy_type (for PDF).
-    Returns a summary of what was saved/applied.
-    """
-    import uuid
-    from datetime import datetime as dt
-
+    """One-click: route parsed email/policy data to the right destinations."""
     db = get_db()
     user_id = await verify_token(credentials)
     data = body.get("data") or {}
     source = body.get("source", "smart_import")
+
+    actions = await apply_parsed_data(db, user_id, data, source)
+
+    return {
+        "success": True,
+        "actions": actions,
+        "message": _build_summary_message(actions),
+    }
+
+
+def _build_summary_message(a: dict) -> str:
+    parts = []
+    if a["transactions_saved"] > 0:
+        parts.append(f"{a['transactions_saved']} transaction(s) saved")
+    if a["questionnaire_fields_updated"]:
+        parts.append(f"{len(a['questionnaire_fields_updated'])} questionnaire field(s) updated")
+    if a["policy_applied"]:
+        parts.append(f"policy ({a['policy_applied']}) applied")
+    if a["investment_applied"]:
+        parts.append(a["investment_applied"])
+    return ". ".join(parts) if parts else "No data to apply"
+
+
+async def apply_parsed_data(db, user_id: str, data: dict, source: str = "smart_import") -> dict:
+    """Shared auto-apply logic reusable from other routes (e.g., Gmail bulk scan)."""
+    import uuid
+    from datetime import datetime as dt
 
     actions = {
         "transactions_saved": 0,
@@ -273,7 +293,6 @@ async def auto_apply_parsed(
         "investment_applied": None,
     }
 
-    # 1. Transactions → transactions collection
     txns = data.get("transactions") or []
     for t in txns:
         try:
@@ -296,11 +315,9 @@ async def auto_apply_parsed(
         except Exception:
             pass
 
-    # 2. Insurance data (from email) → questionnaire
     update_fields = {}
     ins = data.get("insurance_data")
     if ins and isinstance(ins, dict):
-        # Infer insurance type from insurer / scheme hints
         cover = ins.get("cover_amount") or 0
         premium = ins.get("premium_due") or 0
         insurer_lower = (ins.get("insurer") or "").lower()
@@ -317,14 +334,12 @@ async def auto_apply_parsed(
             if premium > 0:
                 update_fields["term_insurance_premium_annual"] = float(premium)
         elif cover > 0:
-            # Generic — default to term life
             update_fields["has_term_life_insurance"] = True
             update_fields["term_insurance_cover"] = float(cover)
             if premium > 0:
                 update_fields["term_insurance_premium_annual"] = float(premium)
         actions["policy_applied"] = ins.get("insurer") or "insurance"
 
-    # 3. Policy data (from PDF upload) → questionnaire (reuse apply-policy mapping)
     policy_type = data.get("policy_type")
     if policy_type:
         if policy_type == "term_life":
@@ -355,14 +370,12 @@ async def auto_apply_parsed(
                 update_fields["ulip_endowment_premium_annual"] = float(data["premium_amount"])
         actions["policy_applied"] = policy_type
 
-    # 4. Investment data (SIPs, mutual funds) → questionnaire
     inv = data.get("investment_data")
     if inv and isinstance(inv, dict):
         amount = inv.get("amount") or 0
         inv_type = (inv.get("type") or "").lower()
         if amount > 0:
             if inv_type == "sip":
-                # Add to existing monthly SIP investment
                 existing = await db.questionnaires.find_one({"user_id": user_id}, {"monthly_investments_sip": 1, "_id": 0})
                 current = float((existing or {}).get("monthly_investments_sip") or 0)
                 update_fields["invests_in_mutual_funds"] = True
@@ -375,9 +388,7 @@ async def auto_apply_parsed(
                 update_fields["equity_mf_current_value"] = current + float(amount)
                 actions["investment_applied"] = f"Lump sum ₹{amount} added to MF value"
 
-    # Apply questionnaire updates
     if update_fields:
-        # Upsert so it works even if questionnaire doesn't exist yet
         await db.questionnaires.update_one(
             {"user_id": user_id},
             {"$set": update_fields, "$setOnInsert": {"user_id": user_id, "created_at": datetime.now(timezone.utc).isoformat()}},
@@ -385,21 +396,4 @@ async def auto_apply_parsed(
         )
         actions["questionnaire_fields_updated"] = list(update_fields.keys())
 
-    return {
-        "success": True,
-        "actions": actions,
-        "message": _build_summary_message(actions),
-    }
-
-
-def _build_summary_message(a: dict) -> str:
-    parts = []
-    if a["transactions_saved"] > 0:
-        parts.append(f"{a['transactions_saved']} transaction(s) saved")
-    if a["questionnaire_fields_updated"]:
-        parts.append(f"{len(a['questionnaire_fields_updated'])} questionnaire field(s) updated")
-    if a["policy_applied"]:
-        parts.append(f"policy ({a['policy_applied']}) applied")
-    if a["investment_applied"]:
-        parts.append(a["investment_applied"])
-    return ". ".join(parts) if parts else "No data to apply"
+    return actions

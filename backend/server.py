@@ -467,7 +467,33 @@ async def get_recurring_subscriptions(credentials: HTTPAuthorizationCredentials 
         {"_id": 0}
     ).sort("date", -1).limit(500).to_list(500)
 
-    return detect_subscriptions(transactions)
+    cancelled = await db.cancelled_subscriptions.find(
+        {"user_id": user_id}, {"_id": 0, "merchant": 1}
+    ).to_list(200)
+    cancelled_set = {c["merchant"] for c in cancelled}
+
+    return detect_subscriptions(transactions, cancelled_set)
+
+
+@api_router.post("/transactions/subscriptions/cancel")
+async def mark_subscription_cancelled(body: dict, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Mark a subscription merchant as cancelled so it stops appearing in the list."""
+    user_id = await verify_token(credentials)
+    merchant = (body.get("merchant") or "").strip()
+    if not merchant:
+        raise HTTPException(status_code=400, detail="merchant is required")
+
+    await db.cancelled_subscriptions.update_one(
+        {"user_id": user_id, "merchant": merchant},
+        {"$set": {
+            "user_id": user_id,
+            "merchant": merchant,
+            "display_name": body.get("display_name", merchant),
+            "cancelled_at": datetime.now(timezone.utc).isoformat(),
+        }},
+        upsert=True,
+    )
+    return {"message": "Marked as cancelled", "merchant": merchant}
 
 # ============= AI Routes =============
 

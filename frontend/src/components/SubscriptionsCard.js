@@ -1,30 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { API } from '../App';
 import { Card } from './ui/card';
-import { RefreshCw, AlertCircle, ChevronRight } from 'lucide-react';
+import { Button } from './ui/button';
+import { RefreshCw, AlertCircle, ChevronRight, Zap, X, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SubscriptionsCard({ token }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const res = await axios.get(`${API}/transactions/subscriptions`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!cancelled) setData(res.data);
-      } catch {
-        if (!cancelled) setData({ subscriptions: [], count: 0, total_monthly_cost: 0, total_yearly_cost: 0 });
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+  const load = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/transactions/subscriptions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setData(res.data);
+    } catch {
+      setData({ subscriptions: [], count: 0, total_monthly_cost: 0, total_yearly_cost: 0 });
+    } finally {
+      setLoading(false);
+    }
   }, [token]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleCancel = async (sub) => {
+    setCancelling(sub.merchant);
+    try {
+      await axios.post(`${API}/transactions/subscriptions/cancel`,
+        { merchant: sub.merchant, display_name: sub.display_name },
+        { headers: { Authorization: `Bearer ${token}` } });
+      toast.success(`${sub.display_name} marked as cancelled · saving ₹${sub.yearly_savings_if_cancelled.toLocaleString('en-IN')}/yr`);
+      await load();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Could not mark cancelled');
+    } finally {
+      setCancelling(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -56,6 +71,8 @@ export default function SubscriptionsCard({ token }) {
   }
 
   const upcoming = data.subscriptions.filter(s => s.days_until_next <= 7);
+  const unused = data.subscriptions.filter(s => s.likely_unused);
+  const potentialSavings = unused.reduce((sum, s) => sum + (s.yearly_savings_if_cancelled || 0), 0);
 
   return (
     <Card className="p-6 border border-slate-200 rounded-2xl overflow-hidden" data-testid="subscriptions-card">
@@ -78,6 +95,25 @@ export default function SubscriptionsCard({ token }) {
         </div>
       </div>
 
+      {/* Smart Cancel Nudge */}
+      {unused.length > 0 && (
+        <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 mb-4" data-testid="cancel-nudge-banner">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-4 h-4 text-emerald-700" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-emerald-900">
+                Save ₹{potentialSavings.toLocaleString('en-IN')}/year
+              </p>
+              <p className="text-xs text-emerald-700 mt-0.5">
+                {unused.length} subscription{unused.length > 1 ? 's' : ''} show no recent usage — review before the next charge.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {upcoming.length > 0 && (
         <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 mb-4 flex items-start gap-3">
           <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -93,10 +129,12 @@ export default function SubscriptionsCard({ token }) {
       )}
 
       <div className="space-y-2" data-testid="subscriptions-list">
-        {data.subscriptions.slice(0, 6).map((sub, i) => (
+        {data.subscriptions.slice(0, 8).map((sub, i) => (
           <div
             key={`${sub.merchant}-${i}`}
-            className="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors"
+            className={`flex items-center justify-between p-3 rounded-xl transition-colors ${
+              sub.likely_unused ? 'bg-emerald-50/50 border border-emerald-200' : 'bg-slate-50 hover:bg-slate-100'
+            }`}
             data-testid={`subscription-item-${i}`}
           >
             <div className="flex items-center gap-3 min-w-0">
@@ -110,21 +148,46 @@ export default function SubscriptionsCard({ token }) {
                 </span>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-800 truncate">{sub.display_name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-800 truncate">{sub.display_name}</p>
+                  {sub.likely_unused && (
+                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                      <Zap className="w-2.5 h-2.5" /> UNUSED
+                    </span>
+                  )}
+                </div>
                 <p className="text-[11px] text-slate-500">
                   {sub.category} · Next: {sub.days_until_next === 0 ? 'any day' : `in ${sub.days_until_next}d`}
+                  {sub.likely_unused && sub.yearly_savings_if_cancelled > 0 && (
+                    <span className="text-emerald-600 font-semibold"> · Save ₹{sub.yearly_savings_if_cancelled.toLocaleString('en-IN')}/yr</span>
+                  )}
                 </p>
               </div>
             </div>
-            <div className="text-right flex-shrink-0">
-              <p className="text-sm font-bold font-mono text-slate-800">₹{sub.amount.toLocaleString('en-IN')}</p>
-              <p className="text-[10px] text-slate-400">{sub.frequency}</p>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="text-right">
+                <p className="text-sm font-bold font-mono text-slate-800">₹{sub.amount.toLocaleString('en-IN')}</p>
+                <p className="text-[10px] text-slate-400">{sub.frequency}</p>
+              </div>
+              {sub.likely_unused && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleCancel(sub)}
+                  disabled={cancelling === sub.merchant}
+                  className="h-8 px-2 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-100 rounded-lg"
+                  data-testid={`cancel-sub-btn-${i}`}
+                  title="Mark as cancelled"
+                >
+                  {cancelling === sub.merchant ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                </Button>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      {data.subscriptions.length > 6 && (
+      {data.subscriptions.length > 8 && (
         <button
           className="mt-3 text-xs font-semibold text-brand-blue hover:text-brand-blue/80 flex items-center gap-1"
           data-testid="view-all-subscriptions-btn"

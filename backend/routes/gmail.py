@@ -333,3 +333,136 @@ async def refresh_gmail_scan(credentials: HTTPAuthorizationCredentials = Depends
 
     result = await scan_user_gmail(db, user_id)
     return result
+
+
+@router.post("/scan-and-apply-all")
+async def scan_and_apply_all(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    max_emails: int = Query(20, ge=1, le=50),
+):
+    """Mega-button: refresh inbox, parse every unparsed financial email with GPT-5.2,
+    and auto-apply each extraction. Returns aggregate summary."""
+    from services.gmail_auto_scan import scan_user_gmail
+    from services.document_parser import parse_email_text
+    from routes.documents import apply_parsed_data
+
+    db = get_db()
+    user_id = await verify_token(credentials)
+
+    creds = await _get_gmail_creds(user_id)
+    if not creds:
+        raise HTTPException(status_code=403, detail="Gmail not connected")
+
+    # Step 1: Refresh inbox to catch any brand-new emails
+    await scan_user_gmail(db, user_id)
+
+    # Step 2: Find unparsed financial emails (prioritize the most recent)
+    unparsed = await db.gmail_inbox.find(
+        {"user_id": user_id, "parsed": False},
+        {"_id": 0}
+    ).sort("queued_at", -1).limit(max_emails).to_list(max_emails)
+
+    if not unparsed:
+        # Fallback: fetch recent emails directly from Gmail if inbox cache is empty
+        try:
+            from googleapiclient.discovery import build
+            service = build('gmail', 'v1', credentials=creds)
+            query = '(subject:statement OR subject:policy OR subject:investment OR subject:SIP OR subject:premium OR subject:renewal OR subject:insurance OR subject:EMI OR subject:credit OR subject:debit OR subject:transaction)'
+            result = service.users().messages().list(userId='me', q=query, maxResults=max_emails).execute()
+            for msg_ref in result.get('messages', []):
+                meta = service.users().messages().get(userId='me', id=msg_ref['id'], format='metadata',
+                                                     metadataHeaders=['Subject', 'From', 'Date']).execute()
+                headers = {h['name']: h['value'] for h in meta.get('payload', {}).get('headers', [])}
+                unparsed.append({
+                    "email_id": msg_ref['id'],
+                    "subject": headers.get('Subject', ''),
+                    "from": headers.get('From', ''),
+                })
+        except Exception as e:
+            logger.error(f"Fallback fetch failed: {e}")
+
+    # Step 3: Parse + apply each
+    from googleapiclient.discovery import build
+    service = build('gmail', 'v1', credentials=creds)
+
+    aggregate = {
+        "emails_processed": 0,
+        "emails_with_data": 0,
+        "total_transactions_saved": 0,
+        "total_fields_updated": 0,
+        "policies_applied": [],
+        "investments_applied": [],
+        "errors": 0,
+        "details": [],
+    }
+
+    for queued in unparsed:
+        email_id = queued.get("email_id") or queued.get("id")
+        if not email_id:
+            continue
+        try:
+            msg = service.users().messages().get(userId='me', id=email_id, format='full').execute()
+            body_text = ''
+            payload = msg.get('payload', {})
+            if payload.get('body', {}).get('data'):
+                body_text = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8', errors='ignore')
+            elif payload.get('parts'):
+                for part in payload['parts']:
+                    if part.get('mimeType') == 'text/plain' and part.get('body', {}).get('data'):
+                        body_text = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
+                        break
+
+            headers = {h['name']: h['value'] for h in payload.get('headers', [])}
+            subject = headers.get('Subject', '')
+            full_text = f"From: {headers.get('From', '')}\nSubject: {subject}\nDate: {headers.get('Date', '')}\n\n{body_text}"
+
+            parsed = await parse_email_text(full_text)
+            aggregate["emails_processed"] += 1
+
+            if not parsed.get("success") or not parsed.get("data"):
+                await db.gmail_inbox.update_one(
+                    {"user_id": user_id, "email_id": email_id},
+                    {"$set": {"parsed": True, "parsed_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                continue
+
+            data = parsed["data"]
+            has_data = bool(data.get("transactions") or data.get("insurance_data") or data.get("investment_data"))
+            if has_data:
+                actions = await apply_parsed_data(db, user_id, data, source="gmail_bulk")
+                aggregate["emails_with_data"] += 1
+                aggregate["total_transactions_saved"] += actions["transactions_saved"]
+                aggregate["total_fields_updated"] += len(actions["questionnaire_fields_updated"])
+                if actions["policy_applied"]:
+                    aggregate["policies_applied"].append(actions["policy_applied"])
+                if actions["investment_applied"]:
+                    aggregate["investments_applied"].append(actions["investment_applied"])
+                aggregate["details"].append({
+                    "subject": subject[:80],
+                    "transactions": actions["transactions_saved"],
+                    "fields_updated": len(actions["questionnaire_fields_updated"]),
+                })
+
+            await db.gmail_inbox.update_one(
+                {"user_id": user_id, "email_id": email_id},
+                {"$set": {"parsed": True, "parsed_at": datetime.now(timezone.utc).isoformat(),
+                          "parsed_data": data}}
+            )
+        except Exception as e:
+            aggregate["errors"] += 1
+            logger.warning(f"scan-and-apply-all: email {email_id} failed: {e}")
+
+    # Build human summary
+    summary_parts = [f"{aggregate['emails_processed']} email(s) scanned"]
+    if aggregate['total_transactions_saved']:
+        summary_parts.append(f"{aggregate['total_transactions_saved']} transaction(s) saved")
+    if aggregate['total_fields_updated']:
+        summary_parts.append(f"{aggregate['total_fields_updated']} profile field(s) auto-filled")
+    if aggregate['policies_applied']:
+        summary_parts.append(f"{len(aggregate['policies_applied'])} policy/policies applied")
+
+    return {
+        "success": True,
+        "summary": ". ".join(summary_parts),
+        **aggregate,
+    }

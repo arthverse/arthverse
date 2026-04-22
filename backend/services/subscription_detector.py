@@ -41,20 +41,36 @@ def _round_amount(amount: float) -> int:
     return round(amount / 100) * 100
 
 
-def detect_subscriptions(transactions: list) -> dict:
+def detect_subscriptions(transactions: list, cancelled_merchants: set = None) -> dict:
     """Detect recurring subscriptions from a list of transactions.
 
     Args:
-        transactions: list of dicts with fields: amount, type, description, date
+        transactions: list of dicts with fields: amount, type, description, date, category
+        cancelled_merchants: set of normalized merchant strings user has marked as cancelled
 
     Returns:
         dict with keys: subscriptions (list), total_monthly_cost, total_yearly_cost, count
+        Each subscription has extra field `likely_unused` (True when no recent matching-category
+        transactions in the last 60 days apart from the subscription itself)
     """
     if not transactions:
         return {"subscriptions": [], "total_monthly_cost": 0, "total_yearly_cost": 0, "count": 0}
 
+    cancelled_merchants = cancelled_merchants or set()
+
     # Only expenses
     expenses = [t for t in transactions if (t.get("type") or "").lower() == "expense" and t.get("amount", 0) > 0]
+
+    # Build a map of recent activity per category (for unused-detection)
+    now = datetime.now()
+    recent_by_category = defaultdict(int)  # category → count in last 60 days
+    for t in expenses:
+        try:
+            d = datetime.fromisoformat(str(t["date"]).split("T")[0])
+            if (now - d).days <= 60:
+                recent_by_category[(t.get("category") or "Other")] += 1
+        except Exception:
+            continue
 
     # Group by merchant + rounded amount
     groups = defaultdict(list)
@@ -71,6 +87,8 @@ def detect_subscriptions(transactions: list) -> dict:
 
     for (merchant, amt_bucket), items in groups.items():
         if len(items) < 2:
+            continue
+        if merchant in cancelled_merchants:
             continue
 
         # Parse dates
@@ -107,6 +125,18 @@ def detect_subscriptions(transactions: list) -> dict:
         # Use the most recent description as display name
         display_name = dated[-1][1].get("description", merchant).strip() or merchant.title()
 
+        # Detect "likely unused" — last charge > 40 days ago OR category has no other
+        # recent activity beyond this subscription (suggests user isn't actively using the service)
+        category = dated[-1][1].get("category", "Other")
+        category_activity = recent_by_category.get(category, 0) - len(dated)  # other txns in category
+        days_since_last_charge = (now - last_date).days
+        likely_unused = (
+            category in ("Entertainment", "Education", "Shopping") and
+            category_activity <= 0 and
+            len(dated) >= 3 and
+            days_since_last_charge >= 20
+        )
+
         sub = {
             "merchant": merchant,
             "display_name": display_name,
@@ -117,7 +147,9 @@ def detect_subscriptions(transactions: list) -> dict:
             "next_expected": next_expected.date().isoformat(),
             "days_until_next": max(0, (next_expected - datetime.now()).days),
             "monthly_cost": round(monthly_cost, 2),
-            "category": dated[-1][1].get("category", "Other"),
+            "category": category,
+            "likely_unused": likely_unused,
+            "yearly_savings_if_cancelled": round(monthly_cost * 12, 2) if likely_unused else 0,
         }
         subscriptions.append(sub)
         total_monthly += monthly_cost

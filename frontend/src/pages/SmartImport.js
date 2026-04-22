@@ -26,6 +26,24 @@ export default function SmartImport({ token, onLogout }) {
   const [savedTransactionIds, setSavedTransactionIds] = useState(new Set());
   const [inbox, setInbox] = useState({ emails: [], unparsed_count: 0, last_scanned: null });
   const [refreshingInbox, setRefreshingInbox] = useState(false);
+  const [bulkScanning, setBulkScanning] = useState(false);
+  const [bulkResult, setBulkResult] = useState(null);
+
+  const handleBulkScanAndApply = async () => {
+    setBulkScanning(true);
+    setBulkResult(null);
+    try {
+      const res = await axios.post(`${API}/gmail/scan-and-apply-all?max_emails=20`, {},
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 300000 });
+      setBulkResult(res.data);
+      toast.success(res.data.summary);
+      loadInbox();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Bulk scan failed');
+    } finally {
+      setBulkScanning(false);
+    }
+  };
 
   const loadGmailStatus = useCallback(async () => {
     try {
@@ -381,6 +399,28 @@ export default function SmartImport({ token, onLogout }) {
                       {loadingEmails ? 'Scanning...' : 'Scan Financial Emails'}
                     </Button>
 
+                    {/* 🚀 Scan & Parse All Mega-button */}
+                    <button
+                      onClick={handleBulkScanAndApply}
+                      disabled={bulkScanning}
+                      className="w-full rounded-2xl p-4 bg-gradient-to-br from-brand-orange via-orange-500 to-amber-500 text-white shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 mb-3"
+                      data-testid="bulk-scan-btn"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                          {bulkScanning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="text-sm font-bold">
+                            {bulkScanning ? 'AI is working its magic...' : 'Scan & Parse All'}
+                          </p>
+                          <p className="text-[11px] text-white/85">
+                            {bulkScanning ? 'Parsing up to 20 emails, auto-applying findings...' : '60-second onboarding: parse every email & auto-fill your profile'}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
                     {gmailEmails.length > 0 && (
                       <div className="space-y-2 max-h-96 overflow-y-auto">
                         {gmailEmails.map(email => (
@@ -412,11 +452,61 @@ export default function SmartImport({ token, onLogout }) {
 
           {/* Right: Parsed Result */}
           <div className="lg:col-span-3">
-            {!parsedResult && (
+            {!parsedResult && !bulkResult && (
               <div className="text-center py-20">
                 <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                 <p className="text-slate-500">Upload a document or parse an email to see AI-extracted data here.</p>
               </div>
+            )}
+
+            {/* Bulk scan result */}
+            {bulkResult && (
+              <Card className="p-6 border border-orange-200 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 mb-4" data-testid="bulk-result-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-brand-orange" />
+                  <h3 className="text-lg font-bold text-slate-800">Bulk Scan Complete</h3>
+                </div>
+                <p className="text-sm text-slate-700 mb-4 font-semibold">{bulkResult.summary}</p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="p-3 bg-white rounded-xl border border-slate-100">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold">Emails Scanned</p>
+                    <p className="text-2xl font-bold font-mono text-slate-800">{bulkResult.emails_processed}</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-100">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold">With Data Found</p>
+                    <p className="text-2xl font-bold font-mono text-emerald-600">{bulkResult.emails_with_data}</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-100">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold">Transactions Saved</p>
+                    <p className="text-2xl font-bold font-mono text-brand-blue">{bulkResult.total_transactions_saved}</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-100">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold">Profile Fields Auto-Filled</p>
+                    <p className="text-2xl font-bold font-mono text-purple-600">{bulkResult.total_fields_updated}</p>
+                  </div>
+                </div>
+                {bulkResult.details?.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-2">Details</p>
+                    {bulkResult.details.map((d, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs p-2 bg-white rounded-lg">
+                        <span className="truncate flex-1 text-slate-700">{d.subject}</span>
+                        <span className="text-slate-500 ml-2 flex-shrink-0">
+                          {d.transactions > 0 && `${d.transactions} txn · `}
+                          {d.fields_updated > 0 && `${d.fields_updated} field${d.fields_updated > 1 ? 's' : ''}`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Button
+                  onClick={() => navigate('/arthvyay/questionnaire')}
+                  className="w-full mt-4 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl"
+                  data-testid="bulk-view-questionnaire-btn"
+                >
+                  Review Auto-Filled Questionnaire <ExternalLink className="w-4 h-4 ml-2" />
+                </Button>
+              </Card>
             )}
 
             {parsedResult?.success && parsedResult.data && (
