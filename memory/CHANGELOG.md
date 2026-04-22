@@ -1,5 +1,14 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 19: Recurring Subscriptions + Gmail Auto-Refresh ✅
+- **Subscription Detector**: New `GET /api/transactions/subscriptions` endpoint + `services/subscription_detector.py` algorithm. Groups expenses by normalized merchant + bucketed amount, detects monthly/yearly/weekly recurrence via median inter-charge gap. Returns total_monthly_cost, total_yearly_cost, next_expected per subscription.
+- **SubscriptionsCard component**: New dashboard card showing monthly outflow, upcoming renewals warning (≤7 days), color-coded M/Y/W frequency pills, top 6 subscriptions sorted by urgency.
+- **Gmail Auto-Refresh**: APScheduler job runs every 12h (started on app startup) to cache new financial emails per connected user into `gmail_inbox` collection. Does NOT auto-parse (keeps GPT cost down) — users trigger parsing manually per email.
+- **New Gmail endpoints**: `GET /api/gmail/inbox` (queue with unparsed_count + last_scanned), `POST /api/gmail/refresh` (manual trigger).
+- **SmartImport UI**: Indigo "Auto-Refresh Active" banner in the connected-Gmail view showing last scan time, unparsed badge, and "Refresh now" button.
+- Added `APScheduler==3.11.2` to requirements.txt.
+- **Testing**: 13/13 backend pytest cases pass, frontend 3-tab switcher + all pages render cleanly with no regressions.
+
 ## Feb 2026 — Iteration 18: Auto-save Parsed Transactions ✅
 - Added `POST /api/documents/save-transactions` — accepts a list of parsed transactions and persists them into the user's `transactions` collection.
 - Smart category normalization: maps loose GPT categories (food, sip, emi, salary...) → app's standard categories (Food & Dining, Investment, Bills & Utilities, Other).
