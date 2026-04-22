@@ -67,7 +67,7 @@ const FinancialSnapshot = ({
         <SnapshotCell 
           label="Total Expenses" 
           value={formatINR2(expenses * 12)} 
-          subtext={`${((expenses/income)*100).toFixed(2)}% income`} 
+          subtext={income > 0 ? `${((expenses/income)*100).toFixed(2)}% income` : 'No income entered'} 
           color="var(--amb)" 
           borderRight 
           borderBottom 
@@ -75,7 +75,7 @@ const FinancialSnapshot = ({
         <SnapshotCell 
           label="Net Worth" 
           value={formatINR2(netWorth)} 
-          subtext={`${(netWorth / (income * 12)).toFixed(2)}× income`} 
+          subtext={income > 0 ? `${(netWorth / (income * 12)).toFixed(2)}× income` : 'No income entered'} 
           color="var(--gold)" 
           borderBottom 
         />

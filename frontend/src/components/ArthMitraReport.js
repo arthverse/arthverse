@@ -52,11 +52,21 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
     fetchData();
   }, []);
 
-  // Calculate financial metrics
-  const income = questionnaire?.monthly_income || userData?.monthlyIncome || 145000;
-  const expenses = questionnaire?.monthly_expenses || userData?.monthlyExpenses || 63000;
+  // Calculate financial metrics (use 0 fallbacks — NO fake demo numbers)
+  const income = questionnaire?.monthly_income ||
+    (Number(questionnaire?.monthly_salary_net || 0) +
+     Number(questionnaire?.monthly_business_income || 0) +
+     Number(questionnaire?.monthly_freelance_income || 0)) ||
+    userData?.monthlyIncome || 0;
+  const expenses = questionnaire?.monthly_expenses ||
+    (Number(questionnaire?.household_expenses || 0) +
+     Number(questionnaire?.utility_bills || 0) +
+     Number(questionnaire?.transport_expenses || 0) +
+     Number(questionnaire?.groceries_expenses || 0) +
+     Number(questionnaire?.entertainment_expenses || 0)) ||
+    userData?.monthlyExpenses || 0;
   const savings = income - expenses;
-  const savingsRate = ((savings / income) * 100).toFixed(1);
+  const savingsRate = income > 0 ? ((savings / income) * 100).toFixed(1) : '0';
   
   // Use 10-factor score if available, fallback to legacy score
   const score = tenFactorData?.normalized_score ?? healthScore?.score ?? healthScore?.overall_score ?? 80;
@@ -382,6 +392,26 @@ export default function ArthMitraReport({ userData, healthScore, questionnaire }
           </div>
         </div>
       </div>
+
+      {/* Empty-data banner */}
+      {income === 0 && expenses === 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg, #fff7ed, #fef3c7)',
+          border: '1px solid #fbbf24',
+          borderRadius: 'var(--r16)',
+          padding: '14px 20px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }} data-testid="empty-income-banner">
+          <span style={{ fontSize: '22px' }}>ℹ️</span>
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#92400e' }}>No income or expense data yet</div>
+            <div style={{ fontSize: '11px', color: '#78350f' }}>Complete the questionnaire or use Smart Import (Gmail / PDF) — your snapshot will populate automatically.</div>
+          </div>
+        </div>
+      )}
 
       {/* YEARLY FINANCIAL SNAPSHOT */}
       <FinancialSnapshot 

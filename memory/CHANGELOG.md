@@ -1,5 +1,25 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 26: Bug Fix — Fake Demo Numbers in Yearly Snapshot ✅
+
+### The Bug
+`ArthMitraReport.js` line 56 had hardcoded demo fallbacks:
+```js
+const income = questionnaire?.monthly_income || ... || 145000;  // ❌
+const expenses = questionnaire?.monthly_expenses || ... || 63000;  // ❌
+```
+When a user had no income/expense data entered, the Yearly Snapshot showed **₹17.40L annual income / ₹7.56L expenses / ₹58,000 max EMI** — fabricated fake numbers.
+
+### The Fix
+1. Changed fallbacks from `145000`/`63000` to `0`.
+2. Added real questionnaire field sum as fallback: `monthly_salary_net + monthly_business_income + monthly_freelance_income`.
+3. `savingsRate` now guards against `income === 0` (returns `'0'` instead of `NaN`).
+4. `FinancialSnapshot` subtexts show *"No income entered"* instead of `NaN% income` / `NaN× income`.
+5. Added prominent amber **empty-data banner** (`data-testid=empty-income-banner`) when both income and expenses are 0: *"No income or expense data yet — Complete the questionnaire or use Smart Import (Gmail / PDF)"*.
+
+### Verified
+Live screenshot confirmed: Yearly Snapshot now shows ₹0.00L for all fields when user has no data entered, and the banner steers users to Smart Import.
+
 ## Feb 2026 — Iteration 25: PAN Auto-Try + Credit Card Statement Parsing ✅
 
 ### PAN Auto-Try
