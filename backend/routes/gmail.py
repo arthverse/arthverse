@@ -12,6 +12,10 @@ import warnings
 import logging
 import base64
 
+# Relax OAuth scope validation — Google sometimes returns scopes in different order,
+# and we handle scope-denial explicitly via API response when Gmail access is actually called.
+os.environ.setdefault('OAUTHLIB_RELAX_TOKEN_SCOPE', '1')
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/gmail", tags=["gmail"])
