@@ -15,6 +15,7 @@ const ArthRakshakDashboard = lazy(() => import('./pages/ArthRakshakDashboard'));
 const ArthRakshakFamily = lazy(() => import('./pages/ArthRakshakFamily'));
 const CreditHealthReport = lazy(() => import('./pages/CreditHealthReport'));
 const SmartImport = lazy(() => import('./pages/SmartImport'));
+const PeerComparison = lazy(() => import('./pages/PeerComparison'));
 
 function PageLoader() {
   return (
@@ -110,6 +111,10 @@ function App() {
             <Route 
               path="/arthvyay/smart-import" 
               element={token ? <SmartImport token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+            />
+            <Route 
+              path="/arthvyay/peer-comparison" 
+              element={token ? <PeerComparison token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
             />
 
             {/* ArthRakshak App Routes */}

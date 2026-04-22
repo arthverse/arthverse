@@ -15,6 +15,7 @@ import AnalysisResults from '../components/AnalysisResults';
 import ArthMitraReport from '../components/ArthMitraReport';
 import RiskMeter from '../components/RiskMeter';
 import SubscriptionsCard from '../components/SubscriptionsCard';
+import OnboardingModal from '../components/OnboardingModal';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
@@ -26,11 +27,22 @@ export default function Dashboard({ token, user, onLogout }) {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [userData, setUserData] = useState(user);
   const [hasQuestionnaire, setHasQuestionnaire] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const navigate = useNavigate();
 
   // Check for demo mode via URL parameter
   const urlParams = new URLSearchParams(window.location.search);
   const isDemo = urlParams.get('demo') === 'true';
+
+  // Auto-open onboarding modal for first-time users or when returning from OAuth
+  useEffect(() => {
+    const dismissed = localStorage.getItem('onboardingDismissed');
+    const inProgress = localStorage.getItem('onboardingInProgress');
+    const returnedFromOAuth = urlParams.get('gmail') === 'connected';
+    if (returnedFromOAuth || inProgress === '1' || (!dismissed && !hasQuestionnaire)) {
+      setShowOnboarding(true);
+    }
+  }, [hasQuestionnaire]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -495,42 +507,56 @@ Check your score too! 👇
         </div>
 
         {/* Smart Import Quick Access */}
-        <div className="col-span-1 md:col-span-4 mt-8">
+        <div className="col-span-1 md:col-span-4 mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <button
             onClick={() => navigate('/arthvyay/smart-import')}
-            className="w-full text-left group"
+            className="text-left group"
             data-testid="smart-import-cta-card"
           >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-orange via-orange-500 to-amber-500 p-8 shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all">
-              <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-              <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-              <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-7 h-7 text-white" />
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-orange via-orange-500 to-amber-500 p-6 shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all h-full">
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <span className="text-[11px] uppercase tracking-widest text-white/80 font-bold">AI-Powered · New</span>
-                    <h3 className="text-2xl font-semibold font-heading text-white mt-1 mb-2">Smart Import</h3>
-                    <p className="text-sm text-white/90 max-w-xl">
-                      Skip manual data entry. Upload an insurance policy PDF, paste a bank email, or connect Gmail —
-                      our AI will auto-extract and populate your financial profile in seconds.
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">
-                        <FileText className="w-3.5 h-3.5" /> Policy PDFs
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">
-                        <Mail className="w-3.5 h-3.5" /> Financial Emails
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">
-                        <Sparkles className="w-3.5 h-3.5" /> Gmail Auto-Sync
-                      </span>
-                    </div>
+                    <span className="text-[10px] uppercase tracking-widest text-white/80 font-bold">AI-Powered</span>
+                    <h3 className="text-xl font-semibold font-heading text-white mt-0.5">Smart Import</h3>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-white font-semibold flex-shrink-0 group-hover:translate-x-1 transition-transform">
-                  Get Started <ChevronRight className="w-5 h-5" />
+                <p className="text-sm text-white/90">
+                  Scan Gmail, upload policy PDFs, or paste emails. GPT-5.2 auto-fills your financial profile in seconds.
+                </p>
+                <div className="flex items-center gap-1 text-white font-semibold text-sm mt-4 group-hover:translate-x-1 transition-transform">
+                  Open <ChevronRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => navigate('/arthvyay/peer-comparison')}
+            className="text-left group"
+            data-testid="peer-comparison-cta-card"
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all h-full">
+              <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-widest text-white/80 font-bold">Premium</span>
+                    <h3 className="text-xl font-semibold font-heading text-white mt-0.5">Peer Comparison</h3>
+                  </div>
+                </div>
+                <p className="text-sm text-white/90">
+                  See how your Net Worth, Savings, SIPs &amp; Insurance stack up vs peers in your city-tier and age bracket.
+                </p>
+                <div className="flex items-center gap-1 text-white font-semibold text-sm mt-4 group-hover:translate-x-1 transition-transform">
+                  Compare <ChevronRight className="w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -567,6 +593,9 @@ Check your score too! 👇
         cancelText="Cancel"
         variant="destructive"
       />
+
+      {/* 60-Second Onboarding Modal */}
+      <OnboardingModal token={token} open={showOnboarding} onClose={() => setShowOnboarding(false)} />
     </Layout>
   );
 }

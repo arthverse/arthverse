@@ -495,6 +495,24 @@ async def mark_subscription_cancelled(body: dict, credentials: HTTPAuthorization
     )
     return {"message": "Marked as cancelled", "merchant": merchant}
 
+
+@api_router.get("/reports/peer-comparison")
+async def get_peer_comparison(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Compare user's financial metrics against synthetic cohort benchmarks (city-tier + age)."""
+    from services.peer_comparison import compare_with_peers
+
+    user_id = await verify_token(credentials)
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    questionnaire = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+    if not questionnaire:
+        raise HTTPException(status_code=400, detail="Complete your financial profile first to unlock Peer Comparison.")
+
+    user_age = user.get("age", 30)
+    return compare_with_peers(questionnaire, user_age)
+
 # ============= AI Routes =============
 
 @api_router.post("/ai/categorize", response_model=CategorizeExpenseResponse)
