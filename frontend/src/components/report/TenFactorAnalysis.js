@@ -36,7 +36,7 @@ export default function TenFactorAnalysis({
         {loadingScore ? (
           <div style={{padding:'40px',textAlign:'center',color:'var(--t3)'}}>Loading 10-Factor Analysis...</div>
         ) : tenFactorData?.components ? (
-          <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)'}}>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
             {tenFactorData.components.map((component, idx) => {
               const percentage = component.max_points > 0 ? (component.score / component.max_points) * 100 : 0;
               const color = percentage >= 70 ? 'var(--grn)' : (percentage >= 40 ? 'var(--amb)' : 'var(--red)');
@@ -66,10 +66,15 @@ export default function TenFactorAnalysis({
               
               return (
                 <div key={idx} style={{
-                  padding:'14px 16px',
-                  borderRight: (idx % 5 !== 4) ? '1px solid var(--border)' : 'none',
-                  borderBottom: idx < 5 ? '1px solid var(--border)' : 'none'
-                }}>
+                  background:'rgba(255,255,255,0.75)',backdropFilter:'blur(12px)',
+                  border:'1px solid rgba(255,255,255,0.4)',borderRadius:'16px',
+                  padding:'14px 18px',boxShadow:'0 4px 16px rgba(0,0,0,0.04)',
+                  transition:'transform .2s ease,box-shadow .2s ease',cursor:'pointer'
+                }}
+                  onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
+                  onClick={() => setSelectedPillar(component.component)}
+                >
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'6px'}}>
                     <span style={{fontSize:'10px',fontWeight:700,color:'var(--t2)',letterSpacing:'.02em',display:'flex',alignItems:'center',gap:'4px'}}>
                       <span style={{fontSize:'12px'}}>{icons[idx]}</span>
@@ -80,41 +85,15 @@ export default function TenFactorAnalysis({
                     <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'18px',fontWeight:700,color:color}}>{component.score.toFixed(1)}</span>
                     <span style={{fontSize:'10px',color:'var(--t3)'}}>/ {component.max_points}</span>
                   </div>
-                  <div style={{height:'3px',background:'var(--bg3)',borderRadius:'2px',overflow:'hidden',marginBottom:'6px'}}>
-                    <div style={{width:`${Math.min(100, percentage)}%`,height:'100%',background:color,borderRadius:'2px',transition:'width 0.5s'}}></div>
+                  <div style={{height:'8px',background:'var(--bg4)',borderRadius:'4px',overflow:'hidden',marginBottom:'8px'}}>
+                    <div style={{width:`${Math.min(100, percentage)}%`,height:'100%',background: percentage >= 70 ? 'linear-gradient(90deg,#10B981,#34D399)' : percentage >= 40 ? 'linear-gradient(90deg,#F97316,#FB923C)' : 'linear-gradient(90deg,#EF4444,#F87171)',borderRadius:'4px',transition:'width 1.2s cubic-bezier(.4,0,.2,1)'}}></div>
                   </div>
-                  <div style={{fontSize:'10px',color:color,fontWeight:600,marginBottom:'4px'}}>
-                    {component.details?.status || (percentage >= 70 ? 'Good' : (percentage >= 40 ? 'Fair' : 'Needs Work'))}
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span style={{fontSize:'10px',fontWeight:600,padding:'2px 8px',borderRadius:'10px',background: percentage >= 70 ? 'var(--grnbg)' : percentage >= 40 ? 'var(--ambbg)' : 'var(--redbg)',color}}>{component.details?.status || (percentage >= 70 ? 'On Track' : percentage >= 40 ? 'Needs Work' : 'Critical')}</span>
+                    {keyMetric && (
+                      <span style={{fontSize:'10px',color:'var(--t3)'}}>{keyMetric.label}: <span style={{fontWeight:600,color:'var(--t1)',fontFamily:"'JetBrains Mono',monospace"}}>{keyMetric.value}</span></span>
+                    )}
                   </div>
-                  {keyMetric && (
-                    <div style={{fontSize:'9px',color:'var(--t3)',marginBottom:'6px'}}>
-                      {keyMetric.label}: <span style={{fontWeight:600,color:'var(--t1)'}}>{keyMetric.value}</span>
-                    </div>
-                  )}
-                  <button
-                    onClick={() => setSelectedPillar(component.component)}
-                    style={{
-                      width:'100%',
-                      padding:'5px 8px',
-                      background:'transparent',
-                      border:'1px solid var(--border)',
-                      borderRadius:'5px',
-                      fontSize:'9px',
-                      fontWeight:600,
-                      color:'var(--blu)',
-                      cursor:'pointer',
-                      display:'flex',
-                      alignItems:'center',
-                      justifyContent:'center',
-                      gap:'3px',
-                      transition:'all .2s'
-                    }}
-                    onMouseOver={(e) => { e.target.style.background = 'var(--blubg)'; e.target.style.borderColor = 'var(--blu)'; }}
-                    onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'var(--border)'; }}
-                  >
-                    <span>View Details</span>
-                    <span style={{fontSize:'10px'}}>→</span>
-                  </button>
                 </div>
               );
             })}
@@ -464,8 +443,8 @@ export default function TenFactorAnalysis({
                             cursor:'pointer',transition:'all .2s',display:'flex',alignItems:'center',gap:'4px'
                           }}
                         >
-                          {showRupeeView ? '₹ Rupees' : '% Percent'}
-                          <span style={{fontSize:'8px'}}>{showRupeeView ? '→ %' : '→ ₹'}</span>
+                          {showRupeeView ? '\u20B9 Rupees' : '% Percent'}
+                          <span style={{fontSize:'8px'}}>{showRupeeView ? '\u2192 %' : '\u2192 \u20B9'}</span>
                         </button>
                       )}
                     </div>
