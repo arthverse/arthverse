@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { LayoutDashboard, Receipt, FileText, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Receipt, FileText, LogOut, ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function Layout({ children, token, onLogout }) {
   const location = useLocation();
@@ -68,6 +68,20 @@ export default function Layout({ children, token, onLogout }) {
                     data-testid="nav-reports-btn"
                   >
                     <FileText className="mr-2 h-4 w-4" strokeWidth={1.5} /> Reports
+                  </Button>
+                </Link>
+
+                <Link to="/arthvyay/smart-import" data-testid="nav-smart-import-link">
+                  <Button 
+                    variant="ghost"
+                    className={`rounded-full px-4 ${
+                      isActive('/arthvyay/smart-import') 
+                        ? 'bg-brand-orange text-white hover:bg-brand-orange' 
+                        : 'text-slate-600 hover:text-brand-orange hover:bg-orange-50'
+                    }`}
+                    data-testid="nav-smart-import-btn"
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" strokeWidth={1.5} /> Smart Import
                   </Button>
                 </Link>
               </div>

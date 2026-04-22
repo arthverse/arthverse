@@ -5,7 +5,7 @@ import { API } from '../App';
 import Layout from '../components/Layout';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw, Share2, Target, Shield, Wallet, ChevronRight, Upload, CheckCircle2, Circle } from 'lucide-react';
+import { TrendingUp, TrendingDown, PiggyBank, Edit, RefreshCw, Share2, Target, Shield, Wallet, ChevronRight, Upload, CheckCircle2, Circle, Sparkles, FileText, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import BankLinking from '../components/BankLinking';
 import AggregatedFinancialData from '../components/AggregatedFinancialData';
@@ -317,13 +317,13 @@ Check your score too! 👇
             
             <Button
               variant="outline"
-              onClick={() => toast.info('Bank statement upload coming soon!')}
-              className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 rounded-full px-8 py-6 text-lg transition-all"
-              data-testid="upload-statement-btn"
+              onClick={() => navigate('/arthvyay/smart-import')}
+              className="border-2 border-brand-orange/40 text-brand-orange hover:bg-orange-50 rounded-full px-8 py-6 text-lg transition-all"
+              data-testid="empty-smart-import-btn"
             >
-              <Upload className="w-5 h-5 mr-2" />
-              Upload Bank Statement
-              <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Recommended</span>
+              <Sparkles className="w-5 h-5 mr-2" />
+              Smart Import (AI)
+              <span className="ml-2 text-xs bg-orange-100 text-brand-orange px-2 py-0.5 rounded-full">New</span>
             </Button>
           </div>
 
@@ -486,6 +486,49 @@ Check your score too! 👇
               />
             </div>
           )}
+        </div>
+
+        {/* Smart Import Quick Access */}
+        <div className="col-span-1 md:col-span-4 mt-8">
+          <button
+            onClick={() => navigate('/arthvyay/smart-import')}
+            className="w-full text-left group"
+            data-testid="smart-import-cta-card"
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-orange via-orange-500 to-amber-500 p-8 shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all">
+              <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
+              <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase tracking-widest text-white/80 font-bold">AI-Powered · New</span>
+                    <h3 className="text-2xl font-semibold font-heading text-white mt-1 mb-2">Smart Import</h3>
+                    <p className="text-sm text-white/90 max-w-xl">
+                      Skip manual data entry. Upload an insurance policy PDF, paste a bank email, or connect Gmail —
+                      our AI will auto-extract and populate your financial profile in seconds.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">
+                        <FileText className="w-3.5 h-3.5" /> Policy PDFs
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">
+                        <Mail className="w-3.5 h-3.5" /> Financial Emails
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">
+                        <Sparkles className="w-3.5 h-3.5" /> Gmail Auto-Sync
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-white font-semibold flex-shrink-0 group-hover:translate-x-1 transition-transform">
+                  Get Started <ChevronRight className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Setu Account Aggregator - Bank Linking Section */}

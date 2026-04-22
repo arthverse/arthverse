@@ -14,6 +14,7 @@ const Reports = lazy(() => import('./pages/Reports'));
 const ArthRakshakDashboard = lazy(() => import('./pages/ArthRakshakDashboard'));
 const ArthRakshakFamily = lazy(() => import('./pages/ArthRakshakFamily'));
 const CreditHealthReport = lazy(() => import('./pages/CreditHealthReport'));
+const SmartImport = lazy(() => import('./pages/SmartImport'));
 
 function PageLoader() {
   return (
@@ -105,6 +106,10 @@ function App() {
             <Route 
               path="/arthvyay/credit-health" 
               element={token ? <CreditHealthReport token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+            />
+            <Route 
+              path="/arthvyay/smart-import" 
+              element={token ? <SmartImport token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
             />
 
             {/* ArthRakshak App Routes */}
