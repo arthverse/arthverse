@@ -205,8 +205,14 @@ async def get_financial_emails(
         from googleapiclient.discovery import build
         service = build('gmail', 'v1', credentials=creds)
 
-        # Search for financial emails
-        query = '(subject:statement OR subject:policy OR subject:investment OR subject:SIP OR subject:premium OR subject:renewal OR subject:insurance OR subject:EMI OR subject:credit OR subject:debit OR from:noreply@hdfcbank OR from:alerts@icicibank)'
+        # Search for financial emails (365-day window, broad financial senders)
+        query = ('(subject:statement OR subject:policy OR subject:investment OR subject:SIP '
+                 'OR subject:premium OR subject:renewal OR subject:insurance OR subject:EMI '
+                 'OR subject:credit OR subject:debit OR subject:CAS OR subject:"consolidated account" '
+                 'OR subject:portfolio OR subject:holdings OR subject:"demat statement" '
+                 'OR from:cams.com OR from:karvy.com OR from:kfintech.com '
+                 'OR from:cdslindia.com OR from:nsdl.co.in '
+                 'OR from:noreply@hdfcbank OR from:alerts@icicibank) newer_than:365d')
         result = service.users().messages().list(userId='me', q=query, maxResults=max_results).execute()
         messages = result.get('messages', [])
 
@@ -217,14 +223,31 @@ async def get_financial_emails(
 
             # Extract body
             body_text = ''
+            attachments = []
             payload = msg.get('payload', {})
             if payload.get('body', {}).get('data'):
                 body_text = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8', errors='ignore')
-            elif payload.get('parts'):
-                for part in payload['parts']:
-                    if part.get('mimeType') == 'text/plain' and part.get('body', {}).get('data'):
-                        body_text = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
-                        break
+
+            # Walk all parts recursively to find text + PDF attachments
+            def _walk_parts(parts):
+                nonlocal body_text
+                for part in parts or []:
+                    mime = part.get('mimeType', '')
+                    filename = part.get('filename', '')
+                    body = part.get('body', {})
+                    if mime == 'text/plain' and body.get('data') and not body_text:
+                        body_text = base64.urlsafe_b64decode(body['data']).decode('utf-8', errors='ignore')
+                    elif filename and filename.lower().endswith('.pdf') and body.get('attachmentId'):
+                        attachments.append({
+                            "attachment_id": body['attachmentId'],
+                            "filename": filename,
+                            "size": body.get('size', 0),
+                            "looks_like_cas": any(k in filename.lower() for k in ['cas', 'consolidated', 'cams', 'karvy', 'statement', 'portfolio', 'holdings']),
+                        })
+                    if part.get('parts'):
+                        _walk_parts(part['parts'])
+
+            _walk_parts(payload.get('parts', []))
 
             emails.append({
                 "id": msg_ref['id'],
@@ -233,6 +256,7 @@ async def get_financial_emails(
                 "date": headers.get('Date', ''),
                 "snippet": msg.get('snippet', ''),
                 "body_preview": body_text[:500] if body_text else '',
+                "attachments": attachments,
             })
 
         return {"emails": emails, "total": len(emails)}
@@ -242,6 +266,137 @@ async def get_financial_emails(
             await db.gmail_tokens.delete_one({"user_id": user_id})
             raise HTTPException(status_code=401, detail="Gmail session expired. Please reconnect.")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/parse-attachment")
+async def parse_gmail_attachment(
+    body: dict,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+):
+    """Download a PDF attachment from Gmail, extract text (handling password-protected CAS),
+    run through GPT-5.2 CAS parser, and optionally auto-apply the results.
+
+    Body: {email_id, attachment_id, filename?, password?, auto_apply?: bool}
+    """
+    from services.pdf_attachment_parser import extract_pdf_text, parse_cas_pdf, cas_to_questionnaire_updates
+    from routes.documents import apply_parsed_data
+    from datetime import datetime as dt
+    import uuid
+
+    db = get_db()
+    user_id = await verify_token(credentials)
+
+    email_id = body.get("email_id")
+    attachment_id = body.get("attachment_id")
+    password = body.get("password")
+    auto_apply = bool(body.get("auto_apply", True))
+
+    if not email_id or not attachment_id:
+        raise HTTPException(status_code=400, detail="email_id and attachment_id are required")
+
+    creds = await _get_gmail_creds(user_id)
+    if not creds:
+        raise HTTPException(status_code=403, detail="Gmail not connected")
+
+    # Download attachment
+    try:
+        from googleapiclient.discovery import build
+        service = build('gmail', 'v1', credentials=creds)
+        att = service.users().messages().attachments().get(
+            userId='me', messageId=email_id, id=attachment_id
+        ).execute()
+        pdf_bytes = base64.urlsafe_b64decode(att['data'])
+    except Exception as e:
+        logger.error(f"Attachment download failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Download failed: {e}")
+
+    # Extract text (may be password-protected)
+    try:
+        pdf_text, was_encrypted = extract_pdf_text(pdf_bytes, password=password)
+    except ValueError as e:
+        # Incorrect password
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        logger.error(f"PDF extract failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Could not read PDF: {e}")
+
+    if was_encrypted and not pdf_text:
+        return {
+            "success": False,
+            "password_required": True,
+            "message": "This PDF is password-protected. For CAS files, the password is usually your PAN (uppercase) or PAN + DOB (DDMMYYYY)."
+        }
+
+    # Parse via GPT-5.2
+    parsed = await parse_cas_pdf(pdf_text)
+    if not parsed.get("success"):
+        return parsed
+
+    data = parsed["data"]
+
+    result = {
+        "success": True,
+        "data": data,
+        "applied": False,
+    }
+
+    # Auto-apply to questionnaire + save transactions
+    if auto_apply:
+        # Map CAS totals to questionnaire fields
+        update_fields = cas_to_questionnaire_updates(data)
+        if update_fields:
+            await db.questionnaires.update_one(
+                {"user_id": user_id},
+                {"$set": update_fields, "$setOnInsert": {"user_id": user_id, "created_at": datetime.now(timezone.utc).isoformat()}},
+                upsert=True
+            )
+
+        # Save transactions (via shared helper so percentile delta works)
+        txns = data.get("transactions") or []
+        apply_actions = None
+        if txns:
+            apply_actions = await apply_parsed_data(
+                db, user_id,
+                {"transactions": txns},
+                source="cas_pdf",
+                track_percentile=False,
+            )
+
+        # Compute percentile delta for the whole operation
+        percentile_change = None
+        try:
+            from services.peer_comparison import compare_with_peers
+            user = await db.users.find_one({"id": user_id}, {"_id": 0})
+            new_q = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+            if user and new_q and update_fields:
+                post = compare_with_peers(new_q, user.get("age", 30))
+                percentile_change = {
+                    "after": post["overall_percentile"],
+                    "cohort_description": post["cohort"]["description"],
+                }
+        except Exception:
+            pass
+
+        result["applied"] = True
+        result["applied_fields"] = list(update_fields.keys())
+        result["transactions_saved"] = (apply_actions or {}).get("transactions_saved", 0)
+        if percentile_change:
+            result["percentile_after"] = percentile_change
+
+        # Persist parsed CAS for history
+        await db.parsed_cas_statements.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "email_id": email_id,
+            "attachment_id": attachment_id,
+            "filename": body.get("filename", ""),
+            "parsed_at": datetime.now(timezone.utc).isoformat(),
+            "document_type": data.get("document_type"),
+            "totals": data.get("totals"),
+            "holdings_count": len(data.get("mutual_funds") or []) + len(data.get("equity_holdings") or []),
+        })
+
+    return result
 
 
 @router.post("/parse-email/{email_id}")

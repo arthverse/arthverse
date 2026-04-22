@@ -28,6 +28,60 @@ export default function SmartImport({ token, onLogout }) {
   const [refreshingInbox, setRefreshingInbox] = useState(false);
   const [bulkScanning, setBulkScanning] = useState(false);
   const [bulkResult, setBulkResult] = useState(null);
+  const [attachmentModal, setAttachmentModal] = useState(null); // {email_id, attachment, password, loading, error}
+
+  const handleParseAttachment = async (emailId, attachment, password = null) => {
+    // If not provided, open modal to collect password
+    if (password === null && !attachmentModal?.password) {
+      setAttachmentModal({ email_id: emailId, attachment, password: '', loading: false, error: null });
+      // Attempt once WITHOUT password — if PDF is unencrypted, it'll just work
+    }
+
+    const workingModal = password !== null
+      ? { ...attachmentModal, loading: true, error: null }
+      : { email_id: emailId, attachment, password: '', loading: true, error: null };
+    setAttachmentModal(workingModal);
+
+    try {
+      const res = await axios.post(`${API}/gmail/parse-attachment`, {
+        email_id: emailId,
+        attachment_id: attachment.attachment_id,
+        filename: attachment.filename,
+        password: password || undefined,
+        auto_apply: true,
+      }, { headers: { Authorization: `Bearer ${token}` }, timeout: 300000 });
+
+      if (res.data.password_required) {
+        setAttachmentModal({ ...workingModal, loading: false, error: null, password_required: true });
+        return;
+      }
+
+      if (res.data.success) {
+        const totals = res.data.data?.totals || {};
+        const mfCount = (res.data.data?.mutual_funds || []).length;
+        const txnCount = res.data.transactions_saved || 0;
+        toast.success(`${attachment.filename} parsed: ${mfCount} holdings, ${res.data.applied_fields?.length || 0} fields auto-filled, ${txnCount} txns saved`);
+
+        const pc = res.data.percentile_after;
+        if (pc) {
+          setTimeout(() => {
+            toast.success(`Your rank is now ${pc.after}th percentile vs ${pc.cohort_description} 🎉`, { duration: 10000 });
+          }, 1500);
+        }
+        setAttachmentModal(null);
+      } else {
+        setAttachmentModal({ ...workingModal, loading: false, error: res.data.error || 'Parse failed' });
+      }
+    } catch (err) {
+      const status = err.response?.status;
+      const detail = err.response?.data?.detail;
+      if (status === 401 && detail?.includes('password')) {
+        setAttachmentModal({ ...workingModal, loading: false, error: detail, password_required: true });
+      } else {
+        setAttachmentModal({ ...workingModal, loading: false, error: detail || 'Parse failed' });
+      }
+    }
+  };
 
   const handleBulkScanAndApply = async () => {
     setBulkScanning(true);
@@ -458,9 +512,35 @@ export default function SmartImport({ token, onLogout }) {
                             {expandedEmail === email.id && (
                               <div className="mt-2 pt-2 border-t border-slate-200">
                                 <p className="text-xs text-slate-500 mb-2">{email.snippet}</p>
-                                <Button size="sm" className="text-xs h-7 bg-brand-blue" onClick={() => handleParseGmailEmail(email.id)}>
+                                <Button size="sm" className="text-xs h-7 bg-brand-blue mr-2" onClick={() => handleParseGmailEmail(email.id)}>
                                   Parse with AI
                                 </Button>
+
+                                {/* PDF attachments — CAS / bank statements / portfolio statements */}
+                                {email.attachments?.length > 0 && (
+                                  <div className="mt-2 space-y-1.5">
+                                    <p className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">PDF Attachments</p>
+                                    {email.attachments.map((att, ai) => (
+                                      <div key={ai} className="flex items-center justify-between gap-2 p-2 bg-white rounded-lg border border-slate-200">
+                                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                          <FileText className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                                          <span className="text-[11px] text-slate-700 truncate">{att.filename}</span>
+                                          {att.looks_like_cas && (
+                                            <span className="text-[9px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full flex-shrink-0">CAS</span>
+                                          )}
+                                        </div>
+                                        <Button
+                                          size="sm"
+                                          className="text-[10px] h-6 px-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex-shrink-0"
+                                          onClick={() => handleParseAttachment(email.id, att)}
+                                          data-testid={`parse-attachment-btn-${ai}`}
+                                        >
+                                          <Sparkles className="w-3 h-3 mr-1" /> Parse
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
@@ -772,6 +852,69 @@ export default function SmartImport({ token, onLogout }) {
             )}
           </div>
         </div>
+
+        {/* PDF Attachment / CAS Password Modal */}
+        {attachmentModal && (
+          <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" data-testid="cas-password-modal">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+              <div className="bg-gradient-to-br from-purple-600 to-indigo-700 text-white p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Shield className="w-4 h-4" />
+                  <span className="text-[10px] uppercase tracking-widest font-bold">Password Required</span>
+                </div>
+                <h3 className="text-lg font-bold">{attachmentModal.attachment?.filename}</h3>
+                <p className="text-xs text-white/80 mt-1">
+                  This PDF is encrypted. Enter the password to extract your holdings.
+                </p>
+              </div>
+              <div className="p-5 space-y-3">
+                <div className="text-[11px] text-slate-600 leading-relaxed p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <p className="font-semibold text-purple-900 mb-1">Common CAS passwords:</p>
+                  <ul className="space-y-0.5 text-slate-600">
+                    <li>• <span className="font-mono font-semibold">PAN</span> (uppercase, e.g. ABCDE1234F)</li>
+                    <li>• <span className="font-mono font-semibold">PAN + DDMMYYYY</span> (e.g. ABCDE1234F15081990)</li>
+                    <li>• <span className="font-mono font-semibold">DDMMYYYY</span> (your date of birth)</li>
+                  </ul>
+                </div>
+                <input
+                  type="password"
+                  autoFocus
+                  value={attachmentModal.password}
+                  onChange={(e) => setAttachmentModal({ ...attachmentModal, password: e.target.value, error: null })}
+                  placeholder="Enter PDF password"
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  data-testid="cas-password-input"
+                  onKeyDown={(e) => { if (e.key === 'Enter' && attachmentModal.password) handleParseAttachment(attachmentModal.email_id, attachmentModal.attachment, attachmentModal.password); }}
+                />
+                {attachmentModal.error && (
+                  <p className="text-xs text-red-600 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" /> {attachmentModal.error}
+                  </p>
+                )}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setAttachmentModal(null)}
+                    disabled={attachmentModal.loading}
+                    className="flex-1 rounded-xl"
+                    data-testid="cas-password-cancel"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => handleParseAttachment(attachmentModal.email_id, attachmentModal.attachment, attachmentModal.password)}
+                    disabled={attachmentModal.loading || !attachmentModal.password}
+                    className="flex-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white"
+                    data-testid="cas-password-submit"
+                  >
+                    {attachmentModal.loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                    {attachmentModal.loading ? 'Parsing...' : 'Unlock & Parse'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

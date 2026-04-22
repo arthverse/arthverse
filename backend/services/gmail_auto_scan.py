@@ -20,7 +20,11 @@ logger = logging.getLogger(__name__)
 FINANCIAL_SEARCH_QUERY = (
     '(subject:statement OR subject:policy OR subject:investment OR subject:SIP '
     'OR subject:premium OR subject:renewal OR subject:insurance OR subject:EMI '
-    'OR subject:credit OR subject:debit OR subject:transaction)'
+    'OR subject:credit OR subject:debit OR subject:transaction '
+    'OR subject:CAS OR subject:"consolidated account" OR subject:portfolio '
+    'OR subject:holdings OR subject:"demat statement" OR subject:"e-statement" '
+    'OR from:cams.com OR from:karvy.com OR from:kfintech.com '
+    'OR from:cdslindia.com OR from:nsdl.co.in)'
 )
 
 
@@ -45,10 +49,10 @@ async def scan_user_gmail(db, user_id: str) -> dict:
 
         query = FINANCIAL_SEARCH_QUERY
         if last_scanned:
-            # Only fetch emails from the last 14 days after first scan (rolling window)
-            query += " newer_than:14d"
+            # Rolling 365-day window so we catch annual statements (CAS, Form 16 etc.)
+            query += " newer_than:365d"
         else:
-            query += " newer_than:30d"
+            query += " newer_than:365d"
 
         result = service.users().messages().list(userId='me', q=query, maxResults=30).execute()
         messages = result.get('messages', [])
