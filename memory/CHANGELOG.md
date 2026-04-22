@@ -1,5 +1,22 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 23: Closing the Loop — Percentile Celebration ✅
+
+**Goal**: Close the Smart Import → Peer Comparison feedback loop so users see objective financial improvement in real-time.
+
+### Backend
+- `apply_parsed_data()` (shared helper) now accepts `track_percentile: bool` and returns a `percentile_change` dict: `{before, after, delta, cohort_description, key_improvements[]}` — capturing snapshots of `compare_with_peers()` before + after the upsert.
+- `/api/documents/auto-apply` → always tracks percentile change.
+- `/api/gmail/scan-and-apply-all` → computes a single before/after snapshot spanning the whole bulk batch (efficient — one comparison per batch, not per email).
+- `key_improvements` highlights up to 3 metrics that moved ≥15 percentile points (e.g., "Monthly SIP: +45").
+
+### Frontend
+- **Toast celebration** after Auto-Apply & Bulk Scan: "Your financial rank jumped from 22nd → 28th percentile vs Tier 2 professionals, age 30-39 🎉" (shown only when delta ≥ 5).
+- **Persistent rank card** (emerald→green gradient) displayed in both the bulk result panel and the OnboardingModal success step, showing before → after big numbers + cohort + key_improvement pills.
+- Live-tested: ₹30,000 SIP + ₹1.5cr life cover → percentile 15 → 22 (delta 7); Monthly SIP metric moved 15 → 60. Verified via screenshot — toast renders correctly in top-right.
+
+**Testing**: Live E2E verified — SIP email parse → auto-apply → toast + rank card all render correctly.
+
 ## Feb 2026 — Iteration 22: Onboarding Modal + Peer Comparison ✅
 
 ### 60-Second Onboarding Modal (Dashboard)

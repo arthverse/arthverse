@@ -6,7 +6,7 @@ import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, Upload, FileText, Mail, CheckCircle2, AlertTriangle, Loader2, ExternalLink, Shield, ChevronDown, ChevronUp, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Mail, CheckCircle2, AlertTriangle, Loader2, ExternalLink, Shield, ChevronDown, ChevronUp, RefreshCw, Sparkles, TrendingUp } from 'lucide-react';
 
 export default function SmartImport({ token, onLogout }) {
   const navigate = useNavigate();
@@ -37,6 +37,17 @@ export default function SmartImport({ token, onLogout }) {
         { headers: { Authorization: `Bearer ${token}` }, timeout: 300000 });
       setBulkResult(res.data);
       toast.success(res.data.summary);
+
+      // 🎉 Percentile celebration toast
+      const pc = res.data.percentile_change;
+      if (pc && pc.delta >= 5) {
+        setTimeout(() => {
+          toast.success(
+            `Your financial rank jumped from ${pc.before}th → ${pc.after}th percentile vs ${pc.cohort_description} 🎉`,
+            { duration: 10000 }
+          );
+        }, 1500);
+      }
       loadInbox();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Bulk scan failed');
@@ -186,6 +197,18 @@ export default function SmartImport({ token, onLogout }) {
       }, { headers: { Authorization: `Bearer ${token}` } });
 
       toast.success(res.data.message || 'Applied successfully');
+
+      // 🎉 Show percentile-change celebration toast if applicable
+      const pc = res.data.actions?.percentile_change;
+      if (pc && pc.delta >= 5) {
+        setTimeout(() => {
+          toast.success(
+            `Your financial rank jumped from ${pc.before}th → ${pc.after}th percentile vs ${pc.cohort_description} 🎉`,
+            { duration: 8000 }
+          );
+        }, 1200);
+      }
+
       // Track signature as saved
       if (parsedData.transactions?.length) {
         const sig = parsedData.transactions.map(t => `${t.date}-${t.amount}-${t.description}`).join('|');
@@ -485,6 +508,33 @@ export default function SmartImport({ token, onLogout }) {
                     <p className="text-2xl font-bold font-mono text-purple-600">{bulkResult.total_fields_updated}</p>
                   </div>
                 </div>
+                {bulkResult.percentile_change && bulkResult.percentile_change.delta >= 3 && (
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 text-white mb-4" data-testid="percentile-celebration-card">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                        <TrendingUp className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs uppercase tracking-widest text-white/80 font-bold">Financial Rank Improved</p>
+                        <p className="text-lg font-bold mt-0.5">
+                          {bulkResult.percentile_change.before}<span className="text-white/70 text-sm"> → </span>{bulkResult.percentile_change.after}<span className="text-white/70 text-xs"> percentile</span>
+                        </p>
+                        <p className="text-[11px] text-white/85 mt-1">
+                          +{bulkResult.percentile_change.delta} places vs {bulkResult.percentile_change.cohort_description}
+                        </p>
+                        {bulkResult.percentile_change.key_improvements?.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {bulkResult.percentile_change.key_improvements.map((ki, i) => (
+                              <span key={i} className="text-[10px] font-bold bg-white/15 backdrop-blur px-2 py-0.5 rounded-full">
+                                {ki.label}: +{ki.delta}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {bulkResult.details?.length > 0 && (
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase text-slate-500 font-bold mb-2">Details</p>

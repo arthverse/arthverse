@@ -167,6 +167,15 @@ export default function OnboardingModal({ token, open, onClose }) {
                 <Stat value={scanResult.total_transactions_saved || 0} label="Transactions saved" color="text-brand-blue" />
                 <Stat value={scanResult.total_fields_updated || 0} label="Profile fields filled" color="text-purple-600" />
               </div>
+              {scanResult.percentile_change && scanResult.percentile_change.delta >= 3 && (
+                <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 text-white" data-testid="onboarding-percentile-card">
+                  <p className="text-[10px] uppercase text-white/80 font-bold tracking-widest">Financial Rank Jumped</p>
+                  <p className="text-lg font-bold">
+                    {scanResult.percentile_change.before}<span className="text-white/70 text-sm"> → </span>{scanResult.percentile_change.after}<span className="text-white/80 text-xs"> percentile 🎉</span>
+                  </p>
+                  <p className="text-[11px] text-white/85">vs {scanResult.percentile_change.cohort_description}</p>
+                </div>
+              )}
               {scanResult.policies_applied?.length > 0 && (
                 <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800">
                   ✓ Applied {scanResult.policies_applied.length} insurance polic{scanResult.policies_applied.length > 1 ? 'ies' : 'y'}

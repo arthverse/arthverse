@@ -259,7 +259,7 @@ async def auto_apply_parsed(
     data = body.get("data") or {}
     source = body.get("source", "smart_import")
 
-    actions = await apply_parsed_data(db, user_id, data, source)
+    actions = await apply_parsed_data(db, user_id, data, source, track_percentile=True)
 
     return {
         "success": True,
@@ -281,10 +281,28 @@ def _build_summary_message(a: dict) -> str:
     return ". ".join(parts) if parts else "No data to apply"
 
 
-async def apply_parsed_data(db, user_id: str, data: dict, source: str = "smart_import") -> dict:
-    """Shared auto-apply logic reusable from other routes (e.g., Gmail bulk scan)."""
+async def apply_parsed_data(db, user_id: str, data: dict, source: str = "smart_import", track_percentile: bool = False) -> dict:
+    """Shared auto-apply logic reusable from other routes (e.g., Gmail bulk scan).
+
+    If track_percentile=True, computes peer percentile before + after and returns delta.
+    """
     import uuid
     from datetime import datetime as dt
+
+    # Snapshot peer comparison BEFORE applying
+    percentile_before = None
+    metrics_before = {}
+    if track_percentile:
+        try:
+            from services.peer_comparison import compare_with_peers
+            user = await db.users.find_one({"id": user_id}, {"_id": 0})
+            existing_q = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+            if user and existing_q:
+                pre = compare_with_peers(existing_q, user.get("age", 30))
+                percentile_before = pre["overall_percentile"]
+                metrics_before = {m["label"]: m["percentile"] for m in pre["metrics"]}
+        except Exception:
+            pass
 
     actions = {
         "transactions_saved": 0,
@@ -395,5 +413,39 @@ async def apply_parsed_data(db, user_id: str, data: dict, source: str = "smart_i
             upsert=True
         )
         actions["questionnaire_fields_updated"] = list(update_fields.keys())
+
+    # Snapshot peer comparison AFTER + compute delta
+    if track_percentile and percentile_before is not None:
+        try:
+            from services.peer_comparison import compare_with_peers
+            user = await db.users.find_one({"id": user_id}, {"_id": 0})
+            new_q = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+            if user and new_q:
+                post = compare_with_peers(new_q, user.get("age", 30))
+                percentile_after = post["overall_percentile"]
+                delta = percentile_after - percentile_before
+
+                # Find which metrics moved up the most
+                key_improvements = []
+                for m in post["metrics"]:
+                    before_p = metrics_before.get(m["label"], 0)
+                    m_delta = m["percentile"] - before_p
+                    if m_delta >= 15:
+                        key_improvements.append({
+                            "label": m["label"],
+                            "before": before_p,
+                            "after": m["percentile"],
+                            "delta": m_delta,
+                        })
+
+                actions["percentile_change"] = {
+                    "before": percentile_before,
+                    "after": percentile_after,
+                    "delta": delta,
+                    "cohort_description": post["cohort"]["description"],
+                    "key_improvements": sorted(key_improvements, key=lambda x: -x["delta"])[:3],
+                }
+        except Exception:
+            pass
 
     return actions

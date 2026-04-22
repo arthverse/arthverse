@@ -356,6 +356,20 @@ async def scan_and_apply_all(
     # Step 1: Refresh inbox to catch any brand-new emails
     await scan_user_gmail(db, user_id)
 
+    # Snapshot peer percentile before
+    percentile_before = None
+    metrics_before = {}
+    try:
+        from services.peer_comparison import compare_with_peers
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        existing_q = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+        if user and existing_q:
+            pre = compare_with_peers(existing_q, user.get("age", 30))
+            percentile_before = pre["overall_percentile"]
+            metrics_before = {m["label"]: m["percentile"] for m in pre["metrics"]}
+    except Exception:
+        pass
+
     # Step 2: Find unparsed financial emails (prioritize the most recent)
     unparsed = await db.gmail_inbox.find(
         {"user_id": user_id, "parsed": False},
@@ -429,7 +443,7 @@ async def scan_and_apply_all(
             data = parsed["data"]
             has_data = bool(data.get("transactions") or data.get("insurance_data") or data.get("investment_data"))
             if has_data:
-                actions = await apply_parsed_data(db, user_id, data, source="gmail_bulk")
+                actions = await apply_parsed_data(db, user_id, data, source="gmail_bulk", track_percentile=False)
                 aggregate["emails_with_data"] += 1
                 aggregate["total_transactions_saved"] += actions["transactions_saved"]
                 aggregate["total_fields_updated"] += len(actions["questionnaire_fields_updated"])
@@ -451,6 +465,30 @@ async def scan_and_apply_all(
         except Exception as e:
             aggregate["errors"] += 1
             logger.warning(f"scan-and-apply-all: email {email_id} failed: {e}")
+
+    # Compute final percentile delta
+    if percentile_before is not None:
+        try:
+            from services.peer_comparison import compare_with_peers
+            user = await db.users.find_one({"id": user_id}, {"_id": 0})
+            new_q = await db.questionnaires.find_one({"user_id": user_id}, {"_id": 0})
+            if user and new_q:
+                post = compare_with_peers(new_q, user.get("age", 30))
+                key_improvements = []
+                for m in post["metrics"]:
+                    before_p = metrics_before.get(m["label"], 0)
+                    m_delta = m["percentile"] - before_p
+                    if m_delta >= 15:
+                        key_improvements.append({"label": m["label"], "before": before_p, "after": m["percentile"], "delta": m_delta})
+                aggregate["percentile_change"] = {
+                    "before": percentile_before,
+                    "after": post["overall_percentile"],
+                    "delta": post["overall_percentile"] - percentile_before,
+                    "cohort_description": post["cohort"]["description"],
+                    "key_improvements": sorted(key_improvements, key=lambda x: -x["delta"])[:3],
+                }
+        except Exception:
+            pass
 
     # Build human summary
     summary_parts = [f"{aggregate['emails_processed']} email(s) scanned"]
