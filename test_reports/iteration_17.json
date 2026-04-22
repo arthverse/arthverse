@@ -1,0 +1,56 @@
+{
+  "summary": "Iteration 17: Smart Import module (backend + frontend) fully tested. Backend 9/9 pytest passed — Gmail OAuth (configured/connect redirect/emails auth guard) and document parsing (parse-email for bank/insurance via GPT-5.2, parsed-policies list, apply-policy for health with correct updated_fields, invalid PDF rejection). Frontend verified end-to-end: login → ArthVyay dashboard → Smart Import nav link + gradient CTA card → 3-tab UI switchable → Gmail tab shows Connect Gmail (not 'credentials not configured') → Email tab successfully parsed ICICI bank email via GPT-5.2 and rendered parsed-result-card with 2 extracted transactions. Top-nav Smart Import link navigates correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_smart_import.py",
+    "/app/test_reports/pytest/smart_import_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "gmail.py correctly uses RedirectResponse (FastAPI defaults to 307), returns accounts.google.com URL with proper client_id — verified",
+    "documents.py parse-email uses GPT-5.2 (Emergent LLM) and returns structured JSON for both bank statements and insurance emails",
+    "apply-policy returns correct updated_fields list keyed by policy_type (health → has_health_insurance, health_insurance_cover, health_insurance_premium_annual)",
+    "parse-policy correctly rejects non-PDF with 400",
+    "/api/gmail/emails correctly returns 403 with clear error 'Gmail not connected' when no token exists",
+    "SmartImport.js exposes all required data-testids (tab-policy/email/gmail, email-text-input, parse-email-btn, parsed-result-card, connect-gmail-btn)",
+    "Observed 405 console errors on dashboard (pre-existing /api/transactions/recent endpoint, noted in iteration_16) — unrelated to Smart Import"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_smart_import.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9 tests passed)",
+    "frontend": "100% (all flows verified)"
+  },
+  "test_credentials": "Client ID: AV271676A7, Password: Demo123!",
+  "seed_data_creation": "None — used existing premium user and sample ICICI bank email text",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Smart Import module is fully working end-to-end. Gmail OAuth credentials are configured in backend/.env. Login flow: /arthverse/auth → click 'Login' tab → client_id=AV271676A7 / password=Demo123! → lands on /arthverse/portal → navigate to /arthvyay/dashboard. Do NOT actually complete Google OAuth consent (would need real Gmail account). parse-email AI responses take ~5-15s; use timeout >=60s in tests.",
+  "features_tested": {
+    "Backend_gmail_status_configured": "PASS - returns configured:true",
+    "Backend_gmail_connect_307": "PASS - 307 redirect to accounts.google.com with client_id",
+    "Backend_gmail_emails_403": "PASS - 403 with 'not connected' message",
+    "Backend_parse_email_bank": "PASS - success:true with extracted transactions (GPT-5.2)",
+    "Backend_parse_email_insurance": "PASS - success:true with insurance fields",
+    "Backend_parse_email_empty": "PASS - 400 for empty body",
+    "Backend_parsed_policies_list": "PASS - returns policies array",
+    "Backend_apply_policy_health": "PASS - updated_fields contains has_health_insurance, health_insurance_cover, health_insurance_premium_annual",
+    "Backend_parse_policy_invalid": "PASS - 400 for non-PDF",
+    "Frontend_login_flow": "PASS - AV271676A7/Demo123! login successful",
+    "Frontend_nav_smart_import_btn": "PASS - visible in top nav",
+    "Frontend_smart_import_cta_card": "PASS - visible on dashboard and navigates to /arthvyay/smart-import",
+    "Frontend_3_tabs": "PASS - tab-policy, tab-email, tab-gmail all visible and switchable",
+    "Frontend_gmail_tab": "PASS - connect-gmail-btn visible, NO 'credentials not configured' warning",
+    "Frontend_email_parsing": "PASS - parse-email-btn → parsed-result-card with BANK STATEMENT type and 2 transactions (-₹2,500 UPI/BigBasket, +₹75,000 Salary)",
+    "Frontend_top_nav_link": "PASS - nav-smart-import-btn navigates to /arthvyay/smart-import"
+  }
+}
