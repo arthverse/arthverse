@@ -1,5 +1,14 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 20: Auto-Apply Everything ✅
+- **New endpoint `POST /api/documents/auto-apply`**: One-click routing of AI-parsed data to the right destinations. Accepts `{data, source}`, handles transactions (→ transactions collection), insurance_data (→ questionnaire with smart insurer-based classification: Star/Niva/Care → health; LIC/HDFC Life/Max Life → term life), investment_data (SIP → monthly_investments_sip increment; lump_sum → equity_mf_current_value), and policy_type from PDF uploads. Uses `upsert` so works even without an existing questionnaire.
+- **UI**: Prominent purple-gradient "Auto-Fill Your Profile" hero card at top of parsed result with single "Auto-Apply Everything" button. Plus new Investment Details and Insurance Details detail cards (previously only policy PDFs had structured display).
+- **Bug fix (Iteration 19)**: Gmail OAuth `user_id` was being stored as literal string "undefined" because frontend was reading non-existent `localStorage.user`. Now `/api/gmail/connect` takes JWT `token` query param, verifies server-side, and extracts real user_id.
+- **Bug fix (Iteration 19)**: Missing PKCE `code_verifier` in OAuth callback — now persisted alongside state and restored on callback.
+- **Bug fix (Iteration 19)**: Added `OAUTHLIB_RELAX_TOKEN_SCOPE=1` to handle Google's scope-order variation.
+- **Verified live**: mehul.2017@gmail.com connected; scanned 5+ real financial emails (CRED, Axis Bank, Tata AIA, Zerodha, IRCTC SBI). Full parse + auto-apply loop works end-to-end.
+- **Testing**: 16/16 backend pytest cases pass.
+
 ## Feb 2026 — Iteration 19: Recurring Subscriptions + Gmail Auto-Refresh ✅
 - **Subscription Detector**: New `GET /api/transactions/subscriptions` endpoint + `services/subscription_detector.py` algorithm. Groups expenses by normalized merchant + bucketed amount, detects monthly/yearly/weekly recurrence via median inter-charge gap. Returns total_monthly_cost, total_yearly_cost, next_expected per subscription.
 - **SubscriptionsCard component**: New dashboard card showing monthly outflow, upcoming renewals warning (≤7 days), color-coded M/Y/W frequency pills, top 6 subscriptions sorted by urgency.
