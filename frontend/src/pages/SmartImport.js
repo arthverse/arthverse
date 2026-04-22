@@ -6,7 +6,7 @@ import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, Upload, FileText, Mail, CheckCircle2, AlertTriangle, Loader2, ExternalLink, Shield, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Mail, CheckCircle2, AlertTriangle, Loader2, ExternalLink, Shield, ChevronDown, ChevronUp, RefreshCw, Sparkles } from 'lucide-react';
 
 export default function SmartImport({ token, onLogout }) {
   const navigate = useNavigate();
@@ -154,6 +154,27 @@ export default function SmartImport({ token, onLogout }) {
       }
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Save failed');
+    } finally {
+      setSavingTransactions(false);
+    }
+  };
+
+  const handleAutoApplyAll = async (parsedData) => {
+    setSavingTransactions(true);
+    try {
+      const res = await axios.post(`${API}/documents/auto-apply`, {
+        data: parsedData,
+        source: activeTab === 'gmail' ? 'gmail' : activeTab === 'email' ? 'email' : 'policy_pdf',
+      }, { headers: { Authorization: `Bearer ${token}` } });
+
+      toast.success(res.data.message || 'Applied successfully');
+      // Track signature as saved
+      if (parsedData.transactions?.length) {
+        const sig = parsedData.transactions.map(t => `${t.date}-${t.amount}-${t.description}`).join('|');
+        setSavedTransactionIds(prev => new Set(prev).add(sig));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Auto-apply failed');
     } finally {
       setSavingTransactions(false);
     }
@@ -412,6 +433,84 @@ export default function SmartImport({ token, onLogout }) {
                 {parsedResult.data.summary && (
                   <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-4">
                     <p className="text-sm text-blue-800">{parsedResult.data.summary}</p>
+                  </div>
+                )}
+
+                {/* 🚀 Top-level Auto-Apply All button */}
+                {(parsedResult.data.transactions?.length > 0 || parsedResult.data.insurance_data || parsedResult.data.investment_data || parsedResult.data.policy_type) && (
+                  <div className="mb-4 p-4 rounded-2xl bg-gradient-to-br from-brand-blue to-indigo-600 shadow-md">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-white">Auto-Fill Your Profile</p>
+                        <p className="text-[11px] text-white/80 mt-0.5">
+                          One-click: route all extracted data to the right place —
+                          {parsedResult.data.transactions?.length > 0 && ` ${parsedResult.data.transactions.length} txn(s) to Transactions,`}
+                          {parsedResult.data.insurance_data && ` insurance → Questionnaire,`}
+                          {parsedResult.data.investment_data && ` SIP → Questionnaire,`}
+                          {parsedResult.data.policy_type && ` policy → Questionnaire.`}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleAutoApplyAll(parsedResult.data)}
+                      disabled={savingTransactions}
+                      className="w-full bg-white hover:bg-slate-50 text-brand-blue font-bold rounded-xl shadow-sm"
+                      data-testid="auto-apply-all-btn"
+                    >
+                      {savingTransactions ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                      {savingTransactions ? 'Applying...' : 'Auto-Apply Everything'}
+                    </Button>
+                  </div>
+                )}
+
+                {/* Insurance data (from email) */}
+                {parsedResult.data.insurance_data && (
+                  <div className="p-3 bg-white rounded-xl border border-slate-100 mb-3" data-testid="insurance-data-card">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-2">Insurance Details Detected</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {parsedResult.data.insurance_data.insurer && (
+                        <div><span className="text-slate-500">Insurer:</span> <span className="font-semibold">{parsedResult.data.insurance_data.insurer}</span></div>
+                      )}
+                      {parsedResult.data.insurance_data.policy_number && (
+                        <div><span className="text-slate-500">Policy #:</span> <span className="font-semibold font-mono">{parsedResult.data.insurance_data.policy_number}</span></div>
+                      )}
+                      {parsedResult.data.insurance_data.cover_amount > 0 && (
+                        <div><span className="text-slate-500">Cover:</span> <span className="font-semibold">₹{Number(parsedResult.data.insurance_data.cover_amount).toLocaleString('en-IN')}</span></div>
+                      )}
+                      {parsedResult.data.insurance_data.premium_due > 0 && (
+                        <div><span className="text-slate-500">Premium:</span> <span className="font-semibold">₹{Number(parsedResult.data.insurance_data.premium_due).toLocaleString('en-IN')}</span></div>
+                      )}
+                      {parsedResult.data.insurance_data.due_date && (
+                        <div className="col-span-2"><span className="text-slate-500">Due:</span> <span className="font-semibold">{parsedResult.data.insurance_data.due_date}</span></div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Investment data (from email) */}
+                {parsedResult.data.investment_data && (
+                  <div className="p-3 bg-white rounded-xl border border-slate-100 mb-3" data-testid="investment-data-card">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-2">Investment Details Detected</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {parsedResult.data.investment_data.scheme_name && (
+                        <div className="col-span-2"><span className="text-slate-500">Scheme:</span> <span className="font-semibold">{parsedResult.data.investment_data.scheme_name}</span></div>
+                      )}
+                      {parsedResult.data.investment_data.amount > 0 && (
+                        <div><span className="text-slate-500">Amount:</span> <span className="font-semibold">₹{Number(parsedResult.data.investment_data.amount).toLocaleString('en-IN')}</span></div>
+                      )}
+                      {parsedResult.data.investment_data.type && (
+                        <div><span className="text-slate-500">Type:</span> <span className="font-semibold uppercase">{parsedResult.data.investment_data.type}</span></div>
+                      )}
+                      {parsedResult.data.investment_data.units > 0 && (
+                        <div><span className="text-slate-500">Units:</span> <span className="font-semibold">{parsedResult.data.investment_data.units}</span></div>
+                      )}
+                      {parsedResult.data.investment_data.nav > 0 && (
+                        <div><span className="text-slate-500">NAV:</span> <span className="font-semibold">₹{parsedResult.data.investment_data.nav}</span></div>
+                      )}
+                    </div>
                   </div>
                 )}
 

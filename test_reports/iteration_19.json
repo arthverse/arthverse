@@ -1,0 +1,38 @@
+{
+  "summary": "Iteration 19 — Smart Import Auto-Apply endpoint + regressions. 16/16 backend pytest tests pass. Frontend E2E: login → /arthvyay/smart-import → Email Parsing tab → pasted SIP email → Parse → purple 'Auto-Fill Your Profile' card with data-testid=auto-apply-all-btn appeared at top, 'Investment Details Detected' card showed Scheme/Amount/Type/Units/NAV, 'Transactions Found (1)' granular 'Save 1 to Transactions' button present. Clicking 'Auto-Apply Everything' showed success toast: '1 transaction(s) saved. 2 questionnaire field(s) updated. SIP ₹5000 added to monthly SIP total'. Granular save button flipped to 'Saved to Transactions' state. Dashboard and Transactions pages render without JS errors. Backend auto-apply correctly handles SIP investment, HDFC Life (term), Star Health (health), vehicle policy, and empty {} cases; requires auth. Upsert confirmed working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/gmail/connect", "issue": "Missing `token` query param returns 422 (pydantic validation) instead of 401 as spec implied. Invalid token correctly returns 401. Cosmetic only — still rejects unauthenticated access."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_19.py",
+    "/app/test_reports/pytest/iteration_19_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "/app/backend/routes/documents.py auto_apply_parsed: insurer-type detection via substring match has a bug-risk — if insurer contains both 'life' and 'health' words (rare but possible e.g., 'Max Life Health'), first match wins. Current ordering (health-keywords first, then life) works for the tested cases but should be formalised with an explicit `insurance_type` field in future parser output.",
+    "/app/backend/routes/documents.py auto_apply_parsed: `_normalize_type` treats 'debit' as 'expense' and 'credit' as 'income'. For SIP-confirmation emails the parser returns type='debit' which becomes 'expense' — correct. However 'salary'/'refund' categories hard-map to 'Other' (line 154-156 in _CATEGORY_MAP) which loses information; consider adding a distinct 'Salary' / 'Refund' category to transactions schema.",
+    "/app/backend/routes/documents.py auto_apply_parsed treats investment_data.type case-insensitively for 'sip'/'lump_sum'/'dividend' but silently no-ops other types (e.g., 'fd', 'nps') — consider logging unhandled investment types to improve observability.",
+    "/app/backend/routes/documents.py uses `$setOnInsert` for upsert — good. But note if a questionnaire is created via auto-apply with only e.g. invests_in_mutual_funds=True, the required-fields-for-score logic elsewhere may treat it as an incomplete doc — verify downstream scoring/ArthSthithi handles partial questionnaires (seen dashboard score 7.1/100 with 'Needs Attention' which is expected)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration_19.py"
+  ],
+  "success_rate": {
+    "backend": "100% (16/16)",
+    "frontend": "100% (all assertions passed; only 4 pre-existing resource 405 console errors, not auto-apply related)"
+  },
+  "test_credentials": "AV271676A7 / Demo123! (used as-is from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Created 1 TEST_ transaction via SIP auto-apply flow and 1 TEST_SaveTxn regression txn via /api/documents/save-transactions. User's questionnaire was upserted with invests_in_mutual_funds + monthly_investments_sip during SIP auto-apply tests (+5000 per run) and insurance/vehicle fields during insurance/vehicle test cases. Tests are idempotent-safe but questionnaire monthly_investments_sip accumulates across runs.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression file: /app/backend/tests/test_iteration_19.py (16 tests, all pass). UI data-testid for auto-apply button: auto-apply-all-btn. Auto-apply endpoint accepts body shape {source, data:{transactions[], insurance_data{insurer,cover_amount,premium_due}, investment_data{amount,type}, policy_type, premium_amount, idv, sum_assured, cover_amount}}. Insurer→type inference uses substring matching (health keywords: health/star/niva/aditya birla health/care; life keywords: life/lic/hdfc life/icici prudential/max life). Empty {} returns 200 success with message 'No data to apply'. Gmail connect query param is `token` (not user_id); missing token returns 422, invalid token returns 401, valid token returns 307 to accounts.google.com. /api/gmail/emails now returns 200 with empty list when not connected (changed from 403 in iter 17). Questionnaire monthly_investments_sip has accumulated across test runs — reset via DB if exact values need to be asserted.",
+  "rca of the issue": "N/A — no issues found. Main agent's prior E2E verification matches this run: SIP parse → auto-apply correctly saved 1 transaction + updated 2 questionnaire fields (invests_in_mutual_funds, monthly_investments_sip)."
+}
