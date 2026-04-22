@@ -61,10 +61,21 @@ async def gmail_status(credentials: HTTPAuthorizationCredentials = Depends(secur
 
 
 @router.get("/connect")
-async def connect_gmail(user_id: str = Query(...)):
-    """Start Gmail OAuth flow."""
+async def connect_gmail(token: str = Query(...)):
+    """Start Gmail OAuth flow. Auth is via JWT token in query string (since OAuth redirect can't carry headers)."""
     if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
         raise HTTPException(status_code=503, detail="Gmail API not configured")
+
+    # Verify the JWT token and extract the real user_id (never trust client-supplied IDs)
+    import jwt as jwt_lib
+    JWT_SECRET = os.environ.get('JWT_SECRET', '')
+    try:
+        payload = jwt_lib.decode(token, JWT_SECRET, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except jwt_lib.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     try:
         from google_auth_oauthlib.flow import Flow

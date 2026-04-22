@@ -161,8 +161,7 @@ export default function SmartImport({ token, onLogout }) {
 
   const handleConnectGmail = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      window.location.href = `${API}/gmail/connect?user_id=${user.id}`;
+      window.location.href = `${API}/gmail/connect?token=${encodeURIComponent(token)}`;
     } catch {
       toast.error('Could not initiate Gmail connection');
     }
