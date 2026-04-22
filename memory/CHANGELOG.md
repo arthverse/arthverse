@@ -1,5 +1,26 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 22: Onboarding Modal + Peer Comparison ✅
+
+### 60-Second Onboarding Modal (Dashboard)
+- New `OnboardingModal` component with 3-step progress (Intro → Scanning → Done).
+- Auto-opens on first-time Dashboard visit (gated by `localStorage.onboardingDismissed`).
+- Detects if Gmail is already connected — if so, shows orange "Scan my Gmail now" CTA. If not, shows blue "Connect Gmail to get started" that deep-links to OAuth with `onboardingInProgress` flag so modal resumes after callback.
+- Fully-automated flow: OAuth callback → auto-triggers `scan-and-apply-all` → shows 4-metric result card (emails scanned / with data / transactions saved / fields filled) → "Review Auto-Filled Questionnaire" CTA.
+- Dismissable forever via X button or "I'll do this manually later" link.
+
+### Peer Comparison (Premium Feature)
+- **New service `/app/backend/services/peer_comparison.py`** with synthetic benchmark tables modeled on CRISIL Wealth Outlook / RBI Consumer Finance Survey / NSSO aggregates. 15 (city_tier × age_bracket) cohorts × 6 metrics each with median (p50) and top-quartile (p75).
+- **New endpoint `GET /api/reports/peer-comparison`** computes user metrics (Net Worth, Savings Rate, Investment Ratio, Emergency Fund months, Monthly SIP, Life Cover Multiplier) from questionnaire, matches to cohort, returns percentile ranks + overall rating + insights. Upserts require filled questionnaire (400 otherwise).
+- **New premium-gated page `/arthvyay/peer-comparison`**: locked state with crown icon for non-premium; dark gradient cohort hero card with overall percentile; 6 metric cards with blue→indigo bars + peer median marker + top-quartile label; emerald/blue/amber/red rating pills by percentile; "Key Takeaways" insights card.
+
+### Dashboard Enhancements
+- Two-card layout: orange Smart Import CTA + purple-pink Peer Comparison CTA side-by-side.
+
+**Bug fix**: Corrected `/api/payments/status` (plural) → `/api/payment/status` (singular) in PeerComparison page — was causing locked view to show even with `?demo=true`.
+
+**Testing**: 9/9 backend pytest pass. Frontend E2E validated (modal auto-show/dismiss, peer page locked + unlocked views, both Dashboard CTAs navigate correctly).
+
 ## Feb 2026 — Iteration 21: Scan & Parse All + Smart Cancel Nudges ✅
 
 ### Scan & Parse All (60-second Onboarding)
