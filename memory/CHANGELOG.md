@@ -1,5 +1,12 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 18: Auto-save Parsed Transactions ✅
+- Added `POST /api/documents/save-transactions` — accepts a list of parsed transactions and persists them into the user's `transactions` collection.
+- Smart category normalization: maps loose GPT categories (food, sip, emi, salary...) → app's standard categories (Food & Dining, Investment, Bills & Utilities, Other).
+- Type normalization: `credit` → `income`, `debit` → `expense`.
+- Frontend: "Save N to Transactions" button below parsed email result. After save, button turns green "Saved to Transactions" + secondary "View" button links to `/arthvyay/transactions`. Duplicate-click protection via local signature set.
+- Verified end-to-end: ICICI email parse → save → GET /api/transactions returns the saved rows with correct type/category mapping.
+
 ## Feb 2026 — Iteration 17: Smart Import Module Complete
 - Wired Gmail OAuth: added `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `REACT_APP_BACKEND_URL` to `/app/backend/.env`. Authorized redirect URI `https://financial-advisor-15.preview.emergentagent.com/api/gmail/callback`. `/api/gmail/status` → `configured:true`, `/api/gmail/connect` correctly 307-redirects to Google with OAuth scopes.
 - Document Parsing via GPT-5.2: `/api/documents/parse-email` successfully extracts transactions from bank/insurance email text. `/api/documents/parse-policy` accepts PDF upload, uses GPT-5.2 vision to extract structured policy fields. `/api/documents/apply-policy` maps parsed data into the user's 84-field questionnaire.

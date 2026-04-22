@@ -22,6 +22,8 @@ export default function SmartImport({ token, onLogout }) {
   const [expandedEmail, setExpandedEmail] = useState(null);
   const [parsedPolicies, setParsedPolicies] = useState([]);
   const [applyingPolicy, setApplyingPolicy] = useState(false);
+  const [savingTransactions, setSavingTransactions] = useState(false);
+  const [savedTransactionIds, setSavedTransactionIds] = useState(new Set());
 
   const loadGmailStatus = useCallback(async () => {
     try {
@@ -103,6 +105,30 @@ export default function SmartImport({ token, onLogout }) {
       toast.error(err.response?.data?.detail || 'Could not apply');
     } finally {
       setApplyingPolicy(false);
+    }
+  };
+
+  const handleSaveTransactions = async (transactions, source = 'email') => {
+    if (!transactions?.length) return;
+    setSavingTransactions(true);
+    try {
+      const res = await axios.post(`${API}/documents/save-transactions`, {
+        transactions,
+        source,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+
+      if (res.data.saved_count > 0) {
+        toast.success(`${res.data.saved_count} transaction${res.data.saved_count > 1 ? 's' : ''} saved to Transactions page`);
+        // Track saved signature so we can disable the button
+        const sig = transactions.map(t => `${t.date}-${t.amount}-${t.description}`).join('|');
+        setSavedTransactionIds(prev => new Set(prev).add(sig));
+      } else {
+        toast.error('No transactions could be saved');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Save failed');
+    } finally {
+      setSavingTransactions(false);
     }
   };
 
@@ -381,7 +407,9 @@ export default function SmartImport({ token, onLogout }) {
                     </div>
                     {parsedResult.data.transactions?.length > 0 && (
                       <div className="p-3 bg-white rounded-xl border border-slate-100">
-                        <p className="text-[10px] uppercase text-slate-500 font-bold mb-2">Transactions Found</p>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[10px] uppercase text-slate-500 font-bold">Transactions Found ({parsedResult.data.transactions.length})</p>
+                        </div>
                         <div className="space-y-2">
                           {parsedResult.data.transactions.map((t, i) => (
                             <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg text-xs">
@@ -395,6 +423,39 @@ export default function SmartImport({ token, onLogout }) {
                             </div>
                           ))}
                         </div>
+
+                        {(() => {
+                          const sig = parsedResult.data.transactions.map(t => `${t.date}-${t.amount}-${t.description}`).join('|');
+                          const alreadySaved = savedTransactionIds.has(sig);
+                          return (
+                            <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                              <Button
+                                onClick={() => handleSaveTransactions(parsedResult.data.transactions, activeTab === 'gmail' ? 'gmail' : 'email')}
+                                disabled={savingTransactions || alreadySaved}
+                                className={`flex-1 rounded-xl text-white ${alreadySaved ? 'bg-green-500 hover:bg-green-500' : 'bg-brand-blue hover:bg-brand-blue/90'}`}
+                                data-testid="save-transactions-btn"
+                              >
+                                {savingTransactions ? (
+                                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</>
+                                ) : alreadySaved ? (
+                                  <><CheckCircle2 className="w-4 h-4 mr-2" /> Saved to Transactions</>
+                                ) : (
+                                  <><CheckCircle2 className="w-4 h-4 mr-2" /> Save {parsedResult.data.transactions.length} to Transactions</>
+                                )}
+                              </Button>
+                              {alreadySaved && (
+                                <Button
+                                  variant="outline"
+                                  onClick={() => navigate('/arthvyay/transactions')}
+                                  className="rounded-xl"
+                                  data-testid="view-transactions-btn"
+                                >
+                                  View <ExternalLink className="w-4 h-4 ml-2" />
+                                </Button>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>

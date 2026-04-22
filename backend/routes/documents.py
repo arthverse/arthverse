@@ -147,3 +147,102 @@ async def apply_policy_to_questionnaire(
             raise HTTPException(status_code=404, detail="Questionnaire not found. Please fill the questionnaire first.")
 
     return {"message": "Policy data applied to questionnaire", "updated_fields": list(update_fields.keys())}
+
+
+# Map freeform GPT-returned categories to the standard transaction categories used by the app
+_CATEGORY_MAP = {
+    "salary": "Other",  # income — no matching expense category, use Other
+    "income": "Other",
+    "refund": "Other",
+    "food": "Food & Dining",
+    "dining": "Food & Dining",
+    "groceries": "Food & Dining",
+    "transport": "Transportation",
+    "travel": "Travel",
+    "fuel": "Transportation",
+    "shopping": "Shopping",
+    "utilities": "Bills & Utilities",
+    "bills": "Bills & Utilities",
+    "rent": "Bills & Utilities",
+    "healthcare": "Healthcare",
+    "medical": "Healthcare",
+    "entertainment": "Entertainment",
+    "education": "Education",
+    "investment": "Investment",
+    "sip": "Investment",
+    "mutual_fund": "Investment",
+    "fd": "Investment",
+    "insurance": "Bills & Utilities",
+    "premium": "Bills & Utilities",
+    "emi": "Bills & Utilities",
+    "loan": "Bills & Utilities",
+    "credit_card": "Bills & Utilities",
+}
+
+
+def _normalize_category(raw: str) -> str:
+    if not raw:
+        return "Other"
+    key = raw.lower().strip().replace(" ", "_")
+    return _CATEGORY_MAP.get(key, "Other")
+
+
+def _normalize_type(raw: str) -> str:
+    if not raw:
+        return "expense"
+    r = raw.lower().strip()
+    if r in ("credit", "income", "deposit", "salary"):
+        return "income"
+    return "expense"
+
+
+@router.post("/save-transactions")
+async def save_parsed_transactions(
+    body: dict,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Save a list of parsed transactions (from email/Gmail parse) into the user's Transactions collection.
+
+    Body: { transactions: [ {date, description, amount, type, category}, ... ], source: "email" | "gmail" }
+    """
+    import uuid
+    from datetime import datetime as dt
+
+    db = get_db()
+    user_id = await verify_token(credentials)
+
+    items = body.get("transactions") or []
+    source = body.get("source", "smart_import")
+    if not isinstance(items, list) or len(items) == 0:
+        raise HTTPException(status_code=400, detail="transactions array is required")
+
+    saved = []
+    skipped = []
+    for t in items:
+        try:
+            amount = float(t.get("amount") or 0)
+            if amount <= 0:
+                skipped.append({"reason": "invalid_amount", "item": t})
+                continue
+
+            description = (t.get("description") or "").strip() or "Imported transaction"
+            date = t.get("date") or dt.now(timezone.utc).date().isoformat()
+
+            doc = {
+                "id": str(uuid.uuid4()),
+                "user_id": user_id,
+                "amount": amount,
+                "type": _normalize_type(t.get("type")),
+                "category": _normalize_category(t.get("category")),
+                "description": description,
+                "date": str(date),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "source": source,
+            }
+            await db.transactions.insert_one(doc)
+            doc.pop("_id", None)
+            saved.append({k: v for k, v in doc.items() if k != "_id"})
+        except Exception as e:
+            skipped.append({"reason": str(e), "item": t})
+
+    return {"saved_count": len(saved), "skipped_count": len(skipped), "saved": saved, "skipped": skipped}
