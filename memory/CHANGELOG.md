@@ -1,5 +1,32 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 24: PDF Attachment + CAS Parsing ✅
+
+### Core Capability
+- Gmail attachments (PDFs) are now **downloaded, text-extracted, and parsed via GPT-5.2**. Supports both plain and password-protected PDFs (CAS from CDSL/NSDL/CAMS/Karvy; bank e-statements; portfolio holdings).
+- Extracted structured data maps to the 84-field questionnaire: `equity_mf_current_value`, `debt_mf_current_value`, `direct_stocks_value`, `nps_balance`, `ppf_balance`, `epf_balance`. Transactions are saved to the Transactions collection.
+
+### Backend
+- **`/app/backend/services/pdf_attachment_parser.py`**: new service.
+  - `extract_pdf_text()` tries pypdf (encryption probe + decryption) then falls back to pdfplumber (superior layout/table extraction).
+  - `parse_cas_pdf()` calls GPT-5.2 with a strict JSON schema for CAS / bank statements / demat statements. Outputs `{document_type, mutual_funds[], equity_holdings[], totals, transactions[]}`.
+  - `cas_to_questionnaire_updates()` maps totals → questionnaire fields.
+- **`POST /api/gmail/parse-attachment`**: new endpoint. Downloads attachment → extracts text → handles password flow (401 if wrong password, 200 + `password_required:true` if encrypted without password) → parses via GPT-5.2 → upserts questionnaire + saves transactions → returns percentile delta.
+- **`GET /api/gmail/emails`**: now includes an `attachments[]` array per email (each with `attachment_id`, `filename`, `size`, `looks_like_cas` heuristic).
+- Auto-scan time window expanded **14/30 days → 365 days** (captures annual CAS, Form 16, portfolio statements).
+- Auto-scan search query expanded: CAS / consolidated / holdings / cams.com / karvy.com / nsdl.co.in / cdslindia.com / kfintech.com.
+- New `pypdf==6.10.2` added to `requirements.txt`.
+
+### Frontend
+- Each email in the Gmail Connect tab now shows a **PDF Attachments** section with purple **"Parse"** buttons.
+- Files that match CAS heuristics get a purple **"CAS"** pill.
+- **CAS Password Modal**: purple gradient header, filename in title, 3-tip info box ("PAN uppercase / PAN+DDMMYYYY / DDMMYYYY"), password input with Enter-to-submit, inline error on wrong password, Cancel + Unlock & Parse buttons.
+- Toast on success with holdings-count + fields-filled + txns-saved + percentile improvement.
+
+### Testing
+- **14/14 backend pytest passed** with live E2E against real Gmail: Zerodha Margin Statement (unencrypted) → GPT-5.2 parsed owner name & summary cleanly. Zerodha Capital Gain Statement (encrypted) → returns `password_required:true`. Wrong password → 401 with clear message.
+- Frontend screenshots confirmed: emails list shows attachments inline; password modal renders with correct purple gradient and all 3 tips visible.
+
 ## Feb 2026 — Iteration 23: Closing the Loop — Percentile Celebration ✅
 
 **Goal**: Close the Smart Import → Peer Comparison feedback loop so users see objective financial improvement in real-time.
