@@ -2,9 +2,22 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
         <meta name="theme-color" content="#1e3a8a" />
         <meta name="description" content="Arth-Verse - Your Complete Financial Ecosystem" />
+
+        <!-- PWA manifest + icons -->
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <link rel="icon" href="%PUBLIC_URL%/arth-verse-logo.png" />
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/arth-verse-logo.png" />
+
+        <!-- iOS-specific PWA tags (so it opens full-screen on iPhone home screen) -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="ArthVyay" />
+        <meta name="format-detection" content="telephone=no" />
+
         <!-- Google Fonts: Outfit + Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,6 +190,15 @@
                     recordCrossOriginIframes: true,
                 },
             });
+        </script>
+
+        <!-- PWA: Register service worker (only in production, not in iframe preview) -->
+        <script>
+            if ('serviceWorker' in navigator && window.self === window.top) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+                });
+            }
         </script>
     </body>
 </html>

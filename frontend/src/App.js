@@ -5,6 +5,8 @@ import ArthVerseLanding from './pages/ArthVerseLanding';
 import ArthVerseAuth from './pages/ArthVerseAuth';
 import ArthVersePortal from './pages/ArthVersePortal';
 import { Toaster } from './components/ui/sonner';
+import BottomNav from './components/BottomNav';
+import InstallPrompt from './components/InstallPrompt';
 
 // Lazy-loaded heavy route components
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -127,6 +129,9 @@ function App() {
               element={token ? <ArthRakshakDashboard token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
             />
           </Routes>
+          {/* Mobile-only global UI */}
+          {token && <BottomNav />}
+          {token && <InstallPrompt />}
         </Suspense>
       </BrowserRouter>
       <Toaster position="top-right" richColors />

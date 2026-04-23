@@ -1,0 +1,53 @@
+{
+  "short_name": "ArthVyay",
+  "name": "Arth-Verse | Your Complete Financial Ecosystem",
+  "description": "AI-powered financial advisory with Smart Import, peer comparison, and 84-field financial health scoring.",
+  "icons": [
+    {
+      "src": "/arth-verse-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/arth-verse-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/arth-verse-logo.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    }
+  ],
+  "start_url": "/arthvyay/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1e3a8a",
+  "background_color": "#f8fafc",
+  "categories": ["finance", "productivity", "business"],
+  "lang": "en-IN",
+  "shortcuts": [
+    {
+      "name": "Smart Import",
+      "short_name": "Import",
+      "description": "Scan Gmail & PDFs with AI",
+      "url": "/arthvyay/smart-import",
+      "icons": [{ "src": "/arth-verse-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "url": "/arthvyay/dashboard",
+      "icons": [{ "src": "/arth-verse-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Transactions",
+      "short_name": "Txns",
+      "url": "/arthvyay/transactions",
+      "icons": [{ "src": "/arth-verse-logo.png", "sizes": "192x192" }]
+    }
+  ]
+}
