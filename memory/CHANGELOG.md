@@ -1,5 +1,18 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 28: Mobile Visual Polish — Snapshot Grid Fits ✅
+
+**Issue**: Yearly Financial Snapshot values were clipped on mobile (`₹0.00L` showed as `₹0.0` / `₹0.00`) because grid was locked at 4-columns desktop-layout.
+
+**Fix**:
+1. Added `.snapshot-grid` / `.snapshot-cell` classes on FinancialSnapshot container + cells.
+2. `index.css` media query (≤640px): forces 2-column grid, reduces padding 20→14px, strips inline borderRight from all cells then re-adds only on odd cells via `nth-child(odd)` so dividers stay clean in the reflowed 2×4 layout.
+3. SnapshotCell value font: `24px` → `clamp(18px, 5.5vw, 24px)` — scales fluidly with viewport.
+4. Global mobile rules: `overflow-wrap: break-word` on h1/h2/h3 so long headings like "Unlock Your Financial Potential" wrap instead of truncating.
+5. Safe-area gutter on all `max-w-*` containers.
+
+**Verified via mobile screenshot (390×844)**: All 8 cells display cleanly in 2×4 layout with full `₹0.00L` values, no text clipping.
+
 ## Feb 2026 — Iteration 27: PWA Conversion — Mobile App Experience ✅
 
 User chose **Path A (PWA) + full mobile UX pass** with strict no-visual-compromise constraint.

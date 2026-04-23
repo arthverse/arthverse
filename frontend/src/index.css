@@ -39,6 +39,26 @@ body, #root {
 /* Smoother scroll on iOS */
 * { -webkit-overflow-scrolling: touch; }
 
+/* =============================
+   Mobile-specific report layout
+   ============================= */
+@media (max-width: 640px) {
+    /* FinancialSnapshot: 4-col → 2-col on narrow phones so values fit */
+    .snapshot-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .snapshot-cell { padding: 14px !important; }
+    /* When reflowing 8 cells into 2 columns the alternate cells (2nd column)
+       shouldn't keep a right border — strip all inline borderRight on mobile,
+       then re-add the divider via nth-child. */
+    .snapshot-cell { border-right: none !important; }
+    .snapshot-cell:nth-child(odd) { border-right: 1px solid var(--border, #e2e8f0) !important; }
+
+    /* Prevent long report headings from being clipped */
+    h1, h2, h3 { overflow-wrap: break-word; word-wrap: break-word; hyphens: auto; }
+
+    /* Give all top-level page containers a tiny inner gutter */
+    main, [class*="max-w-"] { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+}
+
 code {
     font-family: 'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

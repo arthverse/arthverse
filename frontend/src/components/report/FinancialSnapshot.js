@@ -46,7 +46,7 @@ const FinancialSnapshot = ({
         </span>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
+      <div className="snapshot-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
         {/* Row 1 */}
         <SnapshotCell 
           label="Annual Income" 
@@ -115,10 +115,11 @@ const FinancialSnapshot = ({
 
 // Helper component for individual cells
 const SnapshotCell = ({ label, value, subtext, color, borderRight, borderBottom }) => (
-  <div style={{
+  <div className="snapshot-cell" style={{
     padding: '20px',
     borderRight: borderRight ? '1px solid var(--border)' : 'none',
-    borderBottom: borderBottom ? '1px solid var(--border)' : 'none'
+    borderBottom: borderBottom ? '1px solid var(--border)' : 'none',
+    minWidth: 0,
   }}>
     <div style={{
       fontSize: '10px',
@@ -130,12 +131,14 @@ const SnapshotCell = ({ label, value, subtext, color, borderRight, borderBottom 
     }}>
       {label}
     </div>
-    <div style={{
+    <div className="snapshot-value" style={{
       fontFamily: "'JetBrains Mono',monospace",
-      fontSize: '24px',
+      fontSize: 'clamp(18px, 5.5vw, 24px)',
       fontWeight: 700,
       color: color,
-      marginBottom: '6px'
+      marginBottom: '6px',
+      overflowWrap: 'break-word',
+      wordBreak: 'break-word',
     }}>
       {value}
     </div>
