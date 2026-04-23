@@ -7,6 +7,7 @@ import ArthVersePortal from './pages/ArthVersePortal';
 import { Toaster } from './components/ui/sonner';
 import BottomNav from './components/BottomNav';
 import InstallPrompt from './components/InstallPrompt';
+import { initCapacitor } from './lib/capacitor';
 
 // Lazy-loaded heavy route components
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -45,6 +46,8 @@ function App() {
       setToken(storedToken);
     }
     setIsLoading(false);
+    // Initialize Capacitor native bridge (no-op on web)
+    initCapacitor();
   }, []);
 
   useEffect(() => {
