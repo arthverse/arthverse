@@ -1,5 +1,30 @@
 # Arth-Verse Changelog
 
+## Feb 2026 — Iteration 27: PWA Conversion — Mobile App Experience ✅
+
+User chose **Path A (PWA) + full mobile UX pass** with strict no-visual-compromise constraint.
+
+### New Public Assets
+- **`/app/frontend/public/manifest.json`** — PWA manifest with 3 icons, 3 shortcuts (Smart Import / Dashboard / Transactions), `display:standalone`, theme_color `#1e3a8a`, start_url `/arthvyay/dashboard`.
+- **`/app/frontend/public/service-worker.js`** — minimal offline shell. Stale-while-revalidate for images/css/js/fonts, network-first for HTML with offline fallback, never caches `/api/*`. Registration gated behind `window.self === window.top` to avoid activating inside Emergent's preview iframe.
+
+### HTML / CSS
+- **`public/index.html`**: added viewport-fit=cover, manifest link, apple-touch-icon, apple-mobile-web-app-capable, status-bar-style, title meta tags. Added SW registration `<script>`.
+- **`src/index.css`**: safe-area-inset padding on body + #root (iPhone notch); 16px input font-size on mobile to prevent iOS zoom; 40px min-height for buttons/links; hides InstallPrompt in standalone display-mode; smooth iOS scrolling.
+
+### New React Components
+- **`BottomNav.js`** — mobile-only bottom tab bar (hidden md:hidden). 4 tabs: Home, Txns, **Import** (orange FAB accent, center), Reports. Active-state via route matching, animated dot indicator, safe-area padding. data-testids: `mobile-bottom-nav`, `bottom-tab-home`, `bottom-tab-txns`, `bottom-tab-import`, `bottom-tab-reports`.
+- **`InstallPrompt.js`** — PWA install toast. Android/Chrome: captures `beforeinstallprompt` event, offers "Install" button. iOS Safari: shows manual "Tap Share → Add to Home Screen" tip after 10s. Dismissable forever (localStorage `pwa_install_dismissed`).
+
+### Global Wiring
+- `App.js` renders `<BottomNav />` + `<InstallPrompt />` globally when authenticated (`token` present).
+
+### Verification (8/8 tests passed)
+- Mobile 390×844: bottom nav visible, top nav hidden; all 4 tabs navigate correctly.
+- Desktop 1920×1080: bottom nav hidden (zero regression), top nav intact.
+- Backend: all endpoints unaffected.
+- No visual compromise confirmed on Dashboard, Smart Import, Peer Comparison pages.
+
 ## Feb 2026 — Iteration 26: Bug Fix — Fake Demo Numbers in Yearly Snapshot ✅
 
 ### The Bug
