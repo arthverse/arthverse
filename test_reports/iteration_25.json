@@ -1,0 +1,32 @@
+{
+  "summary": "Iteration 25 — India compliance batch (DPDP Act 2023 + IT Rules 2021) fully verified. Backend: 14/14 pytest passing against public URL. (1) GET /api/compliance/grievance-officer returns exact officer details (Mehul Shrishrimal / grievance@arth-verse.in / +91-91113-49710 / India / 24h ack / 15d resolve). (2) POST /api/compliance/grievance returns GRV-YYYYMMDD-XXXXXX id; rejects short message (<10), invalid email, short name (<2), and missing body with 422. (3) GET /api/compliance/export-data requires auth; returns meta+data dict with users/questionnaires/transactions/payments/orders/insurance_policies/risk_profiles/etc. NO _id or password_hash in serialized JSON. (4) DELETE /api/compliance/account requires auth; rejects wrong confirmation strings with 400 (both 'delete' and 'delete my account' lowercase rejected); throwaway user successfully hard-deleted, subsequent login returns 401, and export shows empty users list. Frontend (Playwright on public URL with real login AV271676A7/Demo123!): (a) /privacy-policy public — contains DPDP, Mehul, grievance email, phone. (b) /terms public — contains Mumbai, arbitration, India jurisdiction. (c) /grievance public — officer card + form submission via testids creates grievance and shows grievance-success panel with GRV- id. (d) Landing / footer has /privacy-policy, /terms, /grievance anchor links + 'Made in India' + SEBI disclaimer visible. (e) Signup page shows Privacy Policy + Terms links plus 'Digital Personal Data Protection Act, 2023' consent clause. (f) /settings authenticated — settings-page, download-my-data-btn, delete-account-btn, logout-btn all present; delete dialog opens, delete-confirm-action is DISABLED when empty or when 'nope' typed, ENABLED only when 'DELETE MY ACCOUNT' typed exactly (confirmed via is_disabled checks). (g) Dashboard renders SEBI/Educational disclaimer text at bottom. (h) Desktop top nav contains /settings link (2 matches — gear in Layout). (i) Mobile bottom nav has all 5 tabs (home/txns/import/reports/settings) with correct testids. (j) /arthvyay/peer-comparison?demo=true for logged-out session correctly redirects to /arthverse/auth (Razorpay demo bypass successfully removed). (k) PaymentSection.js line 311 source confirms 'one-time, inclusive of 18% GST' label. No bugs found.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_25_compliance.py",
+    "/app/test_reports/pytest/iteration_25_results.xml"
+  ],
+  "action_items": [
+    "None — all 15 review items verified passing."
+  ],
+  "critical_code_review_comments": [
+    "compliance.py _scrub() correctly strips _id and password_hash/hashed_password/access_token/refresh_token but MongoDB query already uses projection {'_id': 0} (L126) — double defense is good. Consider also scrubbing nested Gmail tokens inside uploaded_documents or any other embedded token fields if present.",
+    "DELETE /api/compliance/account uses exact-string match on 'DELETE MY ACCOUNT' (case-sensitive, no trim) — matches spec but consider documenting the exact casing in the API docs/frontend hint to avoid user frustration (frontend Settings.js already mirrors this exactly).",
+    "deletion_audit stores str(hash(email)) which is Python's salted hash (not deterministic across processes) — fine for non-forensic audit but if regulatory audit requires re-identifying a deletion, use a stable sha256(email+deterministic_salt) instead.",
+    "export-data uses .to_list(length=1000) — for power users with >1000 transactions this silently truncates the DPDP export. Either increase limit, paginate, or log a warning when limit is hit.",
+    "Grievance submissions are stored in db.grievances but there is no admin-side read endpoint in this batch — acceptable for MVP but flag for next batch (main agent likely aware).",
+    "Grievance form success UX confirmed via testid grievance-success — good. No rate limiting on POST /api/compliance/grievance though (public endpoint) — consider adding a simple per-IP throttle to prevent spam abuse post-launch."
+  ],
+  "updated_files": ["/app/backend/tests/test_iteration_25_compliance.py"],
+  "success_rate": {"backend": "100% (14/14 pytest)", "frontend": "100% (all 11 frontend review items validated live on public URL)"},
+  "test_credentials": "AV271676A7 / Demo123! (unchanged, not deleted). Throwaway user auto-created and auto-deleted by test_iteration_25_compliance.py.",
+  "seed_data_creation": "Ephemeral: each run creates one throwaway user (test_throwaway_<uuid>@arthverse.com + PAN ABCDE<uuid>Z) and deletes it within the same run. Also inserts one test grievance document into db.grievances per run (no cleanup — acceptable for compliance audit log semantics).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Authoritative regression file: /app/backend/tests/test_iteration_25_compliance.py. Auth flow: POST /api/auth/register (needs real-looking email TLD — .test is REJECTED by EmailStr, use @arthverse.com) → POST /api/auth/set-password (requires both password and confirm_password + client_id returned from register) → then you get a usable token. Premium demo AV271676A7 must NEVER be targeted by DELETE /api/compliance/account — the test uses a throwaway user exclusively. Signup page does NOT show the literal 'DPDP' abbreviation — it shows 'Digital Personal Data Protection Act, 2023' — search for that string, not 'DPDP'. Peer comparison demo bypass: ?demo=true parameter is no longer honored; URL now requires a real authenticated premium user. On the Settings page, the delete-confirm-action button is disabled until the exact string 'DELETE MY ACCOUNT' is typed in delete-confirm-input — this is correct spec behavior, do not flag it as a bug.",
+  "rca of the issue": "No bugs. One test-fixture-only issue: pydantic[email] rejects emails on reserved TLDs (.test, .localhost, .example) — changed throwaway fixture to use @arthverse.com to make register succeed. This is a test hygiene fix, not a product change."
+}

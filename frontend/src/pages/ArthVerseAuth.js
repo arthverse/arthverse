@@ -354,7 +354,13 @@ export default function ArthVerseAuth({ onAuth }) {
                     required
                   />
                   <Label htmlFor="data_privacy_consent" className="text-sm leading-relaxed cursor-pointer">
-                    I consent to the collection and processing of my personal data in accordance with the data privacy policy. *
+                    I am 18 years or older and I consent to Arth-Verse collecting and
+                    processing my personal data (including PAN, income, and financial
+                    information) in accordance with the{' '}
+                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-brand-blue underline" data-testid="consent-privacy-link">Privacy Policy</a>{' '}
+                    and{' '}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-brand-blue underline" data-testid="consent-terms-link">Terms of Service</a>,
+                    pursuant to the Digital Personal Data Protection Act, 2023. *
                   </Label>
                 </div>
               </>

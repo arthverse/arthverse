@@ -286,14 +286,18 @@ export default function ArthVerseLanding() {
               />
               <p className="text-slate-400 font-body text-sm">Universe for every rupee</p>
             </div>
-            <div className="flex gap-8 text-sm text-slate-400">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
+            <div className="flex flex-wrap gap-6 md:gap-8 text-sm text-slate-400 justify-center">
+              <a href="/privacy-policy" className="hover:text-white transition-colors" data-testid="footer-privacy-link">Privacy Policy</a>
+              <a href="/terms" className="hover:text-white transition-colors" data-testid="footer-terms-link">Terms of Service</a>
+              <a href="/grievance" className="hover:text-white transition-colors" data-testid="footer-grievance-link">Grievance</a>
+              <a href="mailto:grievance@arth-verse.in" className="hover:text-white transition-colors" data-testid="footer-contact-link">Contact</a>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-slate-800 text-center">
-            <p className="text-slate-500 text-sm">© 2025 Arth-Verse. All rights reserved.</p>
+          <div className="mt-12 pt-8 border-t border-slate-800 space-y-3">
+            <p className="text-slate-500 text-xs leading-relaxed text-center max-w-3xl mx-auto" data-testid="footer-sebi-disclaimer">
+              <strong className="text-slate-400">Disclaimer:</strong> Arth-Verse is an educational financial-awareness tool operated by a sole proprietorship registered in India. We are NOT a SEBI-registered investment advisor, RBI-registered lender, or IRDAI-licensed insurance distributor. All insights are for self-planning; consult a qualified professional before making financial decisions.
+            </p>
+            <p className="text-slate-500 text-sm text-center">© 2026 Arth-Verse. Made in India.</p>
           </div>
         </div>
       </footer>

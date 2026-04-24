@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, FileText, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Receipt, FileText, Sparkles, Settings as SettingsIcon } from 'lucide-react';
 
 /**
  * Bottom Tab Navigation — mobile only (hidden ≥ md).
@@ -10,13 +10,14 @@ export default function BottomNav() {
   const path = location.pathname;
 
   // Only show on arthvyay routes (authenticated app shell)
-  if (!path.startsWith('/arthvyay')) return null;
+  if (!path.startsWith('/arthvyay') && path !== '/settings') return null;
 
   const tabs = [
     { label: 'Home', icon: LayoutDashboard, href: '/arthvyay/dashboard', testid: 'bottom-tab-home' },
     { label: 'Txns', icon: Receipt, href: '/arthvyay/transactions', testid: 'bottom-tab-txns' },
     { label: 'Import', icon: Sparkles, href: '/arthvyay/smart-import', testid: 'bottom-tab-import', accent: true },
     { label: 'Reports', icon: FileText, href: '/arthvyay/reports', testid: 'bottom-tab-reports' },
+    { label: 'Settings', icon: SettingsIcon, href: '/settings', testid: 'bottom-tab-settings' },
   ];
 
   return (

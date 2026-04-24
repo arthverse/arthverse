@@ -16,6 +16,7 @@ import ArthMitraReport from '../components/ArthMitraReport';
 import RiskMeter from '../components/RiskMeter';
 import SubscriptionsCard from '../components/SubscriptionsCard';
 import OnboardingModal from '../components/OnboardingModal';
+import SebiDisclaimer from '../components/SebiDisclaimer';
 
 export default function Dashboard({ token, user, onLogout }) {
   const [healthScore, setHealthScore] = useState(null);
@@ -596,6 +597,11 @@ Check your score too! 👇
 
       {/* 60-Second Onboarding Modal */}
       <OnboardingModal token={token} open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+
+      {/* SEBI Educational Disclaimer (India compliance) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-8">
+        <SebiDisclaimer />
+      </div>
     </Layout>
   );
 }

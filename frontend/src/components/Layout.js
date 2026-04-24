@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { LayoutDashboard, Receipt, FileText, LogOut, ArrowLeft, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Receipt, FileText, LogOut, ArrowLeft, Sparkles, Settings as SettingsIcon } from 'lucide-react';
 
 export default function Layout({ children, token, onLogout }) {
   const location = useLocation();
@@ -87,14 +87,25 @@ export default function Layout({ children, token, onLogout }) {
               </div>
             </div>
             
-            <Button 
-              onClick={onLogout}
-              variant="ghost"
-              className="text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-full"
-              data-testid="logout-btn"
-            >
-              <LogOut className="mr-2 h-4 w-4" strokeWidth={1.5} /> Logout
-            </Button>
+            <div className="flex items-center gap-2">
+              <Link to="/settings" data-testid="nav-settings-link">
+                <Button
+                  variant="ghost"
+                  className="text-slate-500 hover:text-brand-blue hover:bg-slate-100 rounded-full"
+                  data-testid="nav-settings-btn"
+                >
+                  <SettingsIcon className="h-4 w-4" strokeWidth={1.5} />
+                </Button>
+              </Link>
+              <Button 
+                onClick={onLogout}
+                variant="ghost"
+                className="text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                data-testid="logout-btn"
+              >
+                <LogOut className="mr-2 h-4 w-4" strokeWidth={1.5} /> Logout
+              </Button>
+            </div>
           </div>
         </div>
       </nav>

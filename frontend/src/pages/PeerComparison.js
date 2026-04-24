@@ -17,11 +17,8 @@ export default function PeerComparison({ token, onLogout }) {
   useEffect(() => {
     const load = async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const isDemo = urlParams.get('demo') === 'true';
-
         const p = await axios.get(`${API}/payment/status`, { headers: { Authorization: `Bearer ${token}` } });
-        const unlocked = Boolean(p.data.has_premium) || isDemo;
+        const unlocked = Boolean(p.data.has_premium);
         setHasPremium(unlocked);
 
         if (unlocked) {

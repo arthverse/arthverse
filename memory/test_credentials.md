@@ -16,5 +16,5 @@
   - Authorized JS origin: `https://financial-advisor-15.preview.emergentagent.com`
   - Test user Gmail must be added in Google Cloud Console → OAuth consent screen → Test users (app is in Testing mode)
 - **Emergent LLM Key** — used for GPT-5.2 document/email parsing
-- **Razorpay** — test mode (`rzp_test_*` keys). Demo bypass via `?demo=true` query param still active.
+- **Razorpay** — test mode (`rzp_test_*` keys). `?demo=true` bypass REMOVED (Feb 2026). Premium gating now enforces real payment.
 - **Setu AA** — BLOCKED (external 403 sandbox)

@@ -308,7 +308,7 @@ export default function PaymentSection({ token, user, questionnaire, healthScore
             <div className="text-right">
               <p className="text-slate-400 text-sm">Total Amount</p>
               <p className="text-4xl font-bold text-white font-mono" data-testid="total-price">₹{totalAmount}</p>
-              <p className="text-xs text-slate-500">one-time, inclusive of taxes</p>
+              <p className="text-xs text-slate-500">one-time, inclusive of 18% GST</p>
             </div>
           </div>
 

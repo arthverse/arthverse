@@ -19,6 +19,10 @@ const ArthRakshakFamily = lazy(() => import('./pages/ArthRakshakFamily'));
 const CreditHealthReport = lazy(() => import('./pages/CreditHealthReport'));
 const SmartImport = lazy(() => import('./pages/SmartImport'));
 const PeerComparison = lazy(() => import('./pages/PeerComparison'));
+const Settings = lazy(() => import('./pages/Settings'));
+const PrivacyPolicy = lazy(() => import('./pages/legal/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/legal/TermsOfService'));
+const Grievance = lazy(() => import('./pages/legal/Grievance'));
 
 function PageLoader() {
   return (
@@ -84,6 +88,11 @@ function App() {
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <Routes>
+            {/* Public Legal Routes (no auth) */}
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/grievance" element={<Grievance />} />
+
             {/* ArthVerse Main Routes */}
             <Route path="/" element={!token ? <ArthVerseLanding /> : <Navigate to="/arthverse/portal" />} />
             <Route path="/arthverse/auth" element={!token ? <ArthVerseAuth onAuth={handleAuth} /> : <Navigate to="/arthverse/portal" />} />
@@ -120,6 +129,10 @@ function App() {
             <Route 
               path="/arthvyay/peer-comparison" 
               element={token ? <PeerComparison token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
+            />
+            <Route 
+              path="/settings" 
+              element={token ? <Settings token={token} onLogout={handleLogout} /> : <Navigate to="/arthverse/auth" />} 
             />
 
             {/* ArthRakshak App Routes */}

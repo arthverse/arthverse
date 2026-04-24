@@ -2100,6 +2100,7 @@ from routes.integrations import router as integrations_router
 from routes.credit import router as credit_router
 from routes.documents import router as documents_router
 from routes.gmail import router as gmail_router
+from routes.compliance import router as compliance_router
 
 api_router.include_router(auth_router)
 api_router.include_router(questionnaire_router)
@@ -2107,6 +2108,7 @@ api_router.include_router(integrations_router)
 api_router.include_router(credit_router)
 api_router.include_router(documents_router)
 api_router.include_router(gmail_router)
+api_router.include_router(compliance_router)
 
 app.include_router(api_router)
 
