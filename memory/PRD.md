@@ -5,6 +5,20 @@ Arth-Verse (arth-verse.in) is a comprehensive financial advisory platform that h
 
 ## Latest Updates
 
+### 🇮🇳 India Compliance Batch (Feb 2026) — Iteration 25 ✅
+- **Scope locked: India-only** (sole proprietorship — Mehul Shrishrimal)
+- **Grievance Officer** wired: `grievance@arth-verse.in`, `+91-91113-49710`
+- **DPDP Act 2023 endpoints** live: `GET /api/compliance/grievance-officer` (public), `POST /api/compliance/grievance` (public), `GET /api/compliance/export-data` (auth), `DELETE /api/compliance/account` (auth, exact-string confirm)
+- **Public legal pages**: `/privacy-policy`, `/terms`, `/grievance`
+- **Authenticated `/settings`** page — Download-my-data + Delete-my-account
+- **SEBI disclaimer** component rendered on Dashboard + landing footer + settings
+- **Razorpay `?demo=true` bypass REMOVED** (P1 productionization done)
+- **Payment label** updated to "one-time, inclusive of 18% GST"
+- **Supporting docs**: `/app/PLAY_STORE_RELEASE_GUIDE.md` (11-phase release plan), `/app/INDIA_COMPLIANCE_GUIDE.md` (DPDP/RBI/SEBI/GST reference)
+- **Tests**: 14/14 backend pytest + 11/11 frontend Playwright — zero bugs (iteration_25.json)
+
+
+
 **SVG Donut Charts & Mobile Responsive (Apr 22, 2026):**
 - Created reusable `DonutChart.js` component using Recharts (PieChart, Pie, Cell, Tooltip)
 - Asset Allocation donut: shows all asset classes with color segments, Net Worth center label, hover tooltips in ₹L format

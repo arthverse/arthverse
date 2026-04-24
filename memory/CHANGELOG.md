@@ -1,4 +1,52 @@
 # Arth-Verse Changelog
+## Feb 2026 — Iteration 25: India Compliance Batch (DPDP + IT Rules) ✅
+
+User declared India-only scope. Registered entity: **Sole Proprietorship — Mehul Shrishrimal**. Grievance contact: `grievance@arth-verse.in` / `+91-91113-49710`. Positioning: **educational tool** (NOT SEBI-registered). MongoDB → Mumbai region.
+
+### New Backend Router — `/app/backend/routes/compliance.py`
+Exposes 4 endpoints (all under `/api/compliance`):
+- `GET /grievance-officer` (public) — returns officer details
+- `POST /grievance` (public) — stores grievance in `db.grievances`, returns `GRV-YYYYMMDD-XXXXXX` id
+- `GET /export-data` (auth) — DPDP Right to Access; JSON dump across 13 user-scoped collections with `_id` + password/token fields scrubbed
+- `DELETE /account` (auth) — DPDP Right to Erasure; requires body `{confirmation: "DELETE MY ACCOUNT"}` exactly; hard-deletes across all 13 collections; writes a no-PII `deletion_audit` entry
+
+### New Frontend Pages
+- **`pages/legal/PrivacyPolicy.js`** (public `/privacy-policy`) — 12-section DPDP-compliant policy naming MongoDB-Mumbai localization, third-party processors, user rights, grievance officer block.
+- **`pages/legal/TermsOfService.js`** (public `/terms`) — Indian jurisdiction, Mumbai arbitration seat, 18+ eligibility, GST-inclusive pricing disclosure, explicit "NOT SEBI/RBI/IRDAI" statement.
+- **`pages/legal/Grievance.js`** (public `/grievance`) — officer contact card + complaint form posting to `/api/compliance/grievance`.
+- **`pages/Settings.js`** (auth `/settings`) — Data Rights card (Download my data / Delete my account with "DELETE MY ACCOUNT" confirm gate), Legal links, Sign out.
+
+### New Utilities / Components
+- **`lib/formatCurrency.js`** — `formatINRCompact` (₹1.5 L / ₹2 Cr), `formatINR` (en-IN grouping), `withGstLabel`. Utility available; broader rollout across Dashboard cards is a follow-up.
+- **`components/SebiDisclaimer.js`** — two variants (`inline` / `footer`) for the "educational tool" disclaimer.
+
+### Modified Files
+- `server.py` — includes `compliance_router`.
+- `App.js` — 4 new lazy-loaded routes (3 public legal + 1 authed `/settings`).
+- `ArthVerseLanding.js` footer — real anchor links + SEBI disclaimer paragraph + "© 2026 Arth-Verse. Made in India".
+- `ArthVerseAuth.js` signup consent — references DPDP Act 2023 + links to `/privacy-policy` and `/terms`.
+- `Layout.js` — Settings gear icon next to Logout (desktop).
+- `BottomNav.js` — expanded to 5 tabs; Settings added.
+- `Dashboard.js` — renders `<SebiDisclaimer />` at bottom.
+- `PaymentSection.js` — pricing label now reads "one-time, inclusive of 18% GST".
+- **`PeerComparison.js` — REMOVED `?demo=true` bypass** (P1 Razorpay productionization). Premium gating now strictly enforced via `/api/payment/status`.
+
+### New Supporting Docs (outside `/memory`)
+- `/app/PLAY_STORE_RELEASE_GUIDE.md` — 11-phase release playbook (GitHub → Android Studio → Play Console → submission).
+- `/app/INDIA_COMPLIANCE_GUIDE.md` — DPDP/RBI/SEBI/Aadhaar/GST compliance reference + India-optimized 3-week release timeline.
+
+### Testing (iteration_25.json)
+- Backend: **14/14 pytest passing** (`/app/backend/tests/test_iteration_25_compliance.py`) — includes end-to-end throwaway user register → set-password → export → delete → re-login 401 lifecycle.
+- Frontend: **11/11 Playwright items** validated live on public URL including consent copy, footer links, settings flow, delete-confirm gating, bottom/top nav, `?demo=true` blocked.
+- **Zero bugs found.**
+
+### Follow-ups flagged by tester (not blockers)
+- `export-data` silently truncates at 1000 transactions per collection — consider pagination for power users.
+- `POST /compliance/grievance` has no rate limit — add IP throttle before launch.
+- `deletion_audit` uses `str(hash(email))` (non-deterministic across processes) — switch to `sha256(email+salt)` if regulatory re-identification ever required.
+- Admin-side read endpoint for `db.grievances` deferred to a later batch.
+
+
 
 ## Feb 2026 — Iteration 28: Mobile Visual Polish — Snapshot Grid Fits ✅
 
