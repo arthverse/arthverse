@@ -272,6 +272,31 @@ class FinancialQuestionnaire(BaseModel):
     monthly_investment: float = 0
     yearly_investment: float = 0
 
+    # Credit Card Preferences — Step 5 extras
+    redeem_free_flights: bool = False
+    redeem_hotel_stays: bool = False
+    redeem_direct_cashback: bool = False
+    redeem_vouchers: bool = False
+    domestic_lounge_visits: int = 0
+    international_lounge_visits: int = 0
+    golf_sessions: int = 0
+    movies_events_monthly: int = 0
+    ideal_card_count: int = 2
+    spend_bills_utilities: str = "low"
+    spend_groceries: str = "low"
+    spend_online_shopping: str = "low"
+    spend_dining_food: str = "low"
+    spend_upi_merchants: str = "low"
+    spend_instore_shopping: str = "low"
+    spend_flights_hotels: str = "low"
+    spend_rent_payments: str = "low"
+    spend_insurance: str = "low"
+    spend_forex: str = "low"
+    spend_fuel: str = "low"
+    spend_jewellery_gold: str = "low"
+    spend_government_tax: str = "low"
+    spend_education: str = "low"
+
     # Structural / dynamic
     properties: List[dict] = []
     vehicles: List[dict] = []

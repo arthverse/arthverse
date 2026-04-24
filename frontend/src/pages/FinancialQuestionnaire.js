@@ -357,7 +357,20 @@ export default function FinancialQuestionnaire({ token, onLogout }) {
       toast.success('Financial profile saved successfully!');
       navigate('/arthvyay/dashboard');
     } catch (error) {
-      toast.error('Failed to save questionnaire');
+      console.error('Questionnaire save failed:', error.response?.data || error);
+      if (error.response?.status === 401) {
+        toast.error('Your session has expired. Please log in again.');
+        localStorage.removeItem('token');
+        setTimeout(() => navigate('/arthverse/auth'), 1500);
+      } else if (error.response?.status === 422) {
+        const detail = error.response.data?.detail;
+        const firstErr = Array.isArray(detail) ? detail[0] : null;
+        const field = firstErr?.loc?.slice(-1)[0] || 'a field';
+        toast.error(`Invalid value for "${field}" — ${firstErr?.msg || 'please review and retry.'}`);
+      } else {
+        const msg = error.response?.data?.detail || error.message || 'Unknown error';
+        toast.error(`Failed to save: ${msg}`);
+      }
     } finally {
       setLoading(false);
     }
